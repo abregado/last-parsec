@@ -1,0 +1,43 @@
+{
+  "table": "Loot Table",
+  "pdf_pages": [
+    133
+  ],
+  "columns": [
+    "weight",
+    "category",
+    "col2"
+  ],
+  "rows": [
+    {
+      "weight": 25,
+      "category": "Weapon",
+      "col2": "Roll once on the Weapons Category Subtable."
+    },
+    {
+      "weight": 10,
+      "category": "Damaged weapons",
+      "col2": "Roll twice on the Weapons Category Subtable. Both items require Repair."
+    },
+    {
+      "weight": 10,
+      "category": "Damaged gear",
+      "col2": "Roll twice on Gear Subtable. Both items require Repair."
+    },
+    {
+      "weight": 20,
+      "category": "Gear",
+      "col2": "Roll once on the Gear Subtable."
+    },
+    {
+      "weight": 15,
+      "category": "Odds and ends",
+      "col2": "Roll once on the Odds and Ends Subtable."
+    },
+    {
+      "weight": 20,
+      "category": "Rewards",
+      "col2": "Roll once on the Rewards Subtable."
+    }
+  ]
+}

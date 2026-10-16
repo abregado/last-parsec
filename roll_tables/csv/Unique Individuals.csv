@@ -1,0 +1,23 @@
+weight,enemy,speed,combat_skill,tough_ness,ai,luck,weapons,notes
+6,Enemy Bruiser,-,-,+1,G,0,Power Claw,A particularly unpleasant-looking individual.
+6,Enemy Heavy,-,-,-,D,0,Rattle Gun,The enemy has opted to bring some additional firepower.
+5,Enemy Boss,-,+1,+1,-,1,"Hand Cannon, Brutal Melee","One of the worst has managed to climb to the top of the hierarchy. Bosses reduce Panic range by 1, but when slain, an extra Morale die must be rolled."
+5,Hired Killer,5”,+1,5,A,1,"Machine Pistol, Blade",Will murder for credits
+3,Corporate Spook,5”,+1,4,C,1,Hand Laser,"One of the mega-corps must be up to no good if they send these creeps. If all other enemies are slain or Bail, the Spook Bails as well. If the Spook is slain, you automatically receive a Corporate Rival."
+5,Bounty Tracker,5”,+1,5,A,1,"Shotgun, Blade","Someone is willing to pay money to have you brought in, whole or in pieces."
+5,Callous Merc,4”,+2,5,T,1,"Infantry Laser, Blade",Bitter and disillusioned mercenaries sometimes strike out on their own.
+6,Freelancer,4”,+1,4,T,1,"Hand Cannon, Blade","A troubleshooter hired to supervise an operation and take care of any intrusions. If the freelancer is slain in a Brawl, you may roll on the Loot Table (p.131) and claim the item for use immediately."
+3,Secret Agent,6”,+2,4,A,1,"Hand Laser, Glare Sword","Mysterious individual packing some state-of-the-art murder implements. Target: Randomly select a crew member. The agent will attempt to move towards and attack them, only firing at other targets if they are in the way or the priority target is not visible. May fire at the priority target, even if it is not the closest."
+4,Hulker Brawler,4”,+1,6,A,0,Hand Cannon. Brutal Melee,"A burly, post-Human uplift, brimming with strength and barely contained anger. Melee fighter: +1 to Combat Skill when Brawling."
+5,Gun Slinger,5”,+1,4,T,1,Machine Pistol,One of any number of trigger-happy people that seem to congregate in Fringe Space. The best of them are frighteningly effective at their craft. Sharp shooter. +1 to Combat Skill when shooting.
+3,Engineer Tech,6”,+1,4,C,1,Blast Pistol,A quiet alien species fascinated with technology and gadgetry.
+5,Mutant Bruiser,4”,+1,5,G,1,"Shotgun, Brutal Melee","A misshapen beast of a creature, irregular in both body and temperament. Ferocious: +1 to Brawling rolls when initiating combat."
+4,Precursor Wanderer,7”,+2,4,A,1,"Infantry Laser, Glare Sword","An alien mystic, brimming with psionic energies. One with the Flow: Moves before the Quick Actions phase. 6+ Saving Throw."
+4,Hakshan Investigator,5”,+0,4,D,1,Plasma Rifle,"Odd, suited aliens that trek the galaxy in search of something vitally important to their species."
+6,K’Erin Warrior,5”,+2,5,A,1,Machine Pistol. Ripper Sword.,A noble alien warrior seeking adventure.
+4,Nomad Scout,6”,+1,4,D,0,Marksman’s Rifle,"A skilled tracker and shooter, hiring out to the starfolk for credits. Concealed: Always counts as being in Cover when fired upon."
+3,Cyborg Merc,7”,+2,6,T,1,Auto Rifle. Power Claw.,A mercenary stuffed full of cybernetic enhancements. Often contemptuous of the “meat-bags” they fight alongside. 6+ Saving Throw.
+3,Rogue Psionic,4”,+0,4,C,3,Hand Gun,Self-taught psionics are a substantial asset in a gun battle.
+6,Gene Dog,6”,+1,4,G,0,Fangs (Damage +0),"Enhanced versions of Earth-dog breeds, usually modified to withstand the environment. Loyal: When owner or Dog moves into a Brawl, it is not resolved until both have had a chance to act. If the owner is slain, the Dog becomes Fearless and remains in place, but attacks anyone that approaches within 8”. If all other enemies are slain or Bailed, it will also Bail."
+5,Sand Runner,7”,+0,3,G,0,Fangs (Damage +1),These fierce lizards can make surprisingly loyal companions.
+4,Mk II Security Bot,4”,+2,5,G,0,Fury Rifle,"The state-of-the-art in robotic security details. Targeting AI: May fire twice per round at the two closest visible targets. If only one target is visible, only one shot is taken. 6+ Saving Throw."

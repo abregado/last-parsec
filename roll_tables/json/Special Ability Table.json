@@ -1,0 +1,36 @@
+{
+  "table": "Special Ability Table",
+  "pdf_pages": [
+    167
+  ],
+  "columns": [
+    "weight",
+    "special_ability"
+  ],
+  "rows": [
+    {
+      "weight": 1,
+      "special_ability": "Alert: -1 to Seize the Initiative."
+    },
+    {
+      "weight": 1,
+      "special_ability": "Stubborn: Ignore the first casualty when making a Morale check"
+    },
+    {
+      "weight": 1,
+      "special_ability": "Ferocious: +1 to Brawling, when initiating."
+    },
+    {
+      "weight": 1,
+      "special_ability": "Fearless: Do not test Morale."
+    },
+    {
+      "weight": 1,
+      "special_ability": "Vengeful: Will become Rivals, if defeated."
+    },
+    {
+      "weight": 1,
+      "special_ability": "Invasion Threat."
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "table": "Notable Sights Table",
+  "pdf_pages": [
+    91
+  ],
+  "columns": [
+    "weight_opportunity_patron",
+    "weight_rival",
+    "weight_quest",
+    "notable_sight"
+  ],
+  "rows": [
+    {
+      "weight_opportunity_patron": 20,
+      "weight_rival": 40,
+      "weight_quest": 10,
+      "notable_sight": "Nothing special"
+    },
+    {
+      "weight_opportunity_patron": 10,
+      "weight_rival": 10,
+      "weight_quest": 15,
+      "notable_sight": "Documentation: Gain a Quest Rumor."
+    },
+    {
+      "weight_opportunity_patron": 10,
+      "weight_rival": 10,
+      "weight_quest": 10,
+      "notable_sight": "Priority target: Select a random enemy figure. Add +1 to their Toughness. If they are slain, gain 1D3 credits."
+    },
+    {
+      "weight_opportunity_patron": 10,
+      "weight_rival": 10,
+      "weight_quest": 15,
+      "notable_sight": "Loot cache: Roll once on the Loot Table (p.131)."
+    },
+    {
+      "weight_opportunity_patron": 10,
+      "weight_rival": 5,
+      "weight_quest": 5,
+      "notable_sight": "Shiny bits: Gain 1 credit."
+    },
+    {
+      "weight_opportunity_patron": 10,
+      "weight_rival": 5,
+      "weight_quest": 10,
+      "notable_sight": "Really shiny bits: Gain 2 credits."
+    },
+    {
+      "weight_opportunity_patron": 10,
+      "weight_rival": 10,
+      "weight_quest": 15,
+      "notable_sight": "Person of interest: Gain +1 story point."
+    },
+    {
+      "weight_opportunity_patron": 10,
+      "weight_rival": 5,
+      "weight_quest": 10,
+      "notable_sight": "Peculiar item: Gain +2 XP."
+    },
+    {
+      "weight_opportunity_patron": 10,
+      "weight_rival": 5,
+      "weight_quest": 10,
+      "notable_sight": "Curious item: Roll 1D6. On a 1-4, it can be sold for 1 credit. On a 5-6, roll on the Loot Table (p.131)."
+    }
+  ]
+}

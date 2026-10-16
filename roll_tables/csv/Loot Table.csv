@@ -1,0 +1,7 @@
+weight,category,col2
+25,Weapon,Roll once on the Weapons Category Subtable.
+10,Damaged weapons,Roll twice on the Weapons Category Subtable. Both items require Repair.
+10,Damaged gear,Roll twice on Gear Subtable. Both items require Repair.
+20,Gear,Roll once on the Gear Subtable.
+15,Odds and ends,Roll once on the Odds and Ends Subtable.
+20,Rewards,Roll once on the Rewards Subtable.

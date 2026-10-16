@@ -1,0 +1,32 @@
+{
+  "table": "Opportunity Mission Objectives",
+  "pdf_pages": [
+    91
+  ],
+  "columns": [
+    "weight",
+    "objective"
+  ],
+  "rows": [
+    {
+      "weight": 2,
+      "objective": "Move Through"
+    },
+    {
+      "weight": 2,
+      "objective": "Deliver"
+    },
+    {
+      "weight": 2,
+      "objective": "Access"
+    },
+    {
+      "weight": 2,
+      "objective": "Patrol"
+    },
+    {
+      "weight": 2,
+      "objective": "Fight Off"
+    }
+  ]
+}

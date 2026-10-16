@@ -1,0 +1,43 @@
+{
+  "table": "Hazards Subtable",
+  "pdf_pages": [
+    86
+  ],
+  "columns": [
+    "weight",
+    "hazards",
+    "effects"
+  ],
+  "rows": [
+    {
+      "weight": 2,
+      "hazards": "Dangerous Job",
+      "effects": "Increase enemy force numbers by +1."
+    },
+    {
+      "weight": 2,
+      "hazards": "Hot Job",
+      "effects": "After the job, you will earn an enemy on 1-2 instead of the normal roll of a 1."
+    },
+    {
+      "weight": 1,
+      "hazards": "VIP",
+      "effects": "A random enemy will have +1 Toughness and a final Combat Skill of +2 (regardless of current value)"
+    },
+    {
+      "weight": 1,
+      "hazards": "Veteran Opposition",
+      "effects": "Enemy is -1 to panic range."
+    },
+    {
+      "weight": 1,
+      "hazards": "Low Priority",
+      "effects": "Reduce enemy force numbers by 1."
+    },
+    {
+      "weight": 3,
+      "hazards": "Private Transport",
+      "effects": "If you have Rivals, they cannot track you this campaign turn."
+    }
+  ]
+}

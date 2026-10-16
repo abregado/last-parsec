@@ -1,0 +1,36 @@
+{
+  "table": "Threat Condition Table",
+  "pdf_pages": [
+    151
+  ],
+  "columns": [
+    "weight",
+    "threat_condition"
+  ],
+  "rows": [
+    {
+      "weight": 1,
+      "threat_condition": "Comms Interference: Each Reaction Roll phase, roll one die less than you normally would. A character not assigned a die will act in the Slow Actions phase."
+    },
+    {
+      "weight": 1,
+      "threat_condition": "Elite Opposition: All opponents with +0 Combat Skill are upgraded to +1."
+    },
+    {
+      "weight": 1,
+      "threat_condition": "Pitch Black: Visibility is limited to 6”. This overrides any other visibility reductions."
+    },
+    {
+      "weight": 1,
+      "threat_condition": "Heavy Opposition: Increase the opposing force by +2 enemy."
+    },
+    {
+      "weight": 1,
+      "threat_condition": "Armored Opponents: All opponents with 3 Toughness are upgraded to 4."
+    },
+    {
+      "weight": 1,
+      "threat_condition": "Enemy Captain: Add an additional Lieutenant with Combat Skill +2 and Toughness 5, regardless of the normal profile used."
+    }
+  ]
+}

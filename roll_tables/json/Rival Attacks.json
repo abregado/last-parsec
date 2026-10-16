@@ -1,0 +1,32 @@
+{
+  "table": "Rival Attacks",
+  "pdf_pages": [
+    93
+  ],
+  "columns": [
+    "weight",
+    "attack"
+  ],
+  "rows": [
+    {
+      "weight": 1,
+      "attack": "Ambush"
+    },
+    {
+      "weight": 2,
+      "attack": "Brought friends"
+    },
+    {
+      "weight": 4,
+      "attack": "Showdown"
+    },
+    {
+      "weight": 1,
+      "attack": "Assault"
+    },
+    {
+      "weight": 2,
+      "attack": "Raid"
+    }
+  ]
+}

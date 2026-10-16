@@ -1,0 +1,36 @@
+{
+  "table": "Consumables Subtable",
+  "pdf_pages": [
+    135
+  ],
+  "columns": [
+    "weight",
+    "consumables"
+  ],
+  "rows": [
+    {
+      "weight": 20,
+      "consumables": "Booster Pills"
+    },
+    {
+      "weight": 10,
+      "consumables": "Combat Serum"
+    },
+    {
+      "weight": 10,
+      "consumables": "Kiranin Crystals"
+    },
+    {
+      "weight": 15,
+      "consumables": "Rage Out"
+    },
+    {
+      "weight": 15,
+      "consumables": "Still"
+    },
+    {
+      "weight": 30,
+      "consumables": "Stim-pack"
+    }
+  ]
+}

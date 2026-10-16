@@ -1,0 +1,32 @@
+{
+  "table": "Gun Sights Subtable",
+  "pdf_pages": [
+    134
+  ],
+  "columns": [
+    "weight",
+    "gun_sights"
+  ],
+  "rows": [
+    {
+      "weight": 20,
+      "gun_sights": "Laser Sight"
+    },
+    {
+      "weight": 25,
+      "gun_sights": "Quality Sight"
+    },
+    {
+      "weight": 25,
+      "gun_sights": "Seeker Sight"
+    },
+    {
+      "weight": 15,
+      "gun_sights": "Tracker Sight"
+    },
+    {
+      "weight": 15,
+      "gun_sights": "Unity Battle Sight"
+    }
+  ]
+}

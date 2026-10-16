@@ -1,0 +1,100 @@
+{
+  "table": "Gadget Table",
+  "pdf_pages": [
+    31
+  ],
+  "columns": [
+    "weight",
+    "gadget"
+  ],
+  "rows": [
+    {
+      "weight": 4,
+      "gadget": "AI Companion"
+    },
+    {
+      "weight": 5,
+      "gadget": "Analyzer"
+    },
+    {
+      "weight": 4,
+      "gadget": "Battle Visor"
+    },
+    {
+      "weight": 4,
+      "gadget": "Boosted Arm"
+    },
+    {
+      "weight": 4,
+      "gadget": "Boosted Leg"
+    },
+    {
+      "weight": 3,
+      "gadget": "Cyber Hand"
+    },
+    {
+      "weight": 3,
+      "gadget": "Displacer"
+    },
+    {
+      "weight": 4,
+      "gadget": "Distraction Bot"
+    },
+    {
+      "weight": 5,
+      "gadget": "Duplicator"
+    },
+    {
+      "weight": 5,
+      "gadget": "Insta-Wall"
+    },
+    {
+      "weight": 5,
+      "gadget": "Jump Belt"
+    },
+    {
+      "weight": 4,
+      "gadget": "Nerve Adjuster"
+    },
+    {
+      "weight": 5,
+      "gadget": "Repair Bot"
+    },
+    {
+      "weight": 5,
+      "gadget": "Scanner Bot"
+    },
+    {
+      "weight": 5,
+      "gadget": "Screen Generator"
+    },
+    {
+      "weight": 4,
+      "gadget": "Seeker Sight"
+    },
+    {
+      "weight": 4,
+      "gadget": "Shock Attachment"
+    },
+    {
+      "weight": 6,
+      "gadget": "Snooper Bot"
+    },
+    {
+      "weight": 4,
+      "gadget": "Sonic Emitter"
+    },
+    {
+      "weight": 6,
+      "gadget": "Stabilizer"
+    },
+    {
+      "weight": 4,
+      "gadget": "Stealth Gear"
+    },
+    {
+      "weight": 7,
+      "gadget": "Stim-pack"
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "table": "Strange Character Table",
+  "pdf_pages": [
+    16
+  ],
+  "columns": [
+    "weight",
+    "strange_character"
+  ],
+  "rows": [
+    {
+      "weight": 2,
+      "strange_character": "De-converted"
+    },
+    {
+      "weight": 6,
+      "strange_character": "Unity Agent"
+    },
+    {
+      "weight": 9,
+      "strange_character": "Mysterious Past"
+    },
+    {
+      "weight": 5,
+      "strange_character": "Hakshan"
+    },
+    {
+      "weight": 5,
+      "strange_character": "Stalker"
+    },
+    {
+      "weight": 7,
+      "strange_character": "Hulker"
+    },
+    {
+      "weight": 7,
+      "strange_character": "Hopeful Rookie"
+    },
+    {
+      "weight": 6,
+      "strange_character": "Genetic Uplift"
+    },
+    {
+      "weight": 6,
+      "strange_character": "Mutant"
+    },
+    {
+      "weight": 5,
+      "strange_character": "Assault Bot"
+    },
+    {
+      "weight": 4,
+      "strange_character": "Manipulator"
+    },
+    {
+      "weight": 5,
+      "strange_character": "Primitive"
+    },
+    {
+      "weight": 6,
+      "strange_character": "Feeler"
+    },
+    {
+      "weight": 6,
+      "strange_character": "Emo-suppressed"
+    },
+    {
+      "weight": 6,
+      "strange_character": "Minor Alien"
+    },
+    {
+      "weight": 2,
+      "strange_character": "Traveler"
+    },
+    {
+      "weight": 6,
+      "strange_character": "Empath"
+    },
+    {
+      "weight": 7,
+      "strange_character": "Bio-upgrade"
+    }
+  ]
+}

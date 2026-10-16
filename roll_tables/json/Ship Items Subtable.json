@@ -1,0 +1,88 @@
+{
+  "table": "Ship Items Subtable",
+  "pdf_pages": [
+    136
+  ],
+  "columns": [
+    "weight",
+    "ship_items"
+  ],
+  "rows": [
+    {
+      "weight": 4,
+      "ship_items": "Analyzer"
+    },
+    {
+      "weight": 7,
+      "ship_items": "Colonist Ration Packs"
+    },
+    {
+      "weight": 6,
+      "ship_items": "Duplicator"
+    },
+    {
+      "weight": 7,
+      "ship_items": "Fake ID"
+    },
+    {
+      "weight": 7,
+      "ship_items": "Fixer"
+    },
+    {
+      "weight": 3,
+      "ship_items": "Genetic Reconfiguration Kit"
+    },
+    {
+      "weight": 5,
+      "ship_items": "Loaded Dice"
+    },
+    {
+      "weight": 5,
+      "ship_items": "Lucky Dice"
+    },
+    {
+      "weight": 4,
+      "ship_items": "Mk II Translator"
+    },
+    {
+      "weight": 8,
+      "ship_items": "Med-patch"
+    },
+    {
+      "weight": 4,
+      "ship_items": "Meditation Orb"
+    },
+    {
+      "weight": 7,
+      "ship_items": "Nano-doc"
+    },
+    {
+      "weight": 4,
+      "ship_items": "Novelty Stuffed Animal"
+    },
+    {
+      "weight": 3,
+      "ship_items": "Purifier"
+    },
+    {
+      "weight": 4,
+      "ship_items": "Repair Bot"
+    },
+    {
+      "weight": 5,
+      "ship_items": "Sector Permit"
+    },
+    {
+      "weight": 8,
+      "ship_items": "Spare Parts"
+    },
+    {
+      "weight": 5,
+      "ship_items": "Teach-Bot"
+    },
+    {
+      "weight": 4,
+      "ship_items": "Transcender"
+    }
+  ]
+}

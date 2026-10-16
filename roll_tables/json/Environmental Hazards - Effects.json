@@ -1,0 +1,32 @@
+{
+  "table": "Environmental Hazards - Effects",
+  "pdf_pages": [
+    168
+  ],
+  "columns": [
+    "weight",
+    "effects"
+  ],
+  "rows": [
+    {
+      "weight": 1,
+      "effects": "Damage +0 Hit."
+    },
+    {
+      "weight": 1,
+      "effects": "Halves movement speed."
+    },
+    {
+      "weight": 1,
+      "effects": "Damage +1 Hit."
+    },
+    {
+      "weight": 1,
+      "effects": "Damage +0 Hit. Ignore Armor Saving Throws."
+    },
+    {
+      "weight": 1,
+      "effects": "Damage +1 Hit. Ignores Armor Saving Throws."
+    }
+  ]
+}

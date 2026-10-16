@@ -1,0 +1,28 @@
+{
+  "table": "Gear Subtable",
+  "pdf_pages": [
+    134
+  ],
+  "columns": [
+    "weight",
+    "gear_subtable"
+  ],
+  "rows": [
+    {
+      "weight": 20,
+      "gear_subtable": "Gun Mods"
+    },
+    {
+      "weight": 20,
+      "gear_subtable": "Gun Sights"
+    },
+    {
+      "weight": 35,
+      "gear_subtable": "Protective Items"
+    },
+    {
+      "weight": 25,
+      "gear_subtable": "Utility Items"
+    }
+  ]
+}

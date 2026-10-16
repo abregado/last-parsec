@@ -1,0 +1,28 @@
+{
+  "table": "Crew Type Table",
+  "pdf_pages": [
+    16
+  ],
+  "columns": [
+    "weight",
+    "crew_type"
+  ],
+  "rows": [
+    {
+      "weight": 60,
+      "crew_type": "Baseline Human"
+    },
+    {
+      "weight": 20,
+      "crew_type": "Primary Alien"
+    },
+    {
+      "weight": 10,
+      "crew_type": "Bot"
+    },
+    {
+      "weight": 10,
+      "crew_type": "Strange Character"
+    }
+  ]
+}

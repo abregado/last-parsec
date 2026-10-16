@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Last Parsec</title>
+  <meta name="description" content="Unofficial companion tools for Five Parsecs From Home.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1117'/%3E%3Cpath d='M16 5 27 16 16 27 5 16Z' fill='none' stroke='%234fd1c5' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%234fd1c5'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/styles.css?v=20261016205452">
+  <script>
+    // Apply the saved theme before first paint to avoid a flash.
+    try {
+      var savedTheme = localStorage.getItem('lastParsec.theme');
+      if (savedTheme === 'light' || savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      }
+    } catch (e) { /* storage unavailable: keep the default */ }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#/">
+      <span class="brand-mark" aria-hidden="true">◈</span>
+      <span class="brand-name">Last Parsec</span>
+    </a>
+    <button type="button" class="btn btn-ghost theme-toggle" id="theme-toggle">Light mode</button>
+  </header>
+
+  <div class="notices" id="notices" aria-live="polite"></div>
+
+  <main id="app" tabindex="-1"></main>
+
+  <footer class="site-footer">
+    Unofficial fan-made companion for <cite>Five Parsecs From Home</cite>. Not affiliated with Modiphius Entertainment.
+  </footer>
+
+  <script src="js/lp.js?v=20261016205452"></script>
+  <script src="js/data/tables.js?v=20261016205452"></script>
+  <script src="js/core/rng.js?v=20261016205452"></script>
+  <script src="js/core/effects.js?v=20261016205452"></script>
+  <script src="js/data/species.js?v=20261016205452"></script>
+  <script src="js/rules/character.js?v=20261016205452"></script>
+  <script src="js/rules/crew.js?v=20261016205452"></script>
+  <script src="js/ui/dom.js?v=20261016205452"></script>
+  <script src="js/ui/dialogs.js?v=20261016205452"></script>
+  <script src="js/core/storage.js?v=20261016205452"></script>
+  <script src="js/core/router.js?v=20261016205452"></script>
+  <script src="js/ui/campaignList.js?v=20261016205452"></script>
+  <script src="js/ui/rollField.js?v=20261016205452"></script>
+  <script src="js/ui/crewSection.js?v=20261016205452"></script>
+  <script src="js/ui/placeholderTab.js?v=20261016205452"></script>
+  <script src="js/ui/charactersTab.js?v=20261016205452"></script>
+  <script src="js/ui/campaignView.js?v=20261016205452"></script>
+  <script src="js/app.js?v=20261016205452"></script>
+</body>
+</html>

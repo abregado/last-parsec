@@ -1,0 +1,36 @@
+{
+  "table": "Special Weapons Subtable",
+  "pdf_pages": [
+    134
+  ],
+  "columns": [
+    "weight",
+    "special_weapons"
+  ],
+  "rows": [
+    {
+      "weight": 20,
+      "special_weapons": "Needle Rifle"
+    },
+    {
+      "weight": 25,
+      "special_weapons": "Plasma Rifle"
+    },
+    {
+      "weight": 15,
+      "special_weapons": "Fury Rifle"
+    },
+    {
+      "weight": 15,
+      "special_weapons": "Shell Gun"
+    },
+    {
+      "weight": 15,
+      "special_weapons": "Cling Fire Pistol"
+    },
+    {
+      "weight": 10,
+      "special_weapons": "Hand Flamer"
+    }
+  ]
+}

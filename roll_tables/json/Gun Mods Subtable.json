@@ -1,0 +1,44 @@
+{
+  "table": "Gun Mods Subtable",
+  "pdf_pages": [
+    134
+  ],
+  "columns": [
+    "weight",
+    "gun_mods"
+  ],
+  "rows": [
+    {
+      "weight": 10,
+      "gun_mods": "Assault Blade"
+    },
+    {
+      "weight": 10,
+      "gun_mods": "Beam Light"
+    },
+    {
+      "weight": 15,
+      "gun_mods": "Bipod"
+    },
+    {
+      "weight": 20,
+      "gun_mods": "Hot Shot Pack"
+    },
+    {
+      "weight": 10,
+      "gun_mods": "Cyber-configurable Nano-Sludge"
+    },
+    {
+      "weight": 15,
+      "gun_mods": "Stabilizer"
+    },
+    {
+      "weight": 10,
+      "gun_mods": "Shock Attachment"
+    },
+    {
+      "weight": 10,
+      "gun_mods": "Upgrade Kit"
+    }
+  ]
+}

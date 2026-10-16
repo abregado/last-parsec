@@ -1,0 +1,36 @@
+{
+  "table": "Energy Weapons Subtable",
+  "pdf_pages": [
+    133
+  ],
+  "columns": [
+    "weight",
+    "energy_weapons"
+  ],
+  "rows": [
+    {
+      "weight": 20,
+      "energy_weapons": "Hand Laser"
+    },
+    {
+      "weight": 15,
+      "energy_weapons": "Beam Pistol"
+    },
+    {
+      "weight": 20,
+      "energy_weapons": "Infantry Laser"
+    },
+    {
+      "weight": 15,
+      "energy_weapons": "Blast Pistol"
+    },
+    {
+      "weight": 20,
+      "energy_weapons": "Blast Rifle"
+    },
+    {
+      "weight": 10,
+      "energy_weapons": "Hyper Blaster"
+    }
+  ]
+}

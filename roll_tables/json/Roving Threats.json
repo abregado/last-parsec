@@ -1,0 +1,178 @@
+{
+  "table": "Roving Threats",
+  "pdf_pages": [
+    103,
+    104,
+    105
+  ],
+  "columns": [
+    "weight",
+    "enemy",
+    "numbers",
+    "panic",
+    "speed",
+    "combat_skill",
+    "tough_ness",
+    "ai",
+    "weapons",
+    "notes"
+  ],
+  "rows": [
+    {
+      "weight": 4,
+      "enemy": "Converted Acquisition",
+      "numbers": "+1",
+      "panic": "0",
+      "speed": "4”",
+      "combat_skill": "+0",
+      "tough_ness": "5",
+      "ai": "A",
+      "weapons": "2 B",
+      "notes": "Nightmarish cyborg race that replenishes their ranks through captives and corpses, enhanced with bolted-in weaponry and control circuitry. Careless: You are +1 to Seize the Initiative. Built-in: Always count as stationary when firing. Invasion Threat. Test at +1.6+ Saving Throw."
+    },
+    {
+      "weight": 8,
+      "enemy": "Converted Infiltrators",
+      "numbers": "+0",
+      "panic": "0",
+      "speed": "4”",
+      "combat_skill": "+0",
+      "tough_ness": "4",
+      "ai": "A",
+      "weapons": "1 A",
+      "notes": "The Converted often send in adapted members of a prospective target species to scout and spy. Invasion Threat. 6+ Saving Throw."
+    },
+    {
+      "weight": 6,
+      "enemy": "Abductor Raiders",
+      "numbers": "+3",
+      "panic": "1",
+      "speed": "4”",
+      "combat_skill": "+0",
+      "tough_ness": "3",
+      "ai": "A",
+      "weapons": "2 A",
+      "notes": "The short, large-headed clone species known as the Abductors are despised throughout space. They insist they are abducting and mind-controlling other sapients for a higher purpose. Invasion Threat."
+    },
+    {
+      "weight": 10,
+      "enemy": "Swarm Brood",
+      "numbers": "+2",
+      "panic": "0",
+      "speed": "6”",
+      "combat_skill": "+1",
+      "tough_ness": "4",
+      "ai": "B",
+      "weapons": "Claws (Damage +1)",
+      "notes": "Multiple-limbed aliens that react to all other lifeforms with extreme violence. Pack hunters: All Brawls initiated by Swarm are resolved at the end of the Enemy Actions phase. Swarm will always attempt to gang up on prey, where possible. Invasion Threat."
+    },
+    {
+      "weight": 6,
+      "enemy": "Haywire Robots",
+      "numbers": "+2",
+      "panic": "0",
+      "speed": "3”",
+      "combat_skill": "+0",
+      "tough_ness": "4",
+      "ai": "R",
+      "weapons": "Smash (Damage +0)",
+      "notes": "Occasionally, robots go berserk. This isn’t a problem when it’s a cat-sized cleaning device. It is a problem when the robot is a mining or construction bot. Careless: You are +1 to Seize the Initiative. 6+ Saving Throw."
+    },
+    {
+      "weight": 10,
+      "enemy": "Razor Lizards",
+      "numbers": "+2",
+      "panic": "1-2",
+      "speed": "6”",
+      "combat_skill": "+1",
+      "tough_ness": "3",
+      "ai": "B",
+      "weapons": "Fangs (Damage +0)",
+      "notes": "An over-sized lizard brimming with spikes and sharp teeth. Needle fangs: Armor Saving Throws are ignored."
+    },
+    {
+      "weight": 12,
+      "enemy": "Sand Runners",
+      "numbers": "+1",
+      "panic": "1-2",
+      "speed": "7”",
+      "combat_skill": "+0",
+      "tough_ness": "3",
+      "ai": "B",
+      "weapons": "Fangs (Damage +1)",
+      "notes": "Fast predators associated with desert planets. As they are somewhat trainable, they can be found on many Human worlds, though unfortunately, if set free, they revert to wild behavior very quickly. Leap: If they end a move within 3” of a Human, they may leap into contact as a Free Action."
+    },
+    {
+      "weight": 7,
+      "enemy": "Void Rippers",
+      "numbers": "+0",
+      "panic": "1-2",
+      "speed": "5”",
+      "combat_skill": "+1",
+      "tough_ness": "5",
+      "ai": "R",
+      "weapons": "Fangs (Damage +0)",
+      "notes": "Swarms of extremely aggressive fish-like flyers. They can rip a man to shreds in moments. Gruesome: Characters rolling for post-battle Injuries must apply a -5 to the roll."
+    },
+    {
+      "weight": 6,
+      "enemy": "Krorg",
+      "numbers": "+0",
+      "panic": "0",
+      "speed": "5”",
+      "combat_skill": "+2",
+      "tough_ness": "6",
+      "ai": "R",
+      "weapons": "Claws (Damage +2)",
+      "notes": "These beasts resemble a bear from Old Earth, but with huge claws and a surly demeanor. Ferocious: +1 to Brawling rolls when initiating combat. Easy targets: +1 when firing at this enemy. 5+ Saving Throw. Tough fight: A random survivor gains +1 XP."
+    },
+    {
+      "weight": 9,
+      "enemy": "Large Bugs",
+      "numbers": "+2",
+      "panic": "1",
+      "speed": "5”",
+      "combat_skill": "+1",
+      "tough_ness": "5",
+      "ai": "R",
+      "weapons": "Mandibles (Damage +1)",
+      "notes": "Over-sized insects and other creepy-crawlies are a distressingly common sight throughout space. Easy targets: +1 when firing at this enemy. Stubborn: They ignore the first casualty of the battle when making a Morale check"
+    },
+    {
+      "weight": 6,
+      "enemy": "Carnivore Chasers",
+      "numbers": "+2",
+      "panic": "1-2",
+      "speed": "6”",
+      "combat_skill": "+0",
+      "tough_ness": "4",
+      "ai": "B",
+      "weapons": "Fangs (Damage +0)",
+      "notes": "Fast pack predators. Will hunt any prey they can bring down. Alert: You are -1 to Seize the Initiative."
+    },
+    {
+      "weight": 13,
+      "enemy": "Vent Crawlers",
+      "numbers": "+0",
+      "panic": "0",
+      "speed": "6”",
+      "combat_skill": "+2",
+      "tough_ness": "5",
+      "ai": "R",
+      "weapons": "Claws (Damage +0)",
+      "notes": "Homicidal alien lifeforms that like to lurk inside starships and on strange moons. Fate worse than death: If the post-battle Injury roll is death, the character cannot be saved, and no rerolls are possible for any reason."
+    },
+    {
+      "weight": 3,
+      "enemy": "Distorts",
+      "numbers": "+0",
+      "panic": "0",
+      "speed": "4”",
+      "combat_skill": "+0",
+      "tough_ness": "4",
+      "ai": "B",
+      "weapons": "Touch (Damage +3)",
+      "notes": "Extra-dimensional horrors. It’s rumored they are the remnants of sapient beings who were lost in teleport accidents. Stubborn: They ignore the first casualty when making a Morale check. Shimmer: Move through terrain and solid obstacles. When slain, roll 1D6. On a 5-6, another Distort is placed 1D6” further away."
+    }
+  ]
+}

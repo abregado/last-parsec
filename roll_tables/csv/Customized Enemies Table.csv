@@ -1,0 +1,8 @@
+weight,change
+1,"If the enemy has a Panic range of 1-2 or higher, reduce the Range by 1."
+1,"The enemy adds +1” to Speed, +2” if it is 4” or below."
+1,Increase Combat Skill by +1 to a maximum of +2.
+1,Increase Toughness by +1 to a maximum of 5.
+2,Aggressive and Beast AI types change to Rampaging. Tactical AI changes to Aggressive. Defensive and Cautious AI types change to Tactical. Others do not change.
+2,"Roll 1D6 for a special ability on the table below, or add an extra one."
+2,Gain a 6+ Armor Saving Throw or add +1 to an existing Saving Throw.

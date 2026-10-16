@@ -1,0 +1,31 @@
+weight,exploration_result,effects
+3,I know a good deal when I see one,Roll on the Trade Table instead.
+3,Meet a Patron,You are offered a Patron job.
+2,Must’ve been something I ate,"The character eats bad food, and must spend 1 campaign turn in Sick Bay. Soulless and K’Erin ignore this event."
+3,Meet someone interesting,"Gain a Quest Rumor. A Precursor character may roll 1D6, and on a 5+ receives a second Rumor."
+4,Had a nice chat,Roll 1D6+Savvy. On a 5+ gain +1 story point.
+3,"See the sights, enjoy the view",No effects.
+3,Make a new friend,"Roll up a new character and add them to the crew. If your character is Feral, the new character is also Feral."
+3,Time to relax,No effects.
+4,Possible bargain,"Give up a weapon of choice, then roll 1D6. On a 6, get a roll on the Loot Table (p.131). Otherwise get 1 credit."
+3,Alien merchant,"Give him any item, then roll on the Loot Table (p.131)."
+3,Got yourself noticed,"If you have Rivals, select one at random. You will have to fight them this campaign turn."
+3,You hear a tip,You may opt to automatically track down a Rival to fight this campaign turn.
+3,Completely lost,"Roll 1D6+Savvy. On a 4+ the character finds their way back in time, otherwise they will be unable to participate in a battle this campaign turn. Either way, roll again on this table to see what they find while wandering the streets."
+4,Someone wants a package delivered,"When you travel to a new world, if this crew member is still in the crew, earn 3 credits and roll 1D6. On 1-2, you’ve acquired a Rival and receive +1 story point."
+3,A tech fanatic offers to help out,"Pick a damaged item of equipment and roll 1D6. On 5-6 you have it fixed for free. An Engineer instead spends the afternoon talking shop, earning +2 XP."
+3,Got a few drinks,No effects.
+3,I don’t have a gambling problem!,Discard one item from the character’s equipment or crew Stash. Soulless ignore this event.
+4,Overheard some talk,Gain a Rumor.
+3,Pick a fight,"Add a Rival to your list. If a K’Erin gets this event, add the Rival as normal, but the first time you meet them in battle, they have -1 enemy, as you already knocked one out in the initial brawl."
+4,Found a trainer,Character earns +2 XP.
+4,Information broker,Buy up to 3 Rumors for 2 credits each.
+3,Arms dealer,Purchase any number of rolls on the Military Weapons Table (p.28) for 3 credits each.
+4,Promising lead,Earn +3 credits if you do an Opportunity mission this campaign turn.
+4,Just needs a little love,"Roll on Gadget Table (p.29), but the item is damaged and needs to be repaired before it can be used. If the character is an Engineer, the item works right away."
+3,Get in a bad fight,"Character must spend 1D3 campaign turns in Sick Bay, and loses one item of carried equipment (player choice)."
+4,Offered a small job,"When fighting this campaign turn, select a random enemy figure. If your crew kills them, earn 2 credits. No reward if they run away."
+4,Offered a reward,"When fighting this campaign turn, select a random terrain feature. If a crew member moves into contact and spends a Combat Action, you can retrieve a package and earn 2 credits."
+4,You make a useful contact,"Next campaign turn, add +1 to your choice of a roll to Recruit, Find a Patron, or Track a Rival."
+2,Who left this lying around?,"Add your choice of a Handgun, Blade, Colony Rifle, or Shotgun."
+4,"This place is rather nice, really.","When you are ready to leave this world, unless it is being Invaded, you must pay 1 story point or this crew member will decide to stay behind. If they do, you can keep their equipment, though."

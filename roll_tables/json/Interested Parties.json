@@ -1,0 +1,213 @@
+{
+  "table": "Interested Parties",
+  "pdf_pages": [
+    101,
+    102
+  ],
+  "columns": [
+    "weight",
+    "enemy",
+    "numbers",
+    "panic",
+    "speed",
+    "combat_skill",
+    "tough_ness",
+    "ai",
+    "weapons",
+    "notes"
+  ],
+  "rows": [
+    {
+      "weight": 6,
+      "enemy": "Renegade Soldiers",
+      "numbers": "+1",
+      "panic": "1-2",
+      "speed": "4”",
+      "combat_skill": "+1",
+      "tough_ness": "5",
+      "ai": "T",
+      "weapons": "2 B",
+      "notes": "Deserters, mutineers, and other scoundrels. These groups often declare themselves local warlords and overlords. Grudge: If encountered as Rivals, they bring one additional figure."
+    },
+    {
+      "weight": 7,
+      "enemy": "Bounty Hunters",
+      "numbers": "+0",
+      "panic": "1-2",
+      "speed": "5”",
+      "combat_skill": "+1",
+      "tough_ness": "4",
+      "ai": "T",
+      "weapons": "1 B",
+      "notes": "Hunting down fugitives and people the warlords, governments, and gang bosses want found is a booming business, especially if you aren’t too fussed about the legality of it all. Intrigue: Roll 2D6 and add +1 if you killed a Lieutenant and/or Unique Individual. On a 9+, you obtain a Quest Rumor."
+    },
+    {
+      "weight": 5,
+      "enemy": "Abandoned",
+      "numbers": "+1",
+      "panic": "1-3",
+      "speed": "4”",
+      "combat_skill": "+0",
+      "tough_ness": "3",
+      "ai": "A",
+      "weapons": "1 A",
+      "notes": "Occasionally, a sort of sickness strikes crews in deep space for extended durations. The causes are unknown but they often seek out old acquaintances, attacking in an animal-like fever. Careless: You are +1 to Seize the Initiative. Cowardly: Lieutenants are affected by Morale dice."
+    },
+    {
+      "weight": 9,
+      "enemy": "Vigilantes",
+      "numbers": "+1",
+      "panic": "1-2",
+      "speed": "4”",
+      "combat_skill": "+0",
+      "tough_ness": "4",
+      "ai": "A",
+      "weapons": "2 A",
+      "notes": "Disgruntled locals who have decided to take matters into their own hands. Persistent: If encountered as Rivals, all rolls to remove them from Rival status are at -1."
+    },
+    {
+      "weight": 8,
+      "enemy": "Isolationists",
+      "numbers": "+1",
+      "panic": "1-2",
+      "speed": "4”",
+      "combat_skill": "+0",
+      "tough_ness": "3",
+      "ai": "C",
+      "weapons": "1 A",
+      "notes": "Whenever a group of people declare that they are a political unit, inevitably a smaller group will declare that they will have nothing to do with the rest of them. Dogged: If reduced to only 1 or 2 figures, they become Fearless and will not flee."
+    },
+    {
+      "weight": 6,
+      "enemy": "Zealots",
+      "numbers": "+2",
+      "panic": "1",
+      "speed": "5”",
+      "combat_skill": "+0",
+      "tough_ness": "4",
+      "ai": "A",
+      "weapons": "1 A",
+      "notes": "Near-suicidal devotees to some cause, belief, principle, or brand loyalty. Ferocious: +1 to Brawling rolls when initiating combat."
+    },
+    {
+      "weight": 7,
+      "enemy": "Mutants",
+      "numbers": "+3",
+      "panic": "1-3",
+      "speed": "4”",
+      "combat_skill": "+0",
+      "tough_ness": "5",
+      "ai": "A",
+      "weapons": "1 A",
+      "notes": "The result of genetic warfare, black-site experiments, or hostile environments, these wretches are often treated with considerable prejudice. Needless to say, eventually some decide to fight back. Cowardly: Lieutenants are affected by Morale dice."
+    },
+    {
+      "weight": 4,
+      "enemy": "Primitives",
+      "numbers": "+2",
+      "panic": "1-2",
+      "speed": "6”",
+      "combat_skill": "+1",
+      "tough_ness": "3",
+      "ai": "A",
+      "weapons": "-",
+      "notes": "For various reasons, space is full of groups of Humans or aliens existing on a pre-industrial level. Going medieval: Instead of normal weapons, each carries a Blade. Specialists carry a Brutal Melee Weapon."
+    },
+    {
+      "weight": 4,
+      "enemy": "Precursor Exiles",
+      "numbers": "+0",
+      "panic": "1-2",
+      "speed": "6”",
+      "combat_skill": "+1",
+      "tough_ness": "4",
+      "ai": "T",
+      "weapons": "3 B",
+      "notes": "The refined and elegant Precursors are rarely seen in Human space. Those that are met tend to be the outcasts, and those too wild to find a place in their serene home culture. Prediction: You cannot Seize the Initiative."
+    },
+    {
+      "weight": 7,
+      "enemy": "K’Erin Colonists",
+      "numbers": "+1",
+      "panic": "1",
+      "speed": "5”",
+      "combat_skill": "+1",
+      "tough_ness": "4",
+      "ai": "A",
+      "weapons": "2 A",
+      "notes": "When this warrior-species decides to colonize a world, war almost inevitably follows. Stubborn: They ignore the first casualty of the battle when making a Morale check Invasion Threat."
+    },
+    {
+      "weight": 5,
+      "enemy": "Swift War Squad",
+      "numbers": "+2",
+      "panic": "1",
+      "speed": "6”",
+      "combat_skill": "+0",
+      "tough_ness": "3",
+      "ai": "A",
+      "weapons": "1 B",
+      "notes": "Diminutive winged lizards who live in a highly ritualistic caste society. Unpredictable: Seize the Initiative roll is always unmodified."
+    },
+    {
+      "weight": 4,
+      "enemy": "Soulless Task Force",
+      "numbers": "+0",
+      "panic": "1",
+      "speed": "4”",
+      "combat_skill": "+2",
+      "tough_ness": "5",
+      "ai": "T",
+      "weapons": "3 C",
+      "notes": "Alien robot species operating in an inter-linked hive mind of sorts. Inscrutable. 6+ Saving Throw."
+    },
+    {
+      "weight": 4,
+      "enemy": "Tech Zealots",
+      "numbers": "+1",
+      "panic": "1-2",
+      "speed": "5”",
+      "combat_skill": "+0",
+      "tough_ness": "5",
+      "ai": "A",
+      "weapons": "3 C",
+      "notes": "Cultists who worship technology. Often brimming with poorly fitted cybernetics. Loot: Gain an extra Loot roll if Holding the Field 6+ Saving Throw."
+    },
+    {
+      "weight": 7,
+      "enemy": "Colonial Militia",
+      "numbers": "+1",
+      "panic": "1-2",
+      "speed": "4”",
+      "combat_skill": "+0",
+      "tough_ness": "3",
+      "ai": "C",
+      "weapons": "2 B",
+      "notes": "The armed militia of a colony is its first line of defense and often doubles as law enforcement. Occasionally, the distinction between “organized militia”, “armed criminal gang,” and “gun-toting lunatics” can be deceptively difficult to tell. Home field advantage: They always count as being in Cover if they are on their third of the table and are not within 12” of the shooter."
+    },
+    {
+      "weight": 5,
+      "enemy": "Planetary Nomads",
+      "numbers": "+2",
+      "panic": "1-2",
+      "speed": "6”",
+      "combat_skill": "+0",
+      "tough_ness": "3",
+      "ai": "C",
+      "weapons": "2 A",
+      "notes": "On many habitable worlds, colonists will abandon civilization and go live among the dunes and jungles. They tend to react very poorly to interlopers. Alert: You are -1 to Seize the Initiative."
+    },
+    {
+      "weight": 12,
+      "enemy": "Salvage Team",
+      "numbers": "+1",
+      "panic": "1-3",
+      "speed": "4”",
+      "combat_skill": "+0",
+      "tough_ness": "4",
+      "ai": "C",
+      "weapons": "2 B",
+      "notes": "A rival crew looking for salvage, and ready to fight for it. Scavengers: Roll twice on the Battlefield Finds Table."
+    }
+  ]
+}

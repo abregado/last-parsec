@@ -1,0 +1,165 @@
+{
+  "table": "Exploration Table",
+  "pdf_pages": [
+    82,
+    83,
+    84
+  ],
+  "columns": [
+    "weight",
+    "exploration_result",
+    "effects"
+  ],
+  "rows": [
+    {
+      "weight": 3,
+      "exploration_result": "I know a good deal when I see one",
+      "effects": "Roll on the Trade Table instead."
+    },
+    {
+      "weight": 3,
+      "exploration_result": "Meet a Patron",
+      "effects": "You are offered a Patron job."
+    },
+    {
+      "weight": 2,
+      "exploration_result": "Must’ve been something I ate",
+      "effects": "The character eats bad food, and must spend 1 campaign turn in Sick Bay. Soulless and K’Erin ignore this event."
+    },
+    {
+      "weight": 3,
+      "exploration_result": "Meet someone interesting",
+      "effects": "Gain a Quest Rumor. A Precursor character may roll 1D6, and on a 5+ receives a second Rumor."
+    },
+    {
+      "weight": 4,
+      "exploration_result": "Had a nice chat",
+      "effects": "Roll 1D6+Savvy. On a 5+ gain +1 story point."
+    },
+    {
+      "weight": 3,
+      "exploration_result": "See the sights, enjoy the view",
+      "effects": "No effects."
+    },
+    {
+      "weight": 3,
+      "exploration_result": "Make a new friend",
+      "effects": "Roll up a new character and add them to the crew. If your character is Feral, the new character is also Feral."
+    },
+    {
+      "weight": 3,
+      "exploration_result": "Time to relax",
+      "effects": "No effects."
+    },
+    {
+      "weight": 4,
+      "exploration_result": "Possible bargain",
+      "effects": "Give up a weapon of choice, then roll 1D6. On a 6, get a roll on the Loot Table (p.131). Otherwise get 1 credit."
+    },
+    {
+      "weight": 3,
+      "exploration_result": "Alien merchant",
+      "effects": "Give him any item, then roll on the Loot Table (p.131)."
+    },
+    {
+      "weight": 3,
+      "exploration_result": "Got yourself noticed",
+      "effects": "If you have Rivals, select one at random. You will have to fight them this campaign turn."
+    },
+    {
+      "weight": 3,
+      "exploration_result": "You hear a tip",
+      "effects": "You may opt to automatically track down a Rival to fight this campaign turn."
+    },
+    {
+      "weight": 3,
+      "exploration_result": "Completely lost",
+      "effects": "Roll 1D6+Savvy. On a 4+ the character finds their way back in time, otherwise they will be unable to participate in a battle this campaign turn. Either way, roll again on this table to see what they find while wandering the streets."
+    },
+    {
+      "weight": 4,
+      "exploration_result": "Someone wants a package delivered",
+      "effects": "When you travel to a new world, if this crew member is still in the crew, earn 3 credits and roll 1D6. On 1-2, you’ve acquired a Rival and receive +1 story point."
+    },
+    {
+      "weight": 3,
+      "exploration_result": "A tech fanatic offers to help out",
+      "effects": "Pick a damaged item of equipment and roll 1D6. On 5-6 you have it fixed for free. An Engineer instead spends the afternoon talking shop, earning +2 XP."
+    },
+    {
+      "weight": 3,
+      "exploration_result": "Got a few drinks",
+      "effects": "No effects."
+    },
+    {
+      "weight": 3,
+      "exploration_result": "I don’t have a gambling problem!",
+      "effects": "Discard one item from the character’s equipment or crew Stash. Soulless ignore this event."
+    },
+    {
+      "weight": 4,
+      "exploration_result": "Overheard some talk",
+      "effects": "Gain a Rumor."
+    },
+    {
+      "weight": 3,
+      "exploration_result": "Pick a fight",
+      "effects": "Add a Rival to your list. If a K’Erin gets this event, add the Rival as normal, but the first time you meet them in battle, they have -1 enemy, as you already knocked one out in the initial brawl."
+    },
+    {
+      "weight": 4,
+      "exploration_result": "Found a trainer",
+      "effects": "Character earns +2 XP."
+    },
+    {
+      "weight": 4,
+      "exploration_result": "Information broker",
+      "effects": "Buy up to 3 Rumors for 2 credits each."
+    },
+    {
+      "weight": 3,
+      "exploration_result": "Arms dealer",
+      "effects": "Purchase any number of rolls on the Military Weapons Table (p.28) for 3 credits each."
+    },
+    {
+      "weight": 4,
+      "exploration_result": "Promising lead",
+      "effects": "Earn +3 credits if you do an Opportunity mission this campaign turn."
+    },
+    {
+      "weight": 4,
+      "exploration_result": "Just needs a little love",
+      "effects": "Roll on Gadget Table (p.29), but the item is damaged and needs to be repaired before it can be used. If the character is an Engineer, the item works right away."
+    },
+    {
+      "weight": 3,
+      "exploration_result": "Get in a bad fight",
+      "effects": "Character must spend 1D3 campaign turns in Sick Bay, and loses one item of carried equipment (player choice)."
+    },
+    {
+      "weight": 4,
+      "exploration_result": "Offered a small job",
+      "effects": "When fighting this campaign turn, select a random enemy figure. If your crew kills them, earn 2 credits. No reward if they run away."
+    },
+    {
+      "weight": 4,
+      "exploration_result": "Offered a reward",
+      "effects": "When fighting this campaign turn, select a random terrain feature. If a crew member moves into contact and spends a Combat Action, you can retrieve a package and earn 2 credits."
+    },
+    {
+      "weight": 4,
+      "exploration_result": "You make a useful contact",
+      "effects": "Next campaign turn, add +1 to your choice of a roll to Recruit, Find a Patron, or Track a Rival."
+    },
+    {
+      "weight": 2,
+      "exploration_result": "Who left this lying around?",
+      "effects": "Add your choice of a Handgun, Blade, Colony Rifle, or Shotgun."
+    },
+    {
+      "weight": 4,
+      "exploration_result": "This place is rather nice, really.",
+      "effects": "When you are ready to leave this world, unless it is being Invaded, you must pay 1 story point or this crew member will decide to stay behind. If they do, you can keep their equipment, though."
+    }
+  ]
+}

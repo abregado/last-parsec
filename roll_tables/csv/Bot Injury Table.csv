@@ -1,0 +1,7 @@
+weight,result,effects,repair_time
+5,Obliterated,"Destroyed, and all carried equipment is damaged.",-
+10,Destroyed,Destroyed,-
+15,Equipment loss,Random carried item is damaged,0
+15,Severe damage,No long-term effect,1D6
+20,Minor damage,No long-term effect,1
+35,Just a few dents,No long-term effect,-

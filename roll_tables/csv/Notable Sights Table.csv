@@ -1,0 +1,10 @@
+weight_opportunity_patron,weight_rival,weight_quest,notable_sight
+20,40,10,Nothing special
+10,10,15,Documentation: Gain a Quest Rumor.
+10,10,10,"Priority target: Select a random enemy figure. Add +1 to their Toughness. If they are slain, gain 1D3 credits."
+10,10,15,Loot cache: Roll once on the Loot Table (p.131).
+10,5,5,Shiny bits: Gain 1 credit.
+10,5,10,Really shiny bits: Gain 2 credits.
+10,10,15,Person of interest: Gain +1 story point.
+10,5,10,Peculiar item: Gain +2 XP.
+10,5,10,"Curious item: Roll 1D6. On a 1-4, it can be sold for 1 credit. On a 5-6, roll on the Loot Table (p.131)."

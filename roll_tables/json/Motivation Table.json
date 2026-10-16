@@ -1,0 +1,134 @@
+{
+  "table": "Motivation Table",
+  "pdf_pages": [
+    28
+  ],
+  "columns": [
+    "weight",
+    "motivation",
+    "effect",
+    "resources",
+    "starting"
+  ],
+  "rows": [
+    {
+      "weight": 8,
+      "motivation": "Wealth",
+      "effect": "-",
+      "resources": "+1D6 credits",
+      "starting": "-"
+    },
+    {
+      "weight": 6,
+      "motivation": "Fame",
+      "effect": "-",
+      "resources": "+1 story point",
+      "starting": "-"
+    },
+    {
+      "weight": 5,
+      "motivation": "Glory",
+      "effect": "+1 Combat Skill",
+      "resources": "-",
+      "starting": "+1 Military Weapon"
+    },
+    {
+      "weight": 7,
+      "motivation": "Survival",
+      "effect": "+1 Toughness",
+      "resources": "-",
+      "starting": "-"
+    },
+    {
+      "weight": 6,
+      "motivation": "Escape",
+      "effect": "+1 Speed",
+      "resources": "-",
+      "starting": "-"
+    },
+    {
+      "weight": 7,
+      "motivation": "Adventure",
+      "effect": "-",
+      "resources": "+1D6 credits",
+      "starting": "+1 Low-tech Weapon"
+    },
+    {
+      "weight": 5,
+      "motivation": "Truth",
+      "effect": "-",
+      "resources": "1 Rumor, +1 story point",
+      "starting": "-"
+    },
+    {
+      "weight": 5,
+      "motivation": "Technology",
+      "effect": "+1 Savvy",
+      "resources": "-",
+      "starting": "+1 Gadget"
+    },
+    {
+      "weight": 7,
+      "motivation": "Discovery",
+      "effect": "+1 Savvy",
+      "resources": "-",
+      "starting": "+1 Gear"
+    },
+    {
+      "weight": 7,
+      "motivation": "Loyalty",
+      "effect": "-",
+      "resources": "Patron, +1 story point",
+      "starting": "-"
+    },
+    {
+      "weight": 6,
+      "motivation": "Revenge",
+      "effect": "+2 XP",
+      "resources": "Rival",
+      "starting": "-"
+    },
+    {
+      "weight": 5,
+      "motivation": "Romance",
+      "effect": "-",
+      "resources": "1 Rumor, +1 story point",
+      "starting": "-"
+    },
+    {
+      "weight": 5,
+      "motivation": "Faith",
+      "effect": "-",
+      "resources": "1 Rumor, +1 story point",
+      "starting": "-"
+    },
+    {
+      "weight": 5,
+      "motivation": "Political",
+      "effect": "-",
+      "resources": "Patron, +1 story point",
+      "starting": "-"
+    },
+    {
+      "weight": 6,
+      "motivation": "Power",
+      "effect": "+2 XP",
+      "resources": "Rival",
+      "starting": "-"
+    },
+    {
+      "weight": 5,
+      "motivation": "Order",
+      "effect": "-",
+      "resources": "Patron, +1 story point",
+      "starting": "-"
+    },
+    {
+      "weight": 5,
+      "motivation": "Freedom",
+      "effect": "+2 XP",
+      "resources": "-",
+      "starting": "-"
+    }
+  ]
+}

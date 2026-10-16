@@ -1,0 +1,33 @@
+{
+  "table": "Your Day in Hell Table",
+  "pdf_pages": [
+    152,
+    153
+  ],
+  "columns": [
+    "weight",
+    "your_day_in_hell"
+  ],
+  "rows": [
+    {
+      "weight": 2,
+      "your_day_in_hell": "Destroy strong point: You must reach the center of the battlefield, then spend an Action and roll 1D6+Savvy. On a 5+, the charges are set. Any crew member can detonate them as a Free Action any distance. Once they go off, all figures within 1D6+3” become casualties automatically and you Win."
+    },
+    {
+      "weight": 2,
+      "your_day_in_hell": "Hold against assault: You must hold out for for 10 rounds. You Win at the end of Round 10."
+    },
+    {
+      "weight": 2,
+      "your_day_in_hell": "Eliminate priority target: Place an extra opponent 6” onto the battlefield from the center of their battlefield edge. This is your target. They receive Toughness 5 and cannot be fired upon at distances exceeding 20”. Once they have been eliminated from the table, you Win. They do not move, but may fire weapons normally, if within range."
+    },
+    {
+      "weight": 2,
+      "your_day_in_hell": "Destroy enemy platoon: You must kill 25 enemy to Win."
+    },
+    {
+      "weight": 2,
+      "your_day_in_hell": "Penetrate the lines: At least two crew members must exit the opposing battlefield edge to Win."
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "table": "Benefits, Hazards, and Conditions (BHC) Table",
+  "pdf_pages": [
+    85
+  ],
+  "columns": [
+    "category",
+    "corporation",
+    "local_government",
+    "sector_government",
+    "wealthy_individual",
+    "private_organisation",
+    "secretive_group"
+  ],
+  "rows": [
+    {
+      "category": "Benefits",
+      "corporation": "8+",
+      "local_government": "8+",
+      "sector_government": "8+",
+      "wealthy_individual": "5+",
+      "private_organisation": "8+",
+      "secretive_group": "8+"
+    },
+    {
+      "category": "Hazards",
+      "corporation": "8+",
+      "local_government": "8+",
+      "sector_government": "8+",
+      "wealthy_individual": "8+",
+      "private_organisation": "8+",
+      "secretive_group": "5+"
+    },
+    {
+      "category": "Conditions",
+      "corporation": "5+",
+      "local_government": "8+",
+      "sector_government": "8+",
+      "wealthy_individual": "8+",
+      "private_organisation": "8+",
+      "secretive_group": "8+"
+    }
+  ],
+  "note": "Target numbers (not dice ranges), so no weight column."
+}

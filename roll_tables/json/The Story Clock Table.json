@@ -1,0 +1,24 @@
+{
+  "table": "The Story Clock Table",
+  "pdf_pages": [
+    155
+  ],
+  "columns": [
+    "weight",
+    "ticks"
+  ],
+  "rows": [
+    {
+      "weight": 1,
+      "ticks": "The clock does not count down"
+    },
+    {
+      "weight": 4,
+      "ticks": "Count down 1 Tick"
+    },
+    {
+      "weight": 1,
+      "ticks": "Count down 2 Ticks"
+    }
+  ]
+}

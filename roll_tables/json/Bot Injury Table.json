@@ -1,0 +1,50 @@
+{
+  "table": "Bot Injury Table",
+  "pdf_pages": [
+    124
+  ],
+  "columns": [
+    "weight",
+    "result",
+    "effects",
+    "repair_time"
+  ],
+  "rows": [
+    {
+      "weight": 5,
+      "result": "Obliterated",
+      "effects": "Destroyed, and all carried equipment is damaged.",
+      "repair_time": "-"
+    },
+    {
+      "weight": 10,
+      "result": "Destroyed",
+      "effects": "Destroyed",
+      "repair_time": "-"
+    },
+    {
+      "weight": 15,
+      "result": "Equipment loss",
+      "effects": "Random carried item is damaged",
+      "repair_time": "0"
+    },
+    {
+      "weight": 15,
+      "result": "Severe damage",
+      "effects": "No long-term effect",
+      "repair_time": "1D6"
+    },
+    {
+      "weight": 20,
+      "result": "Minor damage",
+      "effects": "No long-term effect",
+      "repair_time": "1"
+    },
+    {
+      "weight": 35,
+      "result": "Just a few dents",
+      "effects": "No long-term effect",
+      "repair_time": "-"
+    }
+  ]
+}

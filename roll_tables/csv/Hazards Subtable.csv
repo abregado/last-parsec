@@ -1,0 +1,7 @@
+weight,hazards,effects
+2,Dangerous Job,Increase enemy force numbers by +1.
+2,Hot Job,"After the job, you will earn an enemy on 1-2 instead of the normal roll of a 1."
+1,VIP,A random enemy will have +1 Toughness and a final Combat Skill of +2 (regardless of current value)
+1,Veteran Opposition,Enemy is -1 to panic range.
+1,Low Priority,Reduce enemy force numbers by 1.
+3,Private Transport,"If you have Rivals, they cannot track you this campaign turn."

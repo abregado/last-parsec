@@ -1,0 +1,52 @@
+{
+  "table": "Revelation Table",
+  "pdf_pages": [
+    169
+  ],
+  "columns": [
+    "weight",
+    "revelation"
+  ],
+  "rows": [
+    {
+      "weight": 1,
+      "revelation": "A person you know is connected to the job"
+    },
+    {
+      "weight": 1,
+      "revelation": "You find evidence of a faction or group being involved"
+    },
+    {
+      "weight": 1,
+      "revelation": "A master mind is behind the enemy you fought"
+    },
+    {
+      "weight": 1,
+      "revelation": "The job was a set up to kill you"
+    },
+    {
+      "weight": 1,
+      "revelation": "One of the crew remembers something, or has a flashback"
+    },
+    {
+      "weight": 1,
+      "revelation": "You find evidence of a large-scale conspiracy"
+    },
+    {
+      "weight": 1,
+      "revelation": "You find evidence of serious criminal activity"
+    },
+    {
+      "weight": 1,
+      "revelation": "You find a strange message, file, or communication"
+    },
+    {
+      "weight": 1,
+      "revelation": "You find evidence of government involvement"
+    },
+    {
+      "weight": 1,
+      "revelation": "A mysterious stranger was here"
+    }
+  ]
+}

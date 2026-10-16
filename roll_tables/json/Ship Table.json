@@ -1,0 +1,106 @@
+{
+  "table": "Ship Table",
+  "pdf_pages": [
+    33
+  ],
+  "columns": [
+    "weight",
+    "ship",
+    "debt",
+    "hull",
+    "traits"
+  ],
+  "rows": [
+    {
+      "weight": 12,
+      "ship": "Worn freighter",
+      "debt": "1D6 +20",
+      "hull": "30",
+      "traits": "-"
+    },
+    {
+      "weight": 6,
+      "ship": "Retired troop transport",
+      "debt": "1D6 +30",
+      "hull": "35",
+      "traits": "Emergency Drives"
+    },
+    {
+      "weight": 5,
+      "ship": "Strange alien vessel",
+      "debt": "1D6 +15",
+      "hull": "25",
+      "traits": "-"
+    },
+    {
+      "weight": 8,
+      "ship": "Upgraded shuttle",
+      "debt": "1D6 +10",
+      "hull": "20",
+      "traits": "-"
+    },
+    {
+      "weight": 7,
+      "ship": "Retired scout ship",
+      "debt": "1D6 +20",
+      "hull": "25",
+      "traits": "Fuel-efficient"
+    },
+    {
+      "weight": 7,
+      "ship": "Repurposed science vessel",
+      "debt": "1D6 +10",
+      "hull": "20",
+      "traits": "-"
+    },
+    {
+      "weight": 11,
+      "ship": "Battered mining ship",
+      "debt": "1D6 +20",
+      "hull": "35",
+      "traits": "Fuel Hog"
+    },
+    {
+      "weight": 9,
+      "ship": "Unreliable merchant cruiser",
+      "debt": "1D6 +20",
+      "hull": "30",
+      "traits": "-"
+    },
+    {
+      "weight": 5,
+      "ship": "Former diplomatic vessel",
+      "debt": "1D6 +15",
+      "hull": "25",
+      "traits": "-"
+    },
+    {
+      "weight": 6,
+      "ship": "Ancient low-tech craft",
+      "debt": "1D6 +20",
+      "hull": "35",
+      "traits": "Dodgy Drive"
+    },
+    {
+      "weight": 8,
+      "ship": "Built from salvaged wrecks",
+      "debt": "1D6 +20",
+      "hull": "30",
+      "traits": "-"
+    },
+    {
+      "weight": 11,
+      "ship": "Worn colony ship",
+      "debt": "1D6 +20",
+      "hull": "25",
+      "traits": "Standard Issue"
+    },
+    {
+      "weight": 5,
+      "ship": "Retired military patrol ship",
+      "debt": "1D6 +35",
+      "hull": "40",
+      "traits": "Armored"
+    }
+  ]
+}

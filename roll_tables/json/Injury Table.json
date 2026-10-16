@@ -1,0 +1,68 @@
+{
+  "table": "Injury Table",
+  "pdf_pages": [
+    124
+  ],
+  "columns": [
+    "weight",
+    "result",
+    "effects",
+    "campaign_turns_in_sick_bay"
+  ],
+  "rows": [
+    {
+      "weight": 5,
+      "result": "Gruesome fate",
+      "effects": "Dead, and all carried equipment is damaged.",
+      "campaign_turns_in_sick_bay": "-"
+    },
+    {
+      "weight": 10,
+      "result": "Death or permanent injury",
+      "effects": "Dead, or removed from the campaign.",
+      "campaign_turns_in_sick_bay": "-"
+    },
+    {
+      "weight": 1,
+      "result": "Miraculous escape",
+      "effects": "The character survives and receives +1 Luck, but all items carried are permanently lost.",
+      "campaign_turns_in_sick_bay": "-"
+    },
+    {
+      "weight": 14,
+      "result": "Equipment loss",
+      "effects": "Random carried item is damaged.",
+      "campaign_turns_in_sick_bay": "-"
+    },
+    {
+      "weight": 15,
+      "result": "Crippling wound",
+      "effects": "Require 1D6 credits of surgery immediately, or suffer -1 permanent reduction to highest of Speed or Toughness.",
+      "campaign_turns_in_sick_bay": "1D6"
+    },
+    {
+      "weight": 9,
+      "result": "Serious injury",
+      "effects": "No long-term effect",
+      "campaign_turns_in_sick_bay": "1D3+1"
+    },
+    {
+      "weight": 26,
+      "result": "Minor injuries",
+      "effects": "No long-term effect",
+      "campaign_turns_in_sick_bay": "1"
+    },
+    {
+      "weight": 15,
+      "result": "Knocked out",
+      "effects": "No long-term effect",
+      "campaign_turns_in_sick_bay": "-"
+    },
+    {
+      "weight": 5,
+      "result": "School of hard knocks",
+      "effects": "Earn 1 XP (see below)",
+      "campaign_turns_in_sick_bay": "-"
+    }
+  ]
+}

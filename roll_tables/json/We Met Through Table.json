@@ -1,0 +1,48 @@
+{
+  "table": "We Met Through Table",
+  "pdf_pages": [
+    34
+  ],
+  "columns": [
+    "weight",
+    "we_met_through"
+  ],
+  "rows": [
+    {
+      "weight": 10,
+      "we_met_through": "Hired by a random member of the group"
+    },
+    {
+      "weight": 10,
+      "we_met_through": "Pursuit of random group member’s motivation"
+    },
+    {
+      "weight": 10,
+      "we_met_through": "Being in trouble with the authorities"
+    },
+    {
+      "weight": 10,
+      "we_met_through": "A common enemy"
+    },
+    {
+      "weight": 10,
+      "we_met_through": "A common cause or belief"
+    },
+    {
+      "weight": 15,
+      "we_met_through": "A random meeting in a bar"
+    },
+    {
+      "weight": 10,
+      "we_met_through": "A previous job"
+    },
+    {
+      "weight": 15,
+      "we_met_through": "Mutual protection in a hostile universe"
+    },
+    {
+      "weight": 10,
+      "we_met_through": "Being old war buddies"
+    }
+  ]
+}

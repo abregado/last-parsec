@@ -1,0 +1,32 @@
+{
+  "table": "Connections Table",
+  "pdf_pages": [
+    167
+  ],
+  "columns": [
+    "weight",
+    "connection_is"
+  ],
+  "rows": [
+    {
+      "weight": 2,
+      "connection_is": "A person you’ve met"
+    },
+    {
+      "weight": 1,
+      "connection_is": "A place you’ve been"
+    },
+    {
+      "weight": 1,
+      "connection_is": "A job you’ve done"
+    },
+    {
+      "weight": 1,
+      "connection_is": "A faction or group you have met before"
+    },
+    {
+      "weight": 1,
+      "connection_is": "A personal Connection for a random crew member (family, friend etc.)"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+weight,conditions,effects
+1,Vengeful,"If the mission fails, the Patron becomes a Rival."
+2,Demanding,Danger Pay is only upon success.
+1,Small Squad,You cannot deploy more than 4 crew.
+1,Full Squad,You must have 6 available crew.
+1,Clean,You cannot ever have made law enforcement Rivals.
+2,Busy,"If the mission is a success, the Patron offers a new job next campaign turn."
+1,One-time Contract,This Patron cannot be retained as a contact.
+1,Reputation Required,You must have completed a prior Patron job on this world.

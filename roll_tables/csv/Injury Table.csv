@@ -1,0 +1,10 @@
+weight,result,effects,campaign_turns_in_sick_bay
+5,Gruesome fate,"Dead, and all carried equipment is damaged.",-
+10,Death or permanent injury,"Dead, or removed from the campaign.",-
+1,Miraculous escape,"The character survives and receives +1 Luck, but all items carried are permanently lost.",-
+14,Equipment loss,Random carried item is damaged.,-
+15,Crippling wound,"Require 1D6 credits of surgery immediately, or suffer -1 permanent reduction to highest of Speed or Toughness.",1D6
+9,Serious injury,No long-term effect,1D3+1
+26,Minor injuries,No long-term effect,1
+15,Knocked out,No long-term effect,-
+5,School of hard knocks,Earn 1 XP (see below),-

@@ -1,0 +1,48 @@
+{
+  "table": "We Are Best Characterized As Table",
+  "pdf_pages": [
+    34
+  ],
+  "columns": [
+    "weight",
+    "we_are_best_characterized_as"
+  ],
+  "rows": [
+    {
+      "weight": 12,
+      "we_are_best_characterized_as": "Lovable rogues"
+    },
+    {
+      "weight": 9,
+      "we_are_best_characterized_as": "Consummate professionals"
+    },
+    {
+      "weight": 7,
+      "we_are_best_characterized_as": "Cut-throat outlaws"
+    },
+    {
+      "weight": 6,
+      "we_are_best_characterized_as": "Defenders of the down-trodden"
+    },
+    {
+      "weight": 14,
+      "we_are_best_characterized_as": "Hardened rebels"
+    },
+    {
+      "weight": 10,
+      "we_are_best_characterized_as": "Starport scum"
+    },
+    {
+      "weight": 14,
+      "we_are_best_characterized_as": "Somewhat honorable bandits"
+    },
+    {
+      "weight": 15,
+      "we_are_best_characterized_as": "In it for the credits"
+    },
+    {
+      "weight": 13,
+      "we_are_best_characterized_as": "Living the dream!"
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "table": "Specialists Table",
+  "pdf_pages": [
+    106
+  ],
+  "columns": [
+    "weight",
+    "specialist_a",
+    "specialist_b",
+    "specialist_c"
+  ],
+  "rows": [
+    {
+      "weight": 1,
+      "specialist_a": "Power claw",
+      "specialist_b": "Marksman’s rifle",
+      "specialist_c": "Marksman’s rifle"
+    },
+    {
+      "weight": 1,
+      "specialist_a": "Shotgun",
+      "specialist_b": "Auto rifle",
+      "specialist_c": "Shell gun"
+    },
+    {
+      "weight": 1,
+      "specialist_a": "Auto rifle",
+      "specialist_b": "Shell gun",
+      "specialist_c": "Fury rifle"
+    },
+    {
+      "weight": 1,
+      "specialist_a": "Clingfire pistol",
+      "specialist_b": "Hand flamer",
+      "specialist_c": "Plasma rifle"
+    },
+    {
+      "weight": 1,
+      "specialist_a": "Hunting rifle",
+      "specialist_b": "Rattle gun",
+      "specialist_c": "Plasma rifle"
+    },
+    {
+      "weight": 1,
+      "specialist_a": "Hand gun + Ripper sword",
+      "specialist_b": "Rattle gun",
+      "specialist_c": "Hyper blaster"
+    }
+  ]
+}

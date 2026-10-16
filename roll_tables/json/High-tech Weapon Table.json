@@ -1,0 +1,48 @@
+{
+  "table": "High-tech Weapon Table",
+  "pdf_pages": [
+    30
+  ],
+  "columns": [
+    "weight",
+    "high_tech_weapon"
+  ],
+  "rows": [
+    {
+      "weight": 5,
+      "high_tech_weapon": "Dueling Pistol"
+    },
+    {
+      "weight": 10,
+      "high_tech_weapon": "Hand Cannon"
+    },
+    {
+      "weight": 15,
+      "high_tech_weapon": "Hand Laser"
+    },
+    {
+      "weight": 15,
+      "high_tech_weapon": "Beam Pistol"
+    },
+    {
+      "weight": 10,
+      "high_tech_weapon": "Infantry laser"
+    },
+    {
+      "weight": 15,
+      "high_tech_weapon": "Blast Pistol"
+    },
+    {
+      "weight": 10,
+      "high_tech_weapon": "Blast Rifle"
+    },
+    {
+      "weight": 5,
+      "high_tech_weapon": "Plasma Rifle"
+    },
+    {
+      "weight": 15,
+      "high_tech_weapon": "Glare Sword"
+    }
+  ]
+}

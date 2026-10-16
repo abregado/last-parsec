@@ -1,0 +1,36 @@
+{
+  "table": "Time Constraint Table",
+  "pdf_pages": [
+    151
+  ],
+  "columns": [
+    "weight",
+    "constraint"
+  ],
+  "rows": [
+    {
+      "weight": 1,
+      "constraint": "None: Nothing happens. Carry on."
+    },
+    {
+      "weight": 1,
+      "constraint": "Reinforcements: 3 additional enemy arrive from the center of either neutral battlefield edge. Pick the entry point closest to a crew figure. One of the arrivals is a Specialist."
+    },
+    {
+      "weight": 1,
+      "constraint": "Significant reinforcements: 3 additional enemy arrive from the center of either neutral battlefield edge. Pick the entry point closest to a crew figure. One of the arrivals is a Specialist. Additional enemies arrive from the center of the opponents’ battlefield edge."
+    },
+    {
+      "weight": 1,
+      "constraint": "Count down: Roll 1D6 each round hereafter. On a 1, the Battle ends immediately. At the end of the next round the Battle ends on a 1-2, then 1-3, and so forth. If the clock runs out before the opposing side has been driven off, the battle ends and you do not Hold the Field. You must complete your objective before this happens to Win."
+    },
+    {
+      "weight": 1,
+      "constraint": "Evac now! The battle ends immediately. You do not Hold the Field, and you only Win if you have achieved your objective already."
+    },
+    {
+      "weight": 1,
+      "constraint": "Elite reinforcements: A Unique Individual and 2 enemy (one of which is a Lieutenant) arrive. Place them at the center of the opponents’ battlefield edge."
+    }
+  ]
+}

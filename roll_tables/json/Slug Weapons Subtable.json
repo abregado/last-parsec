@@ -1,0 +1,68 @@
+{
+  "table": "Slug Weapons Subtable",
+  "pdf_pages": [
+    133
+  ],
+  "columns": [
+    "weight",
+    "slug_weapons"
+  ],
+  "rows": [
+    {
+      "weight": 5,
+      "slug_weapons": "Hold Out Pistol"
+    },
+    {
+      "weight": 8,
+      "slug_weapons": "Hand Gun"
+    },
+    {
+      "weight": 5,
+      "slug_weapons": "Scrap Pistol"
+    },
+    {
+      "weight": 8,
+      "slug_weapons": "Machine Pistol"
+    },
+    {
+      "weight": 6,
+      "slug_weapons": "Duelling Pistol"
+    },
+    {
+      "weight": 5,
+      "slug_weapons": "Hand Cannon"
+    },
+    {
+      "weight": 9,
+      "slug_weapons": "Colony Rifle"
+    },
+    {
+      "weight": 10,
+      "slug_weapons": "Military Rifle"
+    },
+    {
+      "weight": 9,
+      "slug_weapons": "Shotgun"
+    },
+    {
+      "weight": 5,
+      "slug_weapons": "Flak Gun"
+    },
+    {
+      "weight": 8,
+      "slug_weapons": "Hunting Rifle"
+    },
+    {
+      "weight": 5,
+      "slug_weapons": "Marksman’s Rifle"
+    },
+    {
+      "weight": 9,
+      "slug_weapons": "Auto Rifle"
+    },
+    {
+      "weight": 8,
+      "slug_weapons": "Rattle Gun"
+    }
+  ]
+}

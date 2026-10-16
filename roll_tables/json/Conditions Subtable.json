@@ -1,0 +1,53 @@
+{
+  "table": "Conditions Subtable",
+  "pdf_pages": [
+    86
+  ],
+  "columns": [
+    "weight",
+    "conditions",
+    "effects"
+  ],
+  "rows": [
+    {
+      "weight": 1,
+      "conditions": "Vengeful",
+      "effects": "If the mission fails, the Patron becomes a Rival."
+    },
+    {
+      "weight": 2,
+      "conditions": "Demanding",
+      "effects": "Danger Pay is only upon success."
+    },
+    {
+      "weight": 1,
+      "conditions": "Small Squad",
+      "effects": "You cannot deploy more than 4 crew."
+    },
+    {
+      "weight": 1,
+      "conditions": "Full Squad",
+      "effects": "You must have 6 available crew."
+    },
+    {
+      "weight": 1,
+      "conditions": "Clean",
+      "effects": "You cannot ever have made law enforcement Rivals."
+    },
+    {
+      "weight": 2,
+      "conditions": "Busy",
+      "effects": "If the mission is a success, the Patron offers a new job next campaign turn."
+    },
+    {
+      "weight": 1,
+      "conditions": "One-time Contract",
+      "effects": "This Patron cannot be retained as a contact."
+    },
+    {
+      "weight": 1,
+      "conditions": "Reputation Required",
+      "effects": "You must have completed a prior Patron job on this world."
+    }
+  ]
+}

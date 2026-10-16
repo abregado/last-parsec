@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Last Parsec tests</title>
+  <link rel="stylesheet" href="css/styles.css?v=20261016205452">
+  <style>
+    .summary { margin: 8px 0 20px; font-weight: 600; }
+    .summary.pass { color: var(--success); }
+    .summary.fail { color: var(--danger); }
+    .results { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; font-size: 0.92rem; }
+    .results li { padding: 6px 10px; border-left: 3px solid var(--success); background: var(--surface); border-radius: 3px; }
+    .results li.fail { border-left-color: var(--danger); }
+    .results .group { margin-top: 14px; padding: 0; border: 0; background: none; color: var(--text-muted); font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.06em; }
+    .results pre { margin: 6px 0 0; white-space: pre-wrap; color: var(--danger); font-family: var(--font-mono); font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Tests</h1>
+    <p class="summary" id="summary">Running…</p>
+    <ul class="results" id="results"></ul>
+  </main>
+
+  <script src="js/lp.js?v=20261016205452"></script>
+  <script src="js/data/tables.js?v=20261016205452"></script>
+  <script src="js/core/rng.js?v=20261016205452"></script>
+  <script src="js/core/effects.js?v=20261016205452"></script>
+  <script src="js/data/species.js?v=20261016205452"></script>
+  <script src="js/rules/character.js?v=20261016205452"></script>
+  <script src="js/rules/crew.js?v=20261016205452"></script>
+  <script src="tests/runner.js?v=20261016205452"></script>
+  <script src="tests/core.test.js?v=20261016205452"></script>
+  <script src="tests/character.test.js?v=20261016205452"></script>
+  <script src="tests/crew.test.js?v=20261016205452"></script>
+  <script>LP.test.run();</script>
+</body>
+</html>

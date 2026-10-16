@@ -1,0 +1,29 @@
+{
+  "table": "Time Frame Table",
+  "pdf_pages": [
+    85
+  ],
+  "columns": [
+    "weight",
+    "time"
+  ],
+  "rows": [
+    {
+      "weight": 5,
+      "time": "This campaign turn."
+    },
+    {
+      "weight": 2,
+      "time": "This or the next campaign turn."
+    },
+    {
+      "weight": 2,
+      "time": "This or the following 2 campaign turns."
+    },
+    {
+      "weight": 1,
+      "time": "Any time."
+    }
+  ],
+  "note": "open-ended '10+' -> weight 1"
+}

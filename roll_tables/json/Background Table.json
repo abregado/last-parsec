@@ -1,0 +1,190 @@
+{
+  "table": "Background Table",
+  "pdf_pages": [
+    27
+  ],
+  "columns": [
+    "weight",
+    "background",
+    "effect",
+    "resources",
+    "starting"
+  ],
+  "rows": [
+    {
+      "weight": 4,
+      "background": "Peaceful, High-Tech Colony",
+      "effect": "+1 Savvy",
+      "resources": "+1D6 credits",
+      "starting": "-"
+    },
+    {
+      "weight": 5,
+      "background": "Giant, Overcrowded, Dystopian City",
+      "effect": "+1 Speed",
+      "resources": "-",
+      "starting": "-"
+    },
+    {
+      "weight": 4,
+      "background": "Low-Tech Colony",
+      "effect": "-",
+      "resources": "-",
+      "starting": "+1 Low-tech Weapon"
+    },
+    {
+      "weight": 4,
+      "background": "Mining Colony",
+      "effect": "+1 Toughness",
+      "resources": "-",
+      "starting": "-"
+    },
+    {
+      "weight": 4,
+      "background": "Military Brat",
+      "effect": "+1 Combat Skill",
+      "resources": "-",
+      "starting": "-"
+    },
+    {
+      "weight": 4,
+      "background": "Space Station",
+      "effect": "-",
+      "resources": "-",
+      "starting": "+1 Gear"
+    },
+    {
+      "weight": 4,
+      "background": "Military Outpost",
+      "effect": "+1 Reactions",
+      "resources": "-",
+      "starting": "-"
+    },
+    {
+      "weight": 5,
+      "background": "Drifter",
+      "effect": "-",
+      "resources": "-",
+      "starting": "+1 Gear"
+    },
+    {
+      "weight": 5,
+      "background": "Lower Megacity Class",
+      "effect": "-",
+      "resources": "-",
+      "starting": "+1 Low-tech Weapon"
+    },
+    {
+      "weight": 3,
+      "background": "Wealthy Merchant Family",
+      "effect": "-",
+      "resources": "+2D6 credits",
+      "starting": "-"
+    },
+    {
+      "weight": 4,
+      "background": "Frontier Gang",
+      "effect": "+1 Combat Skill",
+      "resources": "-",
+      "starting": "-"
+    },
+    {
+      "weight": 3,
+      "background": "Religious Cult",
+      "effect": "-",
+      "resources": "Patron, +1 story point",
+      "starting": "-"
+    },
+    {
+      "weight": 3,
+      "background": "War-Torn Hell-Hole",
+      "effect": "+1 Reactions",
+      "resources": "-",
+      "starting": "+1 Military Weapon"
+    },
+    {
+      "weight": 3,
+      "background": "Tech Guild",
+      "effect": "+1 Savvy",
+      "resources": "+1D6 credits",
+      "starting": "+1 High-tech Weapon"
+    },
+    {
+      "weight": 4,
+      "background": "Subjugated Colony on Alien World",
+      "effect": "-",
+      "resources": "-",
+      "starting": "+1 Gadget"
+    },
+    {
+      "weight": 5,
+      "background": "Long-Term Space Mission",
+      "effect": "+1 Savvy",
+      "resources": "-",
+      "starting": "-"
+    },
+    {
+      "weight": 4,
+      "background": "Research Outpost",
+      "effect": "+1 Savvy",
+      "resources": "-",
+      "starting": "+1 Gadget"
+    },
+    {
+      "weight": 4,
+      "background": "Primitive or Regressed World",
+      "effect": "+1 Toughness",
+      "resources": "-",
+      "starting": "+1 Low-tech Weapon"
+    },
+    {
+      "weight": 4,
+      "background": "Orphan Utility Program",
+      "effect": "-",
+      "resources": "Patron, +1 story point",
+      "starting": "-"
+    },
+    {
+      "weight": 4,
+      "background": "Isolationist Enclave",
+      "effect": "-",
+      "resources": "2 Quest Rumors",
+      "starting": "-"
+    },
+    {
+      "weight": 4,
+      "background": "Comfortable Megacity Class",
+      "effect": "-",
+      "resources": "+1D6 credits",
+      "starting": "-"
+    },
+    {
+      "weight": 5,
+      "background": "Industrial World",
+      "effect": "-",
+      "resources": "-",
+      "starting": "+1 Gear"
+    },
+    {
+      "weight": 4,
+      "background": "Bureaucrat",
+      "effect": "-",
+      "resources": "+1D6 credits",
+      "starting": "-"
+    },
+    {
+      "weight": 4,
+      "background": "Wasteland Nomads",
+      "effect": "+1 Reactions",
+      "resources": "-",
+      "starting": "+1 Low-tech Weapon"
+    },
+    {
+      "weight": 3,
+      "background": "Alien Culture",
+      "effect": "-",
+      "resources": "-",
+      "starting": "+1 High-tech Weapon"
+    }
+  ]
+}

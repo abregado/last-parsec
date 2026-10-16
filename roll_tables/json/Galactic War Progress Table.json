@@ -1,0 +1,34 @@
+{
+  "table": "Galactic War Progress Table",
+  "pdf_pages": [
+    128
+  ],
+  "columns": [
+    "weight",
+    "result",
+    "effect"
+  ],
+  "rows": [
+    {
+      "weight": 6,
+      "result": "Lost to Unity",
+      "effect": "The planet is lost to the invaders and cannot be visited again."
+    },
+    {
+      "weight": 15,
+      "result": "Contested",
+      "effect": "No progress."
+    },
+    {
+      "weight": 9,
+      "result": "Making Ground",
+      "effect": "Add +1 to all future rolls on this table."
+    },
+    {
+      "weight": 6,
+      "result": "Unity Victorious",
+      "effect": "The planet can now be visited again. Due to increased troop presence, all future Invasion Threat rolls on this world are at -2."
+    }
+  ],
+  "note": "2D6 table: weight = number of dice combinations (out of 36) producing the range"
+}

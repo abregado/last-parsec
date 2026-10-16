@@ -1,0 +1,225 @@
+{
+  "table": "World Traits Table",
+  "pdf_pages": [
+    75,
+    76,
+    77
+  ],
+  "columns": [
+    "weight",
+    "trait",
+    "description"
+  ],
+  "rows": [
+    {
+      "weight": 3,
+      "trait": "Haze",
+      "description": "During battle, visibility is reduced to 1D6+8”"
+    },
+    {
+      "weight": 3,
+      "trait": "Overgrown",
+      "description": "When setting up the table, you must add 1D6+2 individual plant features or 1D3 areas of vegetation (roughly 3-5” across)"
+    },
+    {
+      "weight": 2,
+      "trait": "Warzone",
+      "description": "When setting up the table, you must add 1D3 ruined buildings or craters to the table."
+    },
+    {
+      "weight": 2,
+      "trait": "Heavily enforced",
+      "description": "When fighting opponents from the Criminal Elements Encounter Table, the number encountered is reduced by 1. When rolling to see if they become Rivals, only roll a single die as normal."
+    },
+    {
+      "weight": 2,
+      "trait": "Rampant crime",
+      "description": "When fighting opponents from the Criminal Elements encounter list, add 1 to the number encountered."
+    },
+    {
+      "weight": 2,
+      "trait": "Invasion risk",
+      "description": "Add +1 to all Invasion rolls."
+    },
+    {
+      "weight": 2,
+      "trait": "Imminent invasion",
+      "description": "Add +2 to all Invasion rolls and if the world is invaded, rolls for war progress are at -1."
+    },
+    {
+      "weight": 2,
+      "trait": "Lacks starship facilities",
+      "description": "You cannot spend more than 3 credits per campaign turn on starship Repairs."
+    },
+    {
+      "weight": 2,
+      "trait": "Easy recruiting",
+      "description": "Add +1 to the roll when Recruiting."
+    },
+    {
+      "weight": 2,
+      "trait": "Medical science",
+      "description": "The cost for accelerated medical care is only 3 credits per character."
+    },
+    {
+      "weight": 2,
+      "trait": "Technical knowledge",
+      "description": "Add +1 to all Repair attempts."
+    },
+    {
+      "weight": 2,
+      "trait": "Opportunities",
+      "description": "Add +1 to the roll when searching for Patrons."
+    },
+    {
+      "weight": 3,
+      "trait": "Booming economy",
+      "description": "When rolling for post-battle credit rewards, any 1 on the dice is rerolled until it shows a score other than 1."
+    },
+    {
+      "weight": 3,
+      "trait": "Busy markets",
+      "description": "Each campaign turn, you may spend 2 credits once to roll on the Trade Table (p.79)."
+    },
+    {
+      "weight": 2,
+      "trait": "Bureaucratic mess",
+      "description": "When attempting to leave, you must roll 2D6. On a 2-4, you are delayed and cannot leave this campaign turn without a bribe equal to the roll in credits. You may try again next campaign turn."
+    },
+    {
+      "weight": 2,
+      "trait": "Restricted education",
+      "description": "You must roll 6+ to be approved for Advanced Training on this world."
+    },
+    {
+      "weight": 2,
+      "trait": "Expensive education",
+      "description": "The fee to enroll in Advanced Training is 3 credits."
+    },
+    {
+      "weight": 3,
+      "trait": "Travel restricted",
+      "description": "No more than one crew member may take the Explore option each campaign turn."
+    },
+    {
+      "weight": 2,
+      "trait": "Unity safe sector",
+      "description": "The world cannot be Invaded."
+    },
+    {
+      "weight": 3,
+      "trait": "Gloom",
+      "description": "In battle, maximum visibility is restricted to 1D6+6”."
+    },
+    {
+      "weight": 2,
+      "trait": "Bot manufacturing",
+      "description": "All Bot upgrades are 1 credit cheaper."
+    },
+    {
+      "weight": 3,
+      "trait": "Fuel refinery",
+      "description": "Traveling from this world costs only 3 credits."
+    },
+    {
+      "weight": 2,
+      "trait": "Alien species restricted",
+      "description": "Roll 1D10 to determine which species is restricted: 1 Engineer 2-4 K’Erin 5 Soulless 6 Precursor 7-9 Feral 10 Swift Characters of this type cannot be hired here (count as baseline Humans instead), and cannot undertake any crew jobs. They may participate in combat normally."
+    },
+    {
+      "weight": 2,
+      "trait": "Weapon licensing",
+      "description": "Any weapon obtained through the Trade Table or purchased outright costs +1 credit."
+    },
+    {
+      "weight": 2,
+      "trait": "Import restrictions",
+      "description": "You cannot sell any items on this world."
+    },
+    {
+      "weight": 2,
+      "trait": "Military outpost",
+      "description": "Add +2 to Invasion rolls. Add +2 when checking for war progress."
+    },
+    {
+      "weight": 3,
+      "trait": "Dangerous",
+      "description": "When rolling on the Roving Threats Encounter Table, increase the number of opponents by +1."
+    },
+    {
+      "weight": 2,
+      "trait": "Shipyards",
+      "description": "The cost of all Ship Components is reduced by 2 credits."
+    },
+    {
+      "weight": 3,
+      "trait": "Barren",
+      "description": "No plant features can be used on the battlefield."
+    },
+    {
+      "weight": 2,
+      "trait": "Vendetta system",
+      "description": "Opponents become your Rivals on a roll of 1 or 2."
+    },
+    {
+      "weight": 3,
+      "trait": "Free trade zone",
+      "description": "One crew member per campaign turn can roll twice when using the Trade Table, and choose either result."
+    },
+    {
+      "weight": 2,
+      "trait": "Corporate state",
+      "description": "+2 when rolling to find a Patron. Patrons are always Corporations. Failing a mission means being blacklisted and you cannot get Patrons here again."
+    },
+    {
+      "weight": 2,
+      "trait": "Adventurous population",
+      "description": "When successfully Recruiting, you may roll up one additional character and then choose who to hire."
+    },
+    {
+      "weight": 3,
+      "trait": "Frozen",
+      "description": "Any character making a Dash may opt to slide. They move 1D6” in a straight line, and must move the full distance. If they collide with anything, they – and any character they collide with – are knocked 1” in a random direction and become Stunned."
+    },
+    {
+      "weight": 2,
+      "trait": "Flat",
+      "description": "Do not place any hills or raised ground on the battlefield."
+    },
+    {
+      "weight": 3,
+      "trait": "Fuel shortage",
+      "description": "The cost to travel from this world is raised by 1D3 credits. You may roll each campaign turn."
+    },
+    {
+      "weight": 2,
+      "trait": "Reflective dust",
+      "description": "All Laser, Beam, or Blast weapons are -1 to Hit at ranges exceeding 9”."
+    },
+    {
+      "weight": 3,
+      "trait": "High cost",
+      "description": "Your crew size counts as being 2 higher for the purpose of Upkeep costs."
+    },
+    {
+      "weight": 2,
+      "trait": "Interdiction",
+      "description": "You are only approved to stay for 1D3 campaign turns. To extend your stay, you must obtain a license. Roll 2D6, requiring an 8+."
+    },
+    {
+      "weight": 2,
+      "trait": "Null zone",
+      "description": "No teleportation device of any type works."
+    },
+    {
+      "weight": 3,
+      "trait": "Crystals",
+      "description": "Place 2D6 crystals on the battlefield. If you don’t have any, use rocks."
+    },
+    {
+      "weight": 4,
+      "trait": "Fog",
+      "description": "All shots beyond 8” are -1 to Hit."
+    }
+  ]
+}

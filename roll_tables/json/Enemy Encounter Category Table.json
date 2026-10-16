@@ -1,0 +1,43 @@
+{
+  "table": "Enemy Encounter Category Table",
+  "pdf_pages": [
+    96
+  ],
+  "columns": [
+    "element",
+    "weight_opportunity",
+    "weight_patron",
+    "weight_quest",
+    "weight_unknown_rival"
+  ],
+  "rows": [
+    {
+      "element": "Criminal Elements",
+      "weight_opportunity": 30,
+      "weight_patron": 25,
+      "weight_quest": 15,
+      "weight_unknown_rival": 50
+    },
+    {
+      "element": "Hired Muscle",
+      "weight_opportunity": 30,
+      "weight_patron": 35,
+      "weight_quest": 25,
+      "weight_unknown_rival": 30
+    },
+    {
+      "element": "Interested Parties",
+      "weight_opportunity": 20,
+      "weight_patron": 15,
+      "weight_quest": 30,
+      "weight_unknown_rival": 20
+    },
+    {
+      "element": "Roving Threats",
+      "weight_opportunity": 20,
+      "weight_patron": 25,
+      "weight_quest": 30,
+      "weight_unknown_rival": 0
+    }
+  ]
+}

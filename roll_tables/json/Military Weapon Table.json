@@ -1,0 +1,44 @@
+{
+  "table": "Military Weapon Table",
+  "pdf_pages": [
+    30
+  ],
+  "columns": [
+    "weight",
+    "military_weapon"
+  ],
+  "rows": [
+    {
+      "weight": 25,
+      "military_weapon": "Military Rifle"
+    },
+    {
+      "weight": 20,
+      "military_weapon": "Infantry Laser"
+    },
+    {
+      "weight": 5,
+      "military_weapon": "Marksman’s Rifle"
+    },
+    {
+      "weight": 10,
+      "military_weapon": "Needle Rifle"
+    },
+    {
+      "weight": 15,
+      "military_weapon": "Auto Rifle"
+    },
+    {
+      "weight": 5,
+      "military_weapon": "Rattle Gun"
+    },
+    {
+      "weight": 15,
+      "military_weapon": "Boarding Saber"
+    },
+    {
+      "weight": 5,
+      "military_weapon": "Shatter Axe"
+    }
+  ]
+}

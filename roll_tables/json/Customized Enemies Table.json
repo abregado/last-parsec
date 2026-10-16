@@ -1,0 +1,40 @@
+{
+  "table": "Customized Enemies Table",
+  "pdf_pages": [
+    167
+  ],
+  "columns": [
+    "weight",
+    "change"
+  ],
+  "rows": [
+    {
+      "weight": 1,
+      "change": "If the enemy has a Panic range of 1-2 or higher, reduce the Range by 1."
+    },
+    {
+      "weight": 1,
+      "change": "The enemy adds +1” to Speed, +2” if it is 4” or below."
+    },
+    {
+      "weight": 1,
+      "change": "Increase Combat Skill by +1 to a maximum of +2."
+    },
+    {
+      "weight": 1,
+      "change": "Increase Toughness by +1 to a maximum of 5."
+    },
+    {
+      "weight": 2,
+      "change": "Aggressive and Beast AI types change to Rampaging. Tactical AI changes to Aggressive. Defensive and Cautious AI types change to Tactical. Others do not change."
+    },
+    {
+      "weight": 2,
+      "change": "Roll 1D6 for a special ability on the table below, or add an extra one."
+    },
+    {
+      "weight": 2,
+      "change": "Gain a 6+ Armor Saving Throw or add +1 to an existing Saving Throw."
+    }
+  ]
+}

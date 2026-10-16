@@ -1,0 +1,34 @@
+weight,trade_result,effects
+3,A personal weapon,Roll once on the Low Tech Weapon Table (p.28).
+3,Sell some cargo,Earn 2 credits.
+3,Find something useful,Roll once on the Gear Table (p.29).
+2,Quality food and booze,Recruit a new character to your crew. Single-use.
+3,Instruction book,A crew member of choice can read it and earn +1 XP. Single-use.
+4,Bits of scrap,"You sell it on to an interested party, earning 1 credit of profit in the process."
+4,Medical pack,Receive your choice of a Stim-pack or Med-patch.
+2,Worthless trinket,"Worthless? Roll 1D6. On a 6, earn +1 story point."
+2,Local maps,"If you receive a Quest on this or the following world, you may immediately add 1 Rumor. Single-use."
+2,Luxury trinket,"If Recruiting, you may use it as a gift to receive a +2 bonus to the roll. Alternatively, you can sell it: Roll twice on the Trade Table and select the result you prefer. If a Swift character finds this, they will keep it for themselves, earning +2 XP. Single-use."
+2,Basic supplies,Skip Upkeep costs for one campaign turn. Single-use.
+4,Contraband,"You can turn this down, but if you accept it, you earn 1D6 credits from selling it on. If you roll a 4-6, you also receive a Rival."
+3,Gun Upgrade Kit,"Receive your choice of a Laser Sight, Bipod or Beam Light."
+2,Useless trinket,"Useless? Roll 1D6. On a 6, earn +1 story point."
+5,Trade goods,"Every time you arrive on a new planet, you may roll 1D6 to see how many Credits the goods will sell for here. You can wait as long as you like, but if you roll a 1, they have perished or become damaged, and are now worthless."
+4,Something interesting,Roll once on the Loot Table (p.131).
+3,Fuel,"Roll 1D6. You have secured that many credits worth of fuel, which can be used to offset travel costs."
+2,Spare parts,"Add +1 when making a Repair attempt. If the roll is a natural 1, the Spare Parts are used up and must be erased from your roster."
+2,Tourist garbage,"Not actually worth anything, but roll 1D6. On a 5-6, you can add 1 story point."
+1,Don’t usually see these for sale,"You may pay 3 credits. If you do, you can roll on the Loot Table (p.131). The item must be used by the crew member who went trading."
+3,Ordnance,You receive 3 grenades (Frakk or Dazzle in any combination you like)
+3,Basic firearms,"Your choice of a Handgun, Colony Rifle, or Shotgun."
+1,Odd device,"If you want to buy this, pay 1 credit, then roll 1D6. On a 6, you can roll on the Loot Table (p.131). On any other score, it’s complete garbage."
+2,Military fuel cell,Zero travel costs when jumping to a new planet. Single-use.
+4,Hot tip,Gain 1 Quest Rumor.
+2,Insider information,"Automatically obtain a Patron next campaign turn, if you look for one. Single-use."
+4,Army surplus,"Your choice of an Auto Rifle, Blast Pistol or Glare Sword."
+3,A chance to unload some stuff,"A revolutionary will buy any weapons for 2 credits each, provided they are not damaged."
+3,A lot of blinking lights,Roll once on the Gear subsection of the Loot Table (p.132).
+5,“Gently used”,Roll once on the Gear subsection of the Loot Table (p.132). The item is damaged and needs Repair.
+5,“Pre-owned”,Roll once on the Loot Table (p.131). The item is damaged and needs Repair.
+4,Medical reserves,Obtain 2 Stim-packs and 2 Med-patches.
+5,Starship repair parts,Count as 1D6 credits for the purpose of repairing Hull Point damage. Single-use.

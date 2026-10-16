@@ -1,0 +1,24 @@
+{
+  "table": "Odd and Ends Table",
+  "pdf_pages": [
+    135
+  ],
+  "columns": [
+    "weight",
+    "odds_and_ends_table"
+  ],
+  "rows": [
+    {
+      "weight": 55,
+      "odds_and_ends_table": "Consumables (2 uses)"
+    },
+    {
+      "weight": 15,
+      "odds_and_ends_table": "Implants"
+    },
+    {
+      "weight": 30,
+      "odds_and_ends_table": "Ship Items"
+    }
+  ]
+}

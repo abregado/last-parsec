@@ -1,0 +1,100 @@
+{
+  "table": "Gear Table",
+  "pdf_pages": [
+    31
+  ],
+  "columns": [
+    "weight",
+    "gear"
+  ],
+  "rows": [
+    {
+      "weight": 4,
+      "gear": "Assault Blade"
+    },
+    {
+      "weight": 6,
+      "gear": "Beam Light"
+    },
+    {
+      "weight": 5,
+      "gear": "Bipod"
+    },
+    {
+      "weight": 5,
+      "gear": "Booster Pills"
+    },
+    {
+      "weight": 4,
+      "gear": "Camo Cloak"
+    },
+    {
+      "weight": 4,
+      "gear": "Combat Armor"
+    },
+    {
+      "weight": 5,
+      "gear": "Communicator"
+    },
+    {
+      "weight": 4,
+      "gear": "Concealed Blade"
+    },
+    {
+      "weight": 5,
+      "gear": "Fake ID"
+    },
+    {
+      "weight": 4,
+      "gear": "Fixer"
+    },
+    {
+      "weight": 6,
+      "gear": "Frag Vest"
+    },
+    {
+      "weight": 5,
+      "gear": "Grapple Launcher"
+    },
+    {
+      "weight": 4,
+      "gear": "Hazard Suit"
+    },
+    {
+      "weight": 4,
+      "gear": "Laser Sight"
+    },
+    {
+      "weight": 4,
+      "gear": "Loaded Dice"
+    },
+    {
+      "weight": 6,
+      "gear": "Med-patch"
+    },
+    {
+      "weight": 6,
+      "gear": "Nano-doc"
+    },
+    {
+      "weight": 4,
+      "gear": "Purifier"
+    },
+    {
+      "weight": 4,
+      "gear": "Scanner bot"
+    },
+    {
+      "weight": 3,
+      "gear": "Sector Permit"
+    },
+    {
+      "weight": 4,
+      "gear": "Steel Boots"
+    },
+    {
+      "weight": 4,
+      "gear": "Tracker Sight"
+    }
+  ]
+}

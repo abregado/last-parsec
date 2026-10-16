@@ -1,0 +1,36 @@
+{
+  "table": "Environmental Hazards - Form",
+  "pdf_pages": [
+    168
+  ],
+  "columns": [
+    "weight",
+    "form"
+  ],
+  "rows": [
+    {
+      "weight": 1,
+      "form": "2” diameter"
+    },
+    {
+      "weight": 1,
+      "form": "2” diameter"
+    },
+    {
+      "weight": 1,
+      "form": "3” diameter"
+    },
+    {
+      "weight": 1,
+      "form": "3” diameter"
+    },
+    {
+      "weight": 1,
+      "form": "3” diameter"
+    },
+    {
+      "weight": 1,
+      "form": "4” diameter"
+    }
+  ]
+}

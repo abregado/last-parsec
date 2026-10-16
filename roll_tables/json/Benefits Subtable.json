@@ -1,0 +1,49 @@
+{
+  "table": "Benefits Subtable",
+  "pdf_pages": [
+    85,
+    86
+  ],
+  "columns": [
+    "weight",
+    "benefits",
+    "effects"
+  ],
+  "rows": [
+    {
+      "weight": 2,
+      "benefits": "Fringe Benefit",
+      "effects": "Roll on the Loot Table (p.131"
+    },
+    {
+      "weight": 2,
+      "benefits": "Connections",
+      "effects": "Gain a Rumor."
+    },
+    {
+      "weight": 1,
+      "benefits": "Company Store",
+      "effects": "Roll on the Trade Table (p.79)."
+    },
+    {
+      "weight": 1,
+      "benefits": "Health Insurance",
+      "effects": "Mark down 2 campaign turns of injury recovery, assigned as you see fit."
+    },
+    {
+      "weight": 1,
+      "benefits": "Security Team",
+      "effects": "Reduce enemy force numbers by 1"
+    },
+    {
+      "weight": 2,
+      "benefits": "Persistent",
+      "effects": "Patron remains available if you travel."
+    },
+    {
+      "weight": 1,
+      "benefits": "Negotiable",
+      "effects": "If you accept this job, you may reroll the Danger Pay roll and pick the better of the two rolls."
+    }
+  ]
+}

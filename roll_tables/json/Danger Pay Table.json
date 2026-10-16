@@ -1,0 +1,29 @@
+{
+  "table": "Danger Pay Table",
+  "pdf_pages": [
+    85
+  ],
+  "columns": [
+    "weight",
+    "danger_pay"
+  ],
+  "rows": [
+    {
+      "weight": 4,
+      "danger_pay": "+1 credit"
+    },
+    {
+      "weight": 4,
+      "danger_pay": "+2 credits"
+    },
+    {
+      "weight": 1,
+      "danger_pay": "+3 credits"
+    },
+    {
+      "weight": 1,
+      "danger_pay": "+3 credits and roll twice, picking the higher die when rolling for mission pay after the battle."
+    }
+  ],
+  "note": "open-ended '10+' -> weight 1"
+}

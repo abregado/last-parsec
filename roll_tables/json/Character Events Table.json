@@ -1,0 +1,134 @@
+{
+  "table": "Character Events Table",
+  "pdf_pages": [
+    130,
+    131,
+    132
+  ],
+  "columns": [
+    "weight",
+    "event"
+  ],
+  "rows": [
+    {
+      "weight": 3,
+      "event": "All this endless violence is depressing you. The character refuses to participate in any battle during the next campaign turn (except for an Invasion battle). Get +1 story point, as they get a new perspective on life. K’Erin are unaffected by this."
+    },
+    {
+      "weight": 3,
+      "event": "You have some business to attend to elsewhere. The character is unavailable for the next two campaign turns. They require no Upkeep during this time, and cannot be the target of any events. When they return, award them 1D6 XP, and roll once on the Loot Table. If the character is Swift, they never return but are replaced with a brand new Swift character rolled up normally."
+    },
+    {
+      "weight": 4,
+      "event": "You make some local friends. The character earns +1 XP."
+    },
+    {
+      "weight": 2,
+      "event": "You are starting to wonder if it is time to move on. If the character is currently in Sick Bay, roll 1D6. If the roll is equal or below the number of campaign turns of recovery left, they will decide to leave the crew."
+    },
+    {
+      "weight": 3,
+      "event": "You get a letter from home. The character earns +1 XP. Roll 1D6. On a 5-6 you immediately receive a Quest."
+    },
+    {
+      "weight": 4,
+      "event": "You argue with the rest of the crew. During the next campaign turn, the crew member refuses to do any tasks but will participate in battle normally."
+    },
+    {
+      "weight": 4,
+      "event": "You get in a scrap with another crew member. Randomly select another crew member and roll 1D6+Combat Skill for each. The lower score must spend one campaign turn in Sick Bay. On a draw, both go to Sick Bay. If a K’Erin is in the crew, you must fight them."
+    },
+    {
+      "weight": 3,
+      "event": "The local food is sitting well with you. If in Sick Bay, reduce your recovery time by one campaign turn. If not, earn +1 XP. Engineers receive no benefit from this."
+    },
+    {
+      "weight": 3,
+      "event": "You are not sure you are really the same person any longer. Roll on the Motivation Table (p.26) chapter and change to that motivation. You do not receive any items or resources, but if the new motivation would have any ability score bonuses, earn +1 XP for each +1 ability score you would have received normally. If you roll the current motivation, the character becomes particularly self-assured. Earn +1 story point."
+    },
+    {
+      "weight": 4,
+      "event": "It is time for a make-over! The character changes their clothes, hair-style, or something else. This is only cosmetic. If you are able to, reflect this on the miniature."
+    },
+    {
+      "weight": 5,
+      "event": "Overhear something useful. Earn 1 Quest Rumor."
+    },
+    {
+      "weight": 3,
+      "event": "Earn a little on the side. Receive +2 credits."
+    },
+    {
+      "weight": 4,
+      "event": "Have a heart to heart talk with a crew member. Select a random crew member. Both earn +1 XP."
+    },
+    {
+      "weight": 3,
+      "event": "Time spent exercising is never wasted. Earn +2 XP."
+    },
+    {
+      "weight": 3,
+      "event": "You pick up an unusual hobby. Earn +1 story point and the character talks about it constantly. If the character is Swift or Precursor, they also earn +2 XP."
+    },
+    {
+      "weight": 4,
+      "event": "The scars tell the story. If the character was injured in any way last or this campaign turn, they earn +2 XP."
+    },
+    {
+      "weight": 4,
+      "event": "You’ve had time to reflect on your adventures. Earn +1D3 XP."
+    },
+    {
+      "weight": 3,
+      "event": "You’ve made a real personal breakthrough. Select one ability score that has not been increased from its starting value when the character entered the campaign. It increases by +1 immediately."
+    },
+    {
+      "weight": 4,
+      "event": "You get hurt while working on the ship. Spend one campaign turn in Sick Bay, and the ship takes 1 Hull Point damage."
+    },
+    {
+      "weight": 2,
+      "event": "You have finally found true love in this bleak universe. If the characters motivation was True Love, they earn +1D6 XP. Regardless, get +1 story point. And it’s a rather nice thought, isn’t it?"
+    },
+    {
+      "weight": 3,
+      "event": "A personal enemy has tracked you down. Add a Rival. If this character leaves your crew, the Rival also leaves."
+    },
+    {
+      "weight": 4,
+      "event": "Someone has sent you a gift. Roll once on the Loot Table (p.131)."
+    },
+    {
+      "weight": 3,
+      "event": "You feel great. Eating well must be paying off. Put a note on your record sheet: Next time this character would be forced to roll on the Injury Table, the roll is ignored. Engineers cannot benefit from this event."
+    },
+    {
+      "weight": 4,
+      "event": "You know someone who knows someone. Add a Patron."
+    },
+    {
+      "weight": 2,
+      "event": "Maybe you are leading a charmed existence? Add +1 Luck."
+    },
+    {
+      "weight": 3,
+      "event": "You’ve put in a lot of hard work around here. Either repair 2 Hull Point damage or Repair one damaged item in the inventory. Engineers may do both."
+    },
+    {
+      "weight": 4,
+      "event": "They don’t make them like they used to. A random item carried by the character is damaged, and must be Repaired before it can be used again. Engineers are not affected by this event."
+    },
+    {
+      "weight": 3,
+      "event": "Where did it go? A random item carried by the character has been lost. When rolling for a Character Event next campaign turn, roll 1D6+Savvy as well. On a 5+, the item turns up again, otherwise it is lost for good."
+    },
+    {
+      "weight": 3,
+      "event": "A deep feeling of melancholy and despair is afflicting you. The character will earn no XP next campaign turn. K’Erin are not affected by this event."
+    },
+    {
+      "weight": 3,
+      "event": "You’ve had a lot of time to burn. Next campaign turn, the character may perform an additional action, even if they are in Sick Bay."
+    }
+  ]
+}

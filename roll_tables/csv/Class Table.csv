@@ -1,0 +1,24 @@
+weight,class,effect,resources,starting
+5,Working Class,"+1 Savvy, +1 Luck",-,-
+4,Technician,+1 Savvy,-,+1 Gear
+4,Scientist,+1 Savvy,-,+1 Gadget
+4,Hacker,+1 Savvy,Rival,-
+5,Soldier,+1 Combat Skill,+1D6 credits,-
+5,Mercenary,+1 Combat Skill,-,+1 Military Weapon
+5,Agitator,-,Rival,-
+4,Primitive,+1 Speed,-,+1 Low-tech Weapon
+4,Artist,-,+1D6 credits,-
+4,Negotiator,-,"Patron, +1 story point",
+5,Trader,-,+2D6 credits,-
+5,Starship Crew,+1 Savvy,-,-
+4,Petty Criminal,+1 Speed,-,-
+5,Ganger,+1 Reactions,-,+1 Low-tech Weapon
+4,Scoundrel,+1 Speed,-,-
+4,Enforcer,+1 Combat Skill,Patron,-
+4,Special Agent,+1 Reactions,Patron,+1 Gadget
+4,Troubleshooter,+1 Reactions,-,+1 Low-tech Weapon
+4,Bounty Hunter,+1 Speed,1 Rumor,+1 Low-tech Weapon
+5,Nomad,-,-,+1 Gear
+4,Explorer,+2 XP,-,+1 Gear
+4,Punk,+2 XP,Rival,-
+4,Scavenger,-,1 Rumor,+1 High-tech Weapon

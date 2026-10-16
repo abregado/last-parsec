@@ -1,0 +1,48 @@
+{
+  "table": "Protective Items Subtable",
+  "pdf_pages": [
+    134
+  ],
+  "columns": [
+    "weight",
+    "protective_items"
+  ],
+  "rows": [
+    {
+      "weight": 5,
+      "protective_items": "Battle Dress"
+    },
+    {
+      "weight": 10,
+      "protective_items": "Camo Cloak"
+    },
+    {
+      "weight": 25,
+      "protective_items": "Combat Armor"
+    },
+    {
+      "weight": 10,
+      "protective_items": "Deflector Field"
+    },
+    {
+      "weight": 15,
+      "protective_items": "Flak Screen"
+    },
+    {
+      "weight": 10,
+      "protective_items": "Flex-Armor"
+    },
+    {
+      "weight": 15,
+      "protective_items": "Frag Vest"
+    },
+    {
+      "weight": 5,
+      "protective_items": "Screen Generator"
+    },
+    {
+      "weight": 5,
+      "protective_items": "Stealth Gear"
+    }
+  ]
+}

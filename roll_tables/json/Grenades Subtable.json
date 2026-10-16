@@ -1,0 +1,20 @@
+{
+  "table": "Grenades Subtable",
+  "pdf_pages": [
+    134
+  ],
+  "columns": [
+    "weight",
+    "grenades"
+  ],
+  "rows": [
+    {
+      "weight": 60,
+      "grenades": "3 Frakk Grenades"
+    },
+    {
+      "weight": 40,
+      "grenades": "3 Dazzle grenades"
+    }
+  ]
+}

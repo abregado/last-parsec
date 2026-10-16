@@ -1,0 +1,5 @@
+element,weight_opportunity,weight_patron,weight_quest,weight_unknown_rival
+Criminal Elements,30,25,15,50
+Hired Muscle,30,35,25,30
+Interested Parties,20,15,30,20
+Roving Threats,20,25,30,0

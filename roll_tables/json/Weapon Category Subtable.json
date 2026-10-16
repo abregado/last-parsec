@@ -1,0 +1,32 @@
+{
+  "table": "Weapon Category Subtable",
+  "pdf_pages": [
+    133
+  ],
+  "columns": [
+    "weight",
+    "weapons_subtable"
+  ],
+  "rows": [
+    {
+      "weight": 35,
+      "weapons_subtable": "Slug Weapons"
+    },
+    {
+      "weight": 15,
+      "weapons_subtable": "Energy Weapons"
+    },
+    {
+      "weight": 15,
+      "weapons_subtable": "Special Weapons"
+    },
+    {
+      "weight": 20,
+      "weapons_subtable": "Melee Weapons"
+    },
+    {
+      "weight": 15,
+      "weapons_subtable": "Grenades"
+    }
+  ]
+}

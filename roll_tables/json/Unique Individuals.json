@@ -1,0 +1,263 @@
+{
+  "table": "Unique Individuals",
+  "pdf_pages": [
+    107,
+    108,
+    109
+  ],
+  "columns": [
+    "weight",
+    "enemy",
+    "speed",
+    "combat_skill",
+    "tough_ness",
+    "ai",
+    "luck",
+    "weapons",
+    "notes"
+  ],
+  "rows": [
+    {
+      "weight": 6,
+      "enemy": "Enemy Bruiser",
+      "speed": "-",
+      "combat_skill": "-",
+      "tough_ness": "+1",
+      "ai": "G",
+      "luck": "0",
+      "weapons": "Power Claw",
+      "notes": "A particularly unpleasant-looking individual."
+    },
+    {
+      "weight": 6,
+      "enemy": "Enemy Heavy",
+      "speed": "-",
+      "combat_skill": "-",
+      "tough_ness": "-",
+      "ai": "D",
+      "luck": "0",
+      "weapons": "Rattle Gun",
+      "notes": "The enemy has opted to bring some additional firepower."
+    },
+    {
+      "weight": 5,
+      "enemy": "Enemy Boss",
+      "speed": "-",
+      "combat_skill": "+1",
+      "tough_ness": "+1",
+      "ai": "-",
+      "luck": "1",
+      "weapons": "Hand Cannon, Brutal Melee",
+      "notes": "One of the worst has managed to climb to the top of the hierarchy. Bosses reduce Panic range by 1, but when slain, an extra Morale die must be rolled."
+    },
+    {
+      "weight": 5,
+      "enemy": "Hired Killer",
+      "speed": "5”",
+      "combat_skill": "+1",
+      "tough_ness": "5",
+      "ai": "A",
+      "luck": "1",
+      "weapons": "Machine Pistol, Blade",
+      "notes": "Will murder for credits"
+    },
+    {
+      "weight": 3,
+      "enemy": "Corporate Spook",
+      "speed": "5”",
+      "combat_skill": "+1",
+      "tough_ness": "4",
+      "ai": "C",
+      "luck": "1",
+      "weapons": "Hand Laser",
+      "notes": "One of the mega-corps must be up to no good if they send these creeps. If all other enemies are slain or Bail, the Spook Bails as well. If the Spook is slain, you automatically receive a Corporate Rival."
+    },
+    {
+      "weight": 5,
+      "enemy": "Bounty Tracker",
+      "speed": "5”",
+      "combat_skill": "+1",
+      "tough_ness": "5",
+      "ai": "A",
+      "luck": "1",
+      "weapons": "Shotgun, Blade",
+      "notes": "Someone is willing to pay money to have you brought in, whole or in pieces."
+    },
+    {
+      "weight": 5,
+      "enemy": "Callous Merc",
+      "speed": "4”",
+      "combat_skill": "+2",
+      "tough_ness": "5",
+      "ai": "T",
+      "luck": "1",
+      "weapons": "Infantry Laser, Blade",
+      "notes": "Bitter and disillusioned mercenaries sometimes strike out on their own."
+    },
+    {
+      "weight": 6,
+      "enemy": "Freelancer",
+      "speed": "4”",
+      "combat_skill": "+1",
+      "tough_ness": "4",
+      "ai": "T",
+      "luck": "1",
+      "weapons": "Hand Cannon, Blade",
+      "notes": "A troubleshooter hired to supervise an operation and take care of any intrusions. If the freelancer is slain in a Brawl, you may roll on the Loot Table (p.131) and claim the item for use immediately."
+    },
+    {
+      "weight": 3,
+      "enemy": "Secret Agent",
+      "speed": "6”",
+      "combat_skill": "+2",
+      "tough_ness": "4",
+      "ai": "A",
+      "luck": "1",
+      "weapons": "Hand Laser, Glare Sword",
+      "notes": "Mysterious individual packing some state-of-the-art murder implements. Target: Randomly select a crew member. The agent will attempt to move towards and attack them, only firing at other targets if they are in the way or the priority target is not visible. May fire at the priority target, even if it is not the closest."
+    },
+    {
+      "weight": 4,
+      "enemy": "Hulker Brawler",
+      "speed": "4”",
+      "combat_skill": "+1",
+      "tough_ness": "6",
+      "ai": "A",
+      "luck": "0",
+      "weapons": "Hand Cannon. Brutal Melee",
+      "notes": "A burly, post-Human uplift, brimming with strength and barely contained anger. Melee fighter: +1 to Combat Skill when Brawling."
+    },
+    {
+      "weight": 5,
+      "enemy": "Gun Slinger",
+      "speed": "5”",
+      "combat_skill": "+1",
+      "tough_ness": "4",
+      "ai": "T",
+      "luck": "1",
+      "weapons": "Machine Pistol",
+      "notes": "One of any number of trigger-happy people that seem to congregate in Fringe Space. The best of them are frighteningly effective at their craft. Sharp shooter. +1 to Combat Skill when shooting."
+    },
+    {
+      "weight": 3,
+      "enemy": "Engineer Tech",
+      "speed": "6”",
+      "combat_skill": "+1",
+      "tough_ness": "4",
+      "ai": "C",
+      "luck": "1",
+      "weapons": "Blast Pistol",
+      "notes": "A quiet alien species fascinated with technology and gadgetry."
+    },
+    {
+      "weight": 5,
+      "enemy": "Mutant Bruiser",
+      "speed": "4”",
+      "combat_skill": "+1",
+      "tough_ness": "5",
+      "ai": "G",
+      "luck": "1",
+      "weapons": "Shotgun, Brutal Melee",
+      "notes": "A misshapen beast of a creature, irregular in both body and temperament. Ferocious: +1 to Brawling rolls when initiating combat."
+    },
+    {
+      "weight": 4,
+      "enemy": "Precursor Wanderer",
+      "speed": "7”",
+      "combat_skill": "+2",
+      "tough_ness": "4",
+      "ai": "A",
+      "luck": "1",
+      "weapons": "Infantry Laser, Glare Sword",
+      "notes": "An alien mystic, brimming with psionic energies. One with the Flow: Moves before the Quick Actions phase. 6+ Saving Throw."
+    },
+    {
+      "weight": 4,
+      "enemy": "Hakshan Investigator",
+      "speed": "5”",
+      "combat_skill": "+0",
+      "tough_ness": "4",
+      "ai": "D",
+      "luck": "1",
+      "weapons": "Plasma Rifle",
+      "notes": "Odd, suited aliens that trek the galaxy in search of something vitally important to their species."
+    },
+    {
+      "weight": 6,
+      "enemy": "K’Erin Warrior",
+      "speed": "5”",
+      "combat_skill": "+2",
+      "tough_ness": "5",
+      "ai": "A",
+      "luck": "1",
+      "weapons": "Machine Pistol. Ripper Sword.",
+      "notes": "A noble alien warrior seeking adventure."
+    },
+    {
+      "weight": 4,
+      "enemy": "Nomad Scout",
+      "speed": "6”",
+      "combat_skill": "+1",
+      "tough_ness": "4",
+      "ai": "D",
+      "luck": "0",
+      "weapons": "Marksman’s Rifle",
+      "notes": "A skilled tracker and shooter, hiring out to the starfolk for credits. Concealed: Always counts as being in Cover when fired upon."
+    },
+    {
+      "weight": 3,
+      "enemy": "Cyborg Merc",
+      "speed": "7”",
+      "combat_skill": "+2",
+      "tough_ness": "6",
+      "ai": "T",
+      "luck": "1",
+      "weapons": "Auto Rifle. Power Claw.",
+      "notes": "A mercenary stuffed full of cybernetic enhancements. Often contemptuous of the “meat-bags” they fight alongside. 6+ Saving Throw."
+    },
+    {
+      "weight": 3,
+      "enemy": "Rogue Psionic",
+      "speed": "4”",
+      "combat_skill": "+0",
+      "tough_ness": "4",
+      "ai": "C",
+      "luck": "3",
+      "weapons": "Hand Gun",
+      "notes": "Self-taught psionics are a substantial asset in a gun battle."
+    },
+    {
+      "weight": 6,
+      "enemy": "Gene Dog",
+      "speed": "6”",
+      "combat_skill": "+1",
+      "tough_ness": "4",
+      "ai": "G",
+      "luck": "0",
+      "weapons": "Fangs (Damage +0)",
+      "notes": "Enhanced versions of Earth-dog breeds, usually modified to withstand the environment. Loyal: When owner or Dog moves into a Brawl, it is not resolved until both have had a chance to act. If the owner is slain, the Dog becomes Fearless and remains in place, but attacks anyone that approaches within 8”. If all other enemies are slain or Bailed, it will also Bail."
+    },
+    {
+      "weight": 5,
+      "enemy": "Sand Runner",
+      "speed": "7”",
+      "combat_skill": "+0",
+      "tough_ness": "3",
+      "ai": "G",
+      "luck": "0",
+      "weapons": "Fangs (Damage +1)",
+      "notes": "These fierce lizards can make surprisingly loyal companions."
+    },
+    {
+      "weight": 4,
+      "enemy": "Mk II Security Bot",
+      "speed": "4”",
+      "combat_skill": "+2",
+      "tough_ness": "5",
+      "ai": "G",
+      "luck": "0",
+      "weapons": "Fury Rifle",
+      "notes": "The state-of-the-art in robotic security details. Targeting AI: May fire twice per round at the two closest visible targets. If only one target is visible, only one shot is taken. 6+ Saving Throw."
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+(function (LP) {
+  'use strict';
+
+  const { el } = LP.dom;
+
+  const TABS = [
+    { id: 'characters', label: 'Characters' },
+    { id: 'models', label: 'Models' },
+    { id: 'turn', label: 'Campaign Turn' },
+    { id: 'battle', label: 'Battle' }
+  ];
+
+  function renderNotFound(container) {
+    container.appendChild(el('div', { class: 'empty-state' },
+      el('h2', { text: 'Campaign not found' }),
+      el('p', { text: 'It may have been deleted, or the link came from another browser.' }),
+      el('a', { class: 'btn btn-primary', href: LP.router.homePath }, 'Back to campaigns')
+    ));
+  }
+
+  function render(container, route) {
+    const campaign = LP.storage.getCampaign(route.id);
+    if (!campaign) {
+      document.title = 'Last Parsec';
+      renderNotFound(container);
+      return;
+    }
+
+    const tab = TABS.find((t) => t.id === route.tab);
+    if (!tab) {
+      LP.router.redirect(LP.router.campaignPath(campaign.id, TABS[0].id));
+      return;
+    }
+
+    document.title = campaign.name + ' · ' + tab.label + ' · Last Parsec';
+
+    container.appendChild(el('a', { class: 'back-link', href: LP.router.homePath }, '← All campaigns'));
+    container.appendChild(el('div', { class: 'page-header' }, el('h1', { text: campaign.name })));
+
+    container.appendChild(el('nav', { 'aria-label': 'Campaign tools' },
+      el('ul', { class: 'tabs' },
+        TABS.map((t) => el('li', null,
+          el('a', {
+            class: 'tab',
+            href: LP.router.campaignPath(campaign.id, t.id),
+            'aria-current': t.id === tab.id ? 'page' : null
+          }, t.label)
+        ))
+      )
+    ));
+
+    const panel = el('div', { class: 'tab-panel' });
+    container.appendChild(panel);
+    LP.tabs[tab.id](panel, campaign);
+  }
+
+  LP.views.campaign = { render };
+})(window.LP);

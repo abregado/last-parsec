@@ -1,0 +1,50 @@
+{
+  "table": "Varied Armaments Table",
+  "pdf_pages": [
+    106
+  ],
+  "columns": [
+    "weight",
+    "weapon_1",
+    "weapon_2",
+    "weapon_3"
+  ],
+  "rows": [
+    {
+      "weight": 1,
+      "weapon_1": "Scrap pistol",
+      "weapon_2": "Colony rifle",
+      "weapon_3": "Hand laser"
+    },
+    {
+      "weight": 1,
+      "weapon_1": "Handgun",
+      "weapon_2": "Military rifle",
+      "weapon_3": "Hand laser"
+    },
+    {
+      "weight": 1,
+      "weapon_1": "Colony rifle",
+      "weapon_2": "Military rifle",
+      "weapon_3": "Infantry laser"
+    },
+    {
+      "weight": 1,
+      "weapon_1": "Military rifle",
+      "weapon_2": "Military rifle",
+      "weapon_3": "Infantry laser"
+    },
+    {
+      "weight": 1,
+      "weapon_1": "Scrap pistol + Blade",
+      "weapon_2": "Hand laser",
+      "weapon_3": "Blast rifle"
+    },
+    {
+      "weight": 1,
+      "weapon_1": "Shotgun",
+      "weapon_2": "Infantry laser",
+      "weapon_3": "Blast rifle"
+    }
+  ]
+}

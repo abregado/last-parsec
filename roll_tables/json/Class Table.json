@@ -1,0 +1,176 @@
+{
+  "table": "Class Table",
+  "pdf_pages": [
+    29
+  ],
+  "columns": [
+    "weight",
+    "class",
+    "effect",
+    "resources",
+    "starting"
+  ],
+  "rows": [
+    {
+      "weight": 5,
+      "class": "Working Class",
+      "effect": "+1 Savvy, +1 Luck",
+      "resources": "-",
+      "starting": "-"
+    },
+    {
+      "weight": 4,
+      "class": "Technician",
+      "effect": "+1 Savvy",
+      "resources": "-",
+      "starting": "+1 Gear"
+    },
+    {
+      "weight": 4,
+      "class": "Scientist",
+      "effect": "+1 Savvy",
+      "resources": "-",
+      "starting": "+1 Gadget"
+    },
+    {
+      "weight": 4,
+      "class": "Hacker",
+      "effect": "+1 Savvy",
+      "resources": "Rival",
+      "starting": "-"
+    },
+    {
+      "weight": 5,
+      "class": "Soldier",
+      "effect": "+1 Combat Skill",
+      "resources": "+1D6 credits",
+      "starting": "-"
+    },
+    {
+      "weight": 5,
+      "class": "Mercenary",
+      "effect": "+1 Combat Skill",
+      "resources": "-",
+      "starting": "+1 Military Weapon"
+    },
+    {
+      "weight": 5,
+      "class": "Agitator",
+      "effect": "-",
+      "resources": "Rival",
+      "starting": "-"
+    },
+    {
+      "weight": 4,
+      "class": "Primitive",
+      "effect": "+1 Speed",
+      "resources": "-",
+      "starting": "+1 Low-tech Weapon"
+    },
+    {
+      "weight": 4,
+      "class": "Artist",
+      "effect": "-",
+      "resources": "+1D6 credits",
+      "starting": "-"
+    },
+    {
+      "weight": 4,
+      "class": "Negotiator",
+      "effect": "-",
+      "resources": "Patron, +1 story point",
+      "starting": ""
+    },
+    {
+      "weight": 5,
+      "class": "Trader",
+      "effect": "-",
+      "resources": "+2D6 credits",
+      "starting": "-"
+    },
+    {
+      "weight": 5,
+      "class": "Starship Crew",
+      "effect": "+1 Savvy",
+      "resources": "-",
+      "starting": "-"
+    },
+    {
+      "weight": 4,
+      "class": "Petty Criminal",
+      "effect": "+1 Speed",
+      "resources": "-",
+      "starting": "-"
+    },
+    {
+      "weight": 5,
+      "class": "Ganger",
+      "effect": "+1 Reactions",
+      "resources": "-",
+      "starting": "+1 Low-tech Weapon"
+    },
+    {
+      "weight": 4,
+      "class": "Scoundrel",
+      "effect": "+1 Speed",
+      "resources": "-",
+      "starting": "-"
+    },
+    {
+      "weight": 4,
+      "class": "Enforcer",
+      "effect": "+1 Combat Skill",
+      "resources": "Patron",
+      "starting": "-"
+    },
+    {
+      "weight": 4,
+      "class": "Special Agent",
+      "effect": "+1 Reactions",
+      "resources": "Patron",
+      "starting": "+1 Gadget"
+    },
+    {
+      "weight": 4,
+      "class": "Troubleshooter",
+      "effect": "+1 Reactions",
+      "resources": "-",
+      "starting": "+1 Low-tech Weapon"
+    },
+    {
+      "weight": 4,
+      "class": "Bounty Hunter",
+      "effect": "+1 Speed",
+      "resources": "1 Rumor",
+      "starting": "+1 Low-tech Weapon"
+    },
+    {
+      "weight": 5,
+      "class": "Nomad",
+      "effect": "-",
+      "resources": "-",
+      "starting": "+1 Gear"
+    },
+    {
+      "weight": 4,
+      "class": "Explorer",
+      "effect": "+2 XP",
+      "resources": "-",
+      "starting": "+1 Gear"
+    },
+    {
+      "weight": 4,
+      "class": "Punk",
+      "effect": "+2 XP",
+      "resources": "Rival",
+      "starting": "-"
+    },
+    {
+      "weight": 4,
+      "class": "Scavenger",
+      "effect": "-",
+      "resources": "1 Rumor",
+      "starting": "+1 High-tech Weapon"
+    }
+  ]
+}

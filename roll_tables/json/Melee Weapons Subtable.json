@@ -1,0 +1,44 @@
+{
+  "table": "Melee Weapons Subtable",
+  "pdf_pages": [
+    134
+  ],
+  "columns": [
+    "weight",
+    "melee_weapons"
+  ],
+  "rows": [
+    {
+      "weight": 20,
+      "melee_weapons": "Blade"
+    },
+    {
+      "weight": 20,
+      "melee_weapons": "Brutal Melee Weapon"
+    },
+    {
+      "weight": 15,
+      "melee_weapons": "Boarding Saber"
+    },
+    {
+      "weight": 20,
+      "melee_weapons": "Ripper Sword"
+    },
+    {
+      "weight": 10,
+      "melee_weapons": "Shatter Axe"
+    },
+    {
+      "weight": 5,
+      "melee_weapons": "Power Claw"
+    },
+    {
+      "weight": 5,
+      "melee_weapons": "Glare Sword"
+    },
+    {
+      "weight": 5,
+      "melee_weapons": "Suppression Maul"
+    }
+  ]
+}

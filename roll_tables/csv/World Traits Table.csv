@@ -1,0 +1,43 @@
+weight,trait,description
+3,Haze,"During battle, visibility is reduced to 1D6+8”"
+3,Overgrown,"When setting up the table, you must add 1D6+2 individual plant features or 1D3 areas of vegetation (roughly 3-5” across)"
+2,Warzone,"When setting up the table, you must add 1D3 ruined buildings or craters to the table."
+2,Heavily enforced,"When fighting opponents from the Criminal Elements Encounter Table, the number encountered is reduced by 1. When rolling to see if they become Rivals, only roll a single die as normal."
+2,Rampant crime,"When fighting opponents from the Criminal Elements encounter list, add 1 to the number encountered."
+2,Invasion risk,Add +1 to all Invasion rolls.
+2,Imminent invasion,"Add +2 to all Invasion rolls and if the world is invaded, rolls for war progress are at -1."
+2,Lacks starship facilities,You cannot spend more than 3 credits per campaign turn on starship Repairs.
+2,Easy recruiting,Add +1 to the roll when Recruiting.
+2,Medical science,The cost for accelerated medical care is only 3 credits per character.
+2,Technical knowledge,Add +1 to all Repair attempts.
+2,Opportunities,Add +1 to the roll when searching for Patrons.
+3,Booming economy,"When rolling for post-battle credit rewards, any 1 on the dice is rerolled until it shows a score other than 1."
+3,Busy markets,"Each campaign turn, you may spend 2 credits once to roll on the Trade Table (p.79)."
+2,Bureaucratic mess,"When attempting to leave, you must roll 2D6. On a 2-4, you are delayed and cannot leave this campaign turn without a bribe equal to the roll in credits. You may try again next campaign turn."
+2,Restricted education,You must roll 6+ to be approved for Advanced Training on this world.
+2,Expensive education,The fee to enroll in Advanced Training is 3 credits.
+3,Travel restricted,No more than one crew member may take the Explore option each campaign turn.
+2,Unity safe sector,The world cannot be Invaded.
+3,Gloom,"In battle, maximum visibility is restricted to 1D6+6”."
+2,Bot manufacturing,All Bot upgrades are 1 credit cheaper.
+3,Fuel refinery,Traveling from this world costs only 3 credits.
+2,Alien species restricted,"Roll 1D10 to determine which species is restricted: 1 Engineer 2-4 K’Erin 5 Soulless 6 Precursor 7-9 Feral 10 Swift Characters of this type cannot be hired here (count as baseline Humans instead), and cannot undertake any crew jobs. They may participate in combat normally."
+2,Weapon licensing,Any weapon obtained through the Trade Table or purchased outright costs +1 credit.
+2,Import restrictions,You cannot sell any items on this world.
+2,Military outpost,Add +2 to Invasion rolls. Add +2 when checking for war progress.
+3,Dangerous,"When rolling on the Roving Threats Encounter Table, increase the number of opponents by +1."
+2,Shipyards,The cost of all Ship Components is reduced by 2 credits.
+3,Barren,No plant features can be used on the battlefield.
+2,Vendetta system,Opponents become your Rivals on a roll of 1 or 2.
+3,Free trade zone,"One crew member per campaign turn can roll twice when using the Trade Table, and choose either result."
+2,Corporate state,+2 when rolling to find a Patron. Patrons are always Corporations. Failing a mission means being blacklisted and you cannot get Patrons here again.
+2,Adventurous population,"When successfully Recruiting, you may roll up one additional character and then choose who to hire."
+3,Frozen,"Any character making a Dash may opt to slide. They move 1D6” in a straight line, and must move the full distance. If they collide with anything, they – and any character they collide with – are knocked 1” in a random direction and become Stunned."
+2,Flat,Do not place any hills or raised ground on the battlefield.
+3,Fuel shortage,The cost to travel from this world is raised by 1D3 credits. You may roll each campaign turn.
+2,Reflective dust,"All Laser, Beam, or Blast weapons are -1 to Hit at ranges exceeding 9”."
+3,High cost,Your crew size counts as being 2 higher for the purpose of Upkeep costs.
+2,Interdiction,"You are only approved to stay for 1D3 campaign turns. To extend your stay, you must obtain a license. Roll 2D6, requiring an 8+."
+2,Null zone,No teleportation device of any type works.
+3,Crystals,"Place 2D6 crystals on the battlefield. If you don’t have any, use rocks."
+4,Fog,All shots beyond 8” are -1 to Hit.

@@ -1,0 +1,32 @@
+{
+  "table": "Quest Rumors Table",
+  "pdf_pages": [
+    38
+  ],
+  "columns": [
+    "weight",
+    "rumor_is"
+  ],
+  "rows": [
+    {
+      "weight": 2,
+      "rumor_is": "An extracted data file"
+    },
+    {
+      "weight": 2,
+      "rumor_is": "Notebook with secret information"
+    },
+    {
+      "weight": 2,
+      "rumor_is": "Old map showing a location"
+    },
+    {
+      "weight": 2,
+      "rumor_is": "A tip from a contact"
+    },
+    {
+      "weight": 2,
+      "rumor_is": "An intercepted transmission"
+    }
+  ]
+}

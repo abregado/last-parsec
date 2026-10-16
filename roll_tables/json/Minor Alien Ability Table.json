@@ -1,0 +1,32 @@
+{
+  "table": "Minor Alien Ability Table",
+  "pdf_pages": [
+    24
+  ],
+  "columns": [
+    "weight",
+    "ability"
+  ],
+  "rows": [
+    {
+      "weight": 1,
+      "ability": "Reactions"
+    },
+    {
+      "weight": 2,
+      "ability": "Speed"
+    },
+    {
+      "weight": 1,
+      "ability": "Combat"
+    },
+    {
+      "weight": 1,
+      "ability": "Toughness"
+    },
+    {
+      "weight": 1,
+      "ability": "Savvy"
+    }
+  ]
+}

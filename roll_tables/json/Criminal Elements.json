@@ -1,0 +1,202 @@
+{
+  "table": "Criminal Elements",
+  "pdf_pages": [
+    96,
+    97,
+    98
+  ],
+  "columns": [
+    "weight",
+    "enemy",
+    "numbers",
+    "panic",
+    "speed",
+    "combat_skill",
+    "tough_ness",
+    "ai",
+    "weapons",
+    "notes"
+  ],
+  "rows": [
+    {
+      "weight": 10,
+      "enemy": "Gangers",
+      "numbers": "+2",
+      "panic": "1-2",
+      "speed": "4”",
+      "combat_skill": "+0",
+      "tough_ness": "3",
+      "ai": "A",
+      "weapons": "1 A",
+      "notes": "Organized gangs run many backwater settlements, fighting for control. Leg it: When a ganger is hit by a shot, they will retreat 3” away from the shooter."
+    },
+    {
+      "weight": 9,
+      "enemy": "Punks",
+      "numbers": "+3",
+      "panic": "1-3",
+      "speed": "4”",
+      "combat_skill": "+0",
+      "tough_ness": "3",
+      "ai": "A",
+      "weapons": "1 A",
+      "notes": "Disaffected delinquents but armed to the teeth. Careless: You are +1 to Seize the Initiative. Bad shots: Their shooting only Hits on a natural 6."
+    },
+    {
+      "weight": 8,
+      "enemy": "Raiders",
+      "numbers": "+1",
+      "panic": "1-2",
+      "speed": "4”",
+      "combat_skill": "+1",
+      "tough_ness": "3",
+      "ai": "A",
+      "weapons": "2 A",
+      "notes": "The only thing better than making something valuable is stealing it from someone else. Scavengers: Roll twice on the Battlefield Finds Table."
+    },
+    {
+      "weight": 7,
+      "enemy": "Cultists",
+      "numbers": "+2",
+      "panic": "1",
+      "speed": "4”",
+      "combat_skill": "+0",
+      "tough_ness": "3",
+      "ai": "A",
+      "weapons": "1 A",
+      "notes": "Fringe Space is full of odd, para-religious groups, congregating around this or that principle. They are often heavily armed, and up to no good. Intrigue: Roll 2D6 and add +1 if you killed a Lieutenant and/or Unique Individual. On a 9+, you obtain a Quest Rumor."
+    },
+    {
+      "weight": 9,
+      "enemy": "Psychos",
+      "numbers": "+2",
+      "panic": "1",
+      "speed": "6”",
+      "combat_skill": "+0",
+      "tough_ness": "4",
+      "ai": "R",
+      "weapons": "1 B",
+      "notes": "For some, life in space just drives them nuts. Homicidally so. Bad shots: Their shooting only Hits on a natural 6."
+    },
+    {
+      "weight": 5,
+      "enemy": "Brat Gang",
+      "numbers": "+2",
+      "panic": "1-3",
+      "speed": "5”",
+      "combat_skill": "+0",
+      "tough_ness": "4",
+      "ai": "A",
+      "weapons": "2 C",
+      "notes": "Upper class fools who have decided to shoot up the neighborhood for fun. Careless: You are +1 to Seize the Initiative. 6+ Saving Throw."
+    },
+    {
+      "weight": 3,
+      "enemy": "Gene Renegades",
+      "numbers": "+1",
+      "panic": "1-2",
+      "speed": "5”",
+      "combat_skill": "+0",
+      "tough_ness": "4",
+      "ai": "C",
+      "weapons": "1 B",
+      "notes": "Devotees of post-growth genetic reconfiguration, they can take the form of everything from a woman with blue skin to cat-bear-people. Alert: You are -1 to Seize the Initiative."
+    },
+    {
+      "weight": 6,
+      "enemy": "Anarchists",
+      "numbers": "+2",
+      "panic": "1-2",
+      "speed": "5”",
+      "combat_skill": "+0",
+      "tough_ness": "3",
+      "ai": "A",
+      "weapons": "2 B",
+      "notes": "Separatist groups violently opposing the state and the mega-corps. Stubborn: They ignore the first casualty of the battle when making a Morale check."
+    },
+    {
+      "weight": 7,
+      "enemy": "Pirates",
+      "numbers": "+2",
+      "panic": "1-3",
+      "speed": "5”",
+      "combat_skill": "+0",
+      "tough_ness": "4",
+      "ai": "A",
+      "weapons": "2 A",
+      "notes": "Space-faring looters who descend on colonies to raid, pillage, and enslave. Loot: Gain an extra Loot roll if Holding the Field."
+    },
+    {
+      "weight": 7,
+      "enemy": "K’Erin Outlaws",
+      "numbers": "+1",
+      "panic": "1",
+      "speed": "4”",
+      "combat_skill": "+1",
+      "tough_ness": "4",
+      "ai": "A",
+      "weapons": "2 A",
+      "notes": "The war-like K’Erin are an honorable people, though their outcasts frequently raid Human colonies. Stubborn: They ignore the first casualty when making a Morale check."
+    },
+    {
+      "weight": 8,
+      "enemy": "Skulker Brigands",
+      "numbers": "+3",
+      "panic": "1-2",
+      "speed": "6”",
+      "combat_skill": "+0",
+      "tough_ness": "3",
+      "ai": "C",
+      "weapons": "1 B",
+      "notes": "Agile and gregarious, these rat-like humanoids show up almost anywhere in space. Alert: You are -1 to Seize the Initiative. Scavengers: Roll twice on the Battlefield Finds Table."
+    },
+    {
+      "weight": 4,
+      "enemy": "Tech Gangers",
+      "numbers": "+1",
+      "panic": "1-2",
+      "speed": "4”",
+      "combat_skill": "+0",
+      "tough_ness": "5",
+      "ai": "T",
+      "weapons": "3 C",
+      "notes": "Weird criminal syndicates who seem to view high-tech with an almost religious reverence. Loot: Gain an extra Loot roll if Holding the Field 6+ Saving Throw."
+    },
+    {
+      "weight": 7,
+      "enemy": "Starport Scum",
+      "numbers": "+3",
+      "panic": "1-3",
+      "speed": "4”",
+      "combat_skill": "+0",
+      "tough_ness": "3",
+      "ai": "D",
+      "weapons": "1 A",
+      "notes": "Any starship port facility will have assorted low-lives and villains hanging around, waiting to see if today is the day they make it big. It rarely is. Friday Night Warriors: When a scum is slain, all allies within 6” will retreat a standard move at their base speed directly back towards their own battlefield edge."
+    },
+    {
+      "weight": 4,
+      "enemy": "Hulker Gang",
+      "numbers": "+0",
+      "panic": "1",
+      "speed": "4”",
+      "combat_skill": "+1",
+      "tough_ness": "5",
+      "ai": "A",
+      "weapons": "1 A",
+      "notes": "Human-derived brutes possessing massive upper body strength. Often succumb to berserk fury. Ferocious: +1 to Brawling rolls when initiating combat. Aggro: If Hit by a shot and surviving, immediately move 1” towards the shooter."
+    },
+    {
+      "weight": 6,
+      "enemy": "Gun Slingers",
+      "numbers": "+1",
+      "panic": "1-2",
+      "speed": "4”",
+      "combat_skill": "+1",
+      "tough_ness": "3",
+      "ai": "T",
+      "weapons": "1 B",
+      "notes": "Desperadoes eager to test their trigger skills against an opponent. Trick shot: Any natural 6 when they shoot allows an additional shot against the same target or another target within 2”."
+    }
+  ]
+}

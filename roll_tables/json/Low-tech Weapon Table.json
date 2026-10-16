@@ -1,0 +1,44 @@
+{
+  "table": "Low-tech Weapon Table",
+  "pdf_pages": [
+    30
+  ],
+  "columns": [
+    "weight",
+    "low_tech_weapon"
+  ],
+  "rows": [
+    {
+      "weight": 15,
+      "low_tech_weapon": "Handgun"
+    },
+    {
+      "weight": 20,
+      "low_tech_weapon": "Scrap Pistol"
+    },
+    {
+      "weight": 5,
+      "low_tech_weapon": "Machine Pistol"
+    },
+    {
+      "weight": 25,
+      "low_tech_weapon": "Colony Rifle"
+    },
+    {
+      "weight": 10,
+      "low_tech_weapon": "Shotgun"
+    },
+    {
+      "weight": 5,
+      "low_tech_weapon": "Hunting Rifle"
+    },
+    {
+      "weight": 15,
+      "low_tech_weapon": "Blade"
+    },
+    {
+      "weight": 5,
+      "low_tech_weapon": "Brutal Melee Weapon"
+    }
+  ]
+}

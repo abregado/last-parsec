@@ -1,0 +1,43 @@
+{
+  "table": "Patron Table",
+  "pdf_pages": [
+    85
+  ],
+  "columns": [
+    "weight",
+    "patron_is",
+    "notes"
+  ],
+  "rows": [
+    {
+      "weight": 2,
+      "patron_is": "Corporation",
+      "notes": "+1 to the roll on the Danger Pay Table."
+    },
+    {
+      "weight": 2,
+      "patron_is": "Local Government",
+      "notes": "–"
+    },
+    {
+      "weight": 1,
+      "patron_is": "Sector Government",
+      "notes": "–"
+    },
+    {
+      "weight": 2,
+      "patron_is": "Wealthy Individual",
+      "notes": "–"
+    },
+    {
+      "weight": 2,
+      "patron_is": "Private Organization",
+      "notes": "–"
+    },
+    {
+      "weight": 1,
+      "patron_is": "Secretive Group",
+      "notes": "+1 to the roll on the Time Frame Table."
+    }
+  ]
+}

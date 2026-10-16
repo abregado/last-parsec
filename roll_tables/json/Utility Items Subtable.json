@@ -1,0 +1,92 @@
+{
+  "table": "Utility Items Subtable",
+  "pdf_pages": [
+    135
+  ],
+  "columns": [
+    "weight",
+    "utility_items"
+  ],
+  "rows": [
+    {
+      "weight": 6,
+      "utility_items": "Auto Sensor"
+    },
+    {
+      "weight": 5,
+      "utility_items": "Battle Visor"
+    },
+    {
+      "weight": 6,
+      "utility_items": "Communicator"
+    },
+    {
+      "weight": 6,
+      "utility_items": "Concealed Blade"
+    },
+    {
+      "weight": 6,
+      "utility_items": "Displacer"
+    },
+    {
+      "weight": 5,
+      "utility_items": "Distraction Bot"
+    },
+    {
+      "weight": 4,
+      "utility_items": "Grapple Launcher"
+    },
+    {
+      "weight": 5,
+      "utility_items": "Grav Dampener"
+    },
+    {
+      "weight": 6,
+      "utility_items": "Hazard Suit"
+    },
+    {
+      "weight": 5,
+      "utility_items": "Hover Board"
+    },
+    {
+      "weight": 3,
+      "utility_items": "Insta-Wall"
+    },
+    {
+      "weight": 6,
+      "utility_items": "Jump Belt"
+    },
+    {
+      "weight": 7,
+      "utility_items": "Motion Tracker"
+    },
+    {
+      "weight": 5,
+      "utility_items": "Multi-Cutter"
+    },
+    {
+      "weight": 4,
+      "utility_items": "Robo-Rabbit’s Foot"
+    },
+    {
+      "weight": 5,
+      "utility_items": "Scanner Bot"
+    },
+    {
+      "weight": 5,
+      "utility_items": "Snooper Bot"
+    },
+    {
+      "weight": 4,
+      "utility_items": "Sonic Emitter"
+    },
+    {
+      "weight": 3,
+      "utility_items": "Steel Boots"
+    },
+    {
+      "weight": 4,
+      "utility_items": "Time Distorter"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+weight,ship,debt,hull,traits
+12,Worn freighter,1D6 +20,30,-
+6,Retired troop transport,1D6 +30,35,Emergency Drives
+5,Strange alien vessel,1D6 +15,25,-
+8,Upgraded shuttle,1D6 +10,20,-
+7,Retired scout ship,1D6 +20,25,Fuel-efficient
+7,Repurposed science vessel,1D6 +10,20,-
+11,Battered mining ship,1D6 +20,35,Fuel Hog
+9,Unreliable merchant cruiser,1D6 +20,30,-
+5,Former diplomatic vessel,1D6 +15,25,-
+6,Ancient low-tech craft,1D6 +20,35,Dodgy Drive
+8,Built from salvaged wrecks,1D6 +20,30,-
+11,Worn colony ship,1D6 +20,25,Standard Issue
+5,Retired military patrol ship,1D6 +35,40,Armored

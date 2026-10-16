@@ -1,0 +1,7 @@
+weight,volatility
+1,Remains in place
+1,"Each round, disappears on a D6 result of 6"
+1,"Each round, increases 1” diameter on a roll of 5+"
+1,"Each round, moves 1D6” randomly"
+1,"Each round, moves 1D6” in the direction of nearest figure within 8”"
+1,"Each round, increases by 4” diameter on a D6 result of 6, then disappears"

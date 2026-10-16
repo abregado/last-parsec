@@ -1,0 +1,24 @@
+{
+  "table": "The Ticking Clock Table",
+  "pdf_pages": [
+    170
+  ],
+  "columns": [
+    "weight",
+    "ticks"
+  ],
+  "rows": [
+    {
+      "weight": 1,
+      "ticks": "No time passes."
+    },
+    {
+      "weight": 4,
+      "ticks": "Reduce time by 1 Tick"
+    },
+    {
+      "weight": 1,
+      "ticks": "Reduce time by 2 Ticks"
+    }
+  ]
+}

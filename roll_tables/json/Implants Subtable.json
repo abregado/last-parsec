@@ -1,0 +1,56 @@
+{
+  "table": "Implants Subtable",
+  "pdf_pages": [
+    135
+  ],
+  "columns": [
+    "weight",
+    "implants"
+  ],
+  "rows": [
+    {
+      "weight": 10,
+      "implants": "AI Companion"
+    },
+    {
+      "weight": 6,
+      "implants": "Body Wire"
+    },
+    {
+      "weight": 12,
+      "implants": "Boosted Arm"
+    },
+    {
+      "weight": 12,
+      "implants": "Boosted Leg"
+    },
+    {
+      "weight": 10,
+      "implants": "Cyber Hand"
+    },
+    {
+      "weight": 11,
+      "implants": "Genetic Defenses"
+    },
+    {
+      "weight": 10,
+      "implants": "Health Boost"
+    },
+    {
+      "weight": 8,
+      "implants": "Nerve Adjuster"
+    },
+    {
+      "weight": 6,
+      "implants": "Neural Optimization"
+    },
+    {
+      "weight": 9,
+      "implants": "Night Sight"
+    },
+    {
+      "weight": 6,
+      "implants": "Pain Suppressor"
+    }
+  ]
+}

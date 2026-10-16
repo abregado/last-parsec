@@ -1,0 +1,36 @@
+{
+  "table": "Primary Alien Table",
+  "pdf_pages": [
+    16
+  ],
+  "columns": [
+    "weight",
+    "primary_alien"
+  ],
+  "rows": [
+    {
+      "weight": 20,
+      "primary_alien": "Engineer"
+    },
+    {
+      "weight": 20,
+      "primary_alien": "K’Erin"
+    },
+    {
+      "weight": 15,
+      "primary_alien": "Soulless"
+    },
+    {
+      "weight": 15,
+      "primary_alien": "Precursor"
+    },
+    {
+      "weight": 20,
+      "primary_alien": "Feral"
+    },
+    {
+      "weight": 10,
+      "primary_alien": "Swift"
+    }
+  ]
+}
