@@ -9,6 +9,7 @@
    * contents, and `fields` the select values keyed by field key.
    *
    * options.fields: [{ key, label, value, options: [{ value, label }] }]
+   *   or a free-text field: { key, label, value, type: 'text', placeholder }
    *
    * The first choice is the default (pressing Enter picks it), so put the
    * safest/most likely choice first.
@@ -37,10 +38,16 @@
       }
 
       const selects = (options.fields || []).map((field) => {
-        const select = el('select', { class: 'input select' },
-          field.options.map((o) => el('option', { value: String(o.value) }, o.label))
-        );
-        select.value = String(field.value);
+        let select;
+        if (field.type === 'text') {
+          select = el('input', { class: 'input', type: 'text', maxlength: '80', autocomplete: 'off', placeholder: field.placeholder || null });
+          select.value = field.value || '';
+        } else {
+          select = el('select', { class: 'input select' },
+            field.options.map((o) => el('option', { value: String(o.value) }, o.label))
+          );
+          select.value = String(field.value);
+        }
         return { field, select };
       });
 

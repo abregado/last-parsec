@@ -6,6 +6,9 @@
   const TABS = [
     { id: 'characters', label: 'Characters' },
     { id: 'models', label: 'Models' },
+    { id: 'species', label: 'Species' },
+    { id: 'archetypes', label: 'Archetypes' },
+    { id: 'planets', label: 'Planets' },
     { id: 'turn', label: 'Campaign Turn' },
     { id: 'battle', label: 'Battle' }
   ];
@@ -88,9 +91,17 @@
       )
     ));
 
+    // On narrow screens the tab bar scrolls: bring the active tab into view.
+    const tabList = container.querySelector('.tabs');
+    const activeTab = tabList && tabList.querySelector('[aria-current="page"]');
+    if (tabList && activeTab && tabList.scrollWidth > tabList.clientWidth) {
+      tabList.scrollLeft = Math.max(0, activeTab.offsetLeft - tabList.offsetLeft - 16);
+    }
+
     const panel = el('div', { class: 'tab-panel' });
     container.appendChild(panel);
-    LP.tabs[tab.id](panel, campaign);
+    if (LP.tabs[tab.id]) LP.tabs[tab.id](panel, campaign);
+    else panel.appendChild(el('p', { class: 'muted' }, 'Coming soon.'));
   }
 
   LP.views.campaign = { render };

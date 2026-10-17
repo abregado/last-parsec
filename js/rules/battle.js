@@ -122,6 +122,26 @@
     return (ctx.settings && ctx.settings.crewSize) || 6;
   }
 
+  /** The current planet, if planets are in use. */
+  function planetOf(ctx) {
+    return LP.planets && ctx.campaign && Array.isArray(ctx.campaign.planets) ? LP.planets.current(ctx.campaign) : null;
+  }
+
+  /** The named Rival this battle is against (from options.rivalId), if any. */
+  function namedRival(battle, ctx) {
+    if (battle.mission !== 'rival' && battle.mission !== 'rival-attack') return null;
+    const planet = planetOf(ctx);
+    const id = battle.options && battle.options.rivalId;
+    return planet && id ? planet.rivals.find((r) => r.id === id) || null : null;
+  }
+
+  /** The invading enemy of the current planet, for Invasion battles. */
+  function invader(battle, ctx) {
+    if (battle.mission !== 'invasion') return null;
+    const planet = planetOf(ctx);
+    return planet && planet.invasion && planet.invasion.status === 'invaded' ? planet.invasion.enemy : null;
+  }
+
   /** The chosen enemy as { table, row id } from the "Table|rowId" slot value. */
   function enemyRef(battle) {
     const value = slotValue(battle, 'enemy');
@@ -212,6 +232,12 @@
       if (battle.mission === 'invasion') return null;
       const column = categoryColumn(battle.mission);
       const rows = tableRows('Enemy Encounter Category Table', column);
+      const rival = namedRival(battle, ctx);
+      if (rival && rival.enemy) {
+        const cat = E.categoryOfTable(rival.enemy.split('|')[0]);
+        const all = tableRows('Enemy Encounter Category Table', 'weight_opportunity');
+        return { key: 'category', label: 'Enemy category', kind: 'table', rows: all, forced: cat, lockedBy: 'Rival ' + rival.name };
+      }
       // Categories with no enabled models can't be rolled.
       const exclude = rows.filter((r) => M.enabledRows(ctx.campaign, E.CATEGORIES[r.id].table).length === 0).map((r) => r.id);
       return { key: 'category', label: battle.mission.startsWith('rival') ? 'Enemy category (Unknown Rival)' : 'Enemy category', kind: 'table', rows, exclude };
@@ -219,6 +245,14 @@
 
     function enemy(battle, ctx) {
       const campaign = ctx.campaign;
+      const rival = namedRival(battle, ctx);
+      const invading = invader(battle, ctx);
+      const locked = rival && rival.enemy ? rival.enemy : invading;
+      if (locked) {
+        const t = locked.split('|')[0];
+        const rows = rng.getTable(t).rows.map((r) => ({ id: t + '|' + r.id, weight: r.weight, label: r.enemy, range: r.ranges.weight }));
+        return { key: 'enemy', label: rival ? 'Enemy' : 'Invading enemy', kind: 'table', rows, forced: locked, lockedBy: rival ? 'Rival ' + rival.name : planetOf(ctx).name + '\u2019s invader' };
+      }
       if (battle.mission === 'invasion') {
         const rows = [];
         const exclude = [];
@@ -294,12 +328,12 @@
     function unique(battle, ctx) {
       const u = uniqueStatus(battle, ctx);
       if (!u.count) return null;
-      return { key: 'unique', label: 'Unique Individual', kind: 'table', rows: tableRows('Unique Individuals', 'weight', (r) => r.enemy) };
+      return { key: 'unique', label: 'Unique Individual', kind: 'table', rows: tableRows('Unique Individuals', 'weight', (r) => r.enemy), exclude: uniqueExclude(battle, ctx) };
     },
 
     function unique2(battle, ctx) {
       if (uniqueStatus(battle, ctx).count < 2) return null;
-      return { key: 'unique2', label: 'Second Unique Individual', kind: 'table', rows: tableRows('Unique Individuals', 'weight', (r) => r.enemy) };
+      return { key: 'unique2', label: 'Second Unique Individual', kind: 'table', rows: tableRows('Unique Individuals', 'weight', (r) => r.enemy), exclude: uniqueExclude(battle, ctx) };
     },
 
     function bounty(battle) {
@@ -328,6 +362,13 @@
   /* ---------------------------------------------------------------------- */
   /* Derived values                                                         */
   /* ---------------------------------------------------------------------- */
+
+  /** A named Rival only brings their own Unique Individuals (if they list any). */
+  function uniqueExclude(battle, ctx) {
+    const rival = namedRival(battle, ctx);
+    if (!rival || !rival.uniques || !rival.uniques.length) return [];
+    return rng.getTable('Unique Individuals').rows.map((r) => r.id).filter((id) => !rival.uniques.includes(id));
+  }
 
   /** How many Unique Individuals are present: { count, reason }. */
   function uniqueStatus(battle, ctx) {
@@ -371,6 +412,8 @@
     if (battle.mission === 'rival-attack' && attack === 'brought-friends') add('Brought friends', 1);
     if (battle.mission === 'rival-attack' && attack === 'assault') add('Assault', 1);
     if ((battle.mission === 'rival' || battle.mission === 'rival-attack') && e.rivalGrudge) add('Grudge (as Rivals)', 1);
+    const rival = namedRival(battle, ctx);
+    if (rival && rival.hates) add(rival.name + ' hate you', 1);
     if (battle.mission === 'invasion') add('Invasion', 2);
     if (battle.mission === 'patron') {
       if (o.dangerousJob) add('Dangerous Job', 1);
@@ -675,6 +718,8 @@
     const r = resolve(battle, ctx);
     return {
       mission: r.mission,
+      enemy: r.enemy ? r.enemy.table + '|' + r.enemy.id : null,
+      rivalId: battle.options ? battle.options.rivalId || null : null,
       enemyCategory: r.enemy ? r.enemy.category : null,
       enemyName: r.enemy ? r.enemy.name : null,
       invasionThreat: r.enemy ? r.enemy.invasionThreat : false,
@@ -744,7 +789,7 @@
 
   LP.battle = {
     MISSIONS, FROM_TURN, OBJECTIVE_TEXT, RIVAL_ATTACK_TEXT, EDGES,
-    missionLabel, newBattle, normalize, sync, fields, generate, canReroll, reroll,
+    missionLabel, newBattle, normalize, sync, fields, generate, canReroll, reroll, namedRival, planetOf,
     setFixed, setRandom, setMission, setOption, force, uniqueStatus, resolve, summary,
     seizeModifiers, rollSeize, rollEvent, rollNumbers
   };

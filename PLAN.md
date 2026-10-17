@@ -1,6 +1,6 @@
 # Last Parsec — Five Parsecs From Home companion app
 
-Phase 1 (campaigns + Characters tab, build steps 1–6 below) is **done**. Phase 2 is planned at the end of this file: campaign settings and the Models tab (2A) are **done**; the Campaign Turn tab's engine, UI (Restart/Undo, pending choices) and the Start + Travel stages (0, 1.1-1.4) are **done**. The follow-up executor and scripts (Starship Travel Events, Trade, Exploration, Loot chain, Rewards) are **done**, and the travel event stage uses them. The World stages (2.1-2.6) are **done**. Phase 3 (Battle tab) and the Post-Battle stages (2C, pre-filled from the battle) are **done**: a campaign turn now runs from Start to Turn complete.
+Phase 1 (campaigns + Characters tab, build steps 1–6 below) is **done**. Phase 2 is planned at the end of this file: campaign settings and the Models tab (2A) are **done**; the Campaign Turn tab's engine, UI (Restart/Undo, pending choices) and the Start + Travel stages (0, 1.1-1.4) are **done**. The follow-up executor and scripts (Starship Travel Events, Trade, Exploration, Loot chain, Rewards) are **done**, and the travel event stage uses them. The World stages (2.1-2.6) are **done**. Phase 3 (Battle tab) and the Post-Battle stages (2C, pre-filled from the battle) are **done**: a campaign turn now runs from Start to Turn complete. Phase 4 (Species, Archetypes and Planets tabs, and planets throughout the turn and battle) is **done**.
 
 ## Goals and constraints
 
@@ -450,3 +450,165 @@ js/ui/battleTab.js      mission panel, field list (LP.ui.rollField), enemy card,
    - For an Invasion battle, Random rolls among entries that are ticked for invasions **and** enabled, weighted by their printed weights.
    - Stored as `campaign.models.invasion = { tableName: [rowId, ...] }`. Until you change a table, it uses the defaults.
 2. **Rival enemy types:** not remembered for now. For a Rival fight you fix the enemy in its dropdown, or roll on the Unknown Rival column.
+
+---
+
+# Phase 4 — Planet archetypes and planet instances
+
+## Decisions
+- **Species are one combined weighted table** (see "Species tab" below). Each archetype holds its own **weight per species** instead of a yes/no list.
+- **An archetype restricts five event tables:** Campaign Events, Character Events, Exploration, Trade, and Starship Travel Events. Travel events use the **departure** planet's archetype.
+- **A Patron's enemy types are their own forces.** They're used when the Patron turns on you: a Vengeful job failure, or a Bad reputation event. Patron jobs still roll their enemies normally.
+- **The default "All options" archetype** is created with every campaign, and given to existing campaigns:
+  - every world trait and event, and the book's species weights
+  - **47 Rivals**, one per enemy type in Criminal Elements, Hired Muscle and Interested Parties, each named after its enemy and allowing every Unique Individual
+  - **6 Patrons**, one per Patron Table type (Corporation, Local Government, …), each with every enemy type as forces and every Unique Individual
+
+  Out of the box this plays like the rules as written. You rename and prune it, or copy it.
+- **New planets** come from an archetype you pick, or **Random** (each archetype equally likely). The name is typed or generated. Saved planets can be revisited, which brings back the Patrons and Rivals left there.
+
+## Data model
+```js
+campaign.archetypes = [{
+  id, name,
+  worldTraits: [traitId],                 // allowed traits (rolled among these, printed weights)
+  species: { speciesId: weight },         // recruit weights on the combined species table (0 = never)
+  events: { campaign: [id], character: [id], exploration: [id], trade: [id], travel: [id] },
+  patrons: [{ id, name, patronType: 'corporation' | … | null (roll), forces: ['Table|rowId'], uniques: [uniqueId] }],
+  rivals:  [{ id, name, forces: ['Table|rowId'], uniques: [uniqueId] }]
+}]
+
+campaign.planets = [{
+  id, name, archetypeId, createdAt,
+  worldTraits: [traitId],
+  licence: { required, cost, owned },
+  patrons: [{ id, entryId, name, patronType, persistent, oneTimeContract, benefit, forces, uniques }],
+  rivals:  [{ id, entryId, name, enemy: 'Table|rowId', uniques: [uniqueId], hates }],
+  invasion: null | { status: 'invaded' | 'lost' | 'liberated', enemy: 'Table|rowId', makingGround: n },
+  notes
+}]
+
+campaign.currentPlanetId
+```
+- Every list stores the ids that are **allowed**, so a new archetype can start empty or as a copy.
+- Enemy references use the `Table|rowId` form the Battle tab already uses.
+- **Rival enemy type:** a Rival's enemy type is fixed when the Rival is created ("once a Rival has been established, they will always be the same type", p.92). It's picked from the entry's forces, preferring entries that have models enabled.
+- **Rival matching:** after a battle, a new Rival must match the enemy you fought.
+  - If any archetype entries list that enemy, one of them is used, at random.
+  - Otherwise a plain Rival named after the enemy is created.
+- **Unique Individuals** in a battle against a named Rival or Patron are rolled only from that entry's list (falling back to the full table if the list is empty).
+
+### Migration
+- Campaigns without archetypes get the default one.
+- On the first turn after this update, Start of turn offers to **create the current world as a planet**. It uses the remembered world traits, plus placeholder Rivals and Patrons ("Rival 1", "Rival 2"…) matching the remembered counts.
+- The remembered counts (`turnMemory.rivals`, `patrons`, `worldTraits`, `invadedNext`, `invadedPlanets`) are then worked out from planets instead of stored.
+
+## Rules modules
+```
+js/rules/archetypes.js   default archetype builder, normalize, copy, validation warnings,
+                         allowed-row filters for rolls (traits, species, events)
+js/rules/planets.js      create planet (traits, licence), name generator,
+                         newPatron / newRival(fromEnemy?) / patronToRival,
+                         follow check on travel, invasion start/progress,
+                         derived counts (rivals, patrons, invaded planets)
+```
+**Restricted rolls** reuse the Models-tab approach. Each roll excludes the rows the archetype doesn't allow, the rest keep their printed weights, and an empty list falls back to the full table with a warning. This needs two small changes:
+- the follow-up executor gains an `exclude` option per table (as it already does for Models), filled from the archetype
+- recruit rolls use the archetype's species weights (one roll on the combined table)
+
+## Species tab
+One combined table of all 26 species, replacing the book's two-step roll (Crew Type, then the Primary Alien or Strange Character subtable) with a single roll that gives the same odds.
+- **Weights:** each species' weight is its Crew Type weight × its subtable weight, on a 10,000 scale:
+  - Baseline Human 60 × 100 = 6,000
+  - Bot 1,000
+  - Engineer 20 × 20 = 400
+  - De-converted 10 × 2 = 20
+  - and so on
+- **Columns:** species, group (Human / Bot / Primary Alien / Strange), how the weight is built ("Primary Alien 20 × Engineer 20"), weight, and chance.
+- **Read-only reference:** this tab shows the book's defaults, which are what "Reset to default" restores in an archetype.
+- **Other uses:** the Characters tab's Random species already rolls exactly this table (`LP.character.speciesRows`), so creating characters doesn't change. Recruits use the current planet's archetype weights. With no current planet, they use these defaults.
+- **One shared source:** a `speciesTable()` helper builds these weights from the Crew Type and subtable data, for the tab, the default archetype and the reset button.
+
+## Archetypes tab
+- **List** of archetypes, with buttons to **New** (empty), **Copy**, **Rename** and **Delete**. Delete is blocked for the last archetype, or for one still used by a planet unless you choose a replacement.
+- **Editor sections**, each collapsible with All / None:
+  - **World traits:** the 42 traits as tick boxes, each showing its d100 range and its chance within the archetype
+  - **Species:** the 26 species, grouped like the character generator, each with a **weight** (a number box) and its resulting chance. Buttons: **All to 0** and **Reset to default** (the book weights from the Species tab).
+  - **Events:** five lists (Campaign, Character, Exploration, Trade, Starship Travel), each with tick boxes and titles
+  - **Patrons:** entries with a name, a Patron type (or Random), forces (a grouped multi-select of the 47 enemies) and Unique Individuals (a multi-select of 22). You can add, rename, copy and remove entries.
+  - **Rivals:** the same, without a Patron type
+- **Warnings** for an empty trait list, all species weights at 0 (recruits then use the default table), or a Rival entry with no forces.
+
+## Planets tab
+- **List** of planets with the **current planet** marked, each showing:
+  - archetype and traits
+  - licence
+  - Patrons and Rivals by name
+  - invasion status and the invading enemy
+- **Generate planet:** pick an archetype (or Random) and a name (or generated). This rolls traits and licence and saves the planet without travelling there. That's useful for the "Locked in the library" travel event, which rolls three worlds.
+- **Per planet:**
+  - **Make current** (for fixing things up by hand)
+  - **edit** the name, traits, notes and licence owned
+  - **add** a Patron or Rival, either generated from the archetype or chosen from its entries
+  - **remove** a Patron or Rival
+  - **set or clear** an invasion and its enemy
+  - **delete** the planet
+- **Status badges:** Current, Invaded (by X), Lost to Unity, Liberated.
+
+## Campaign Turn integration
+
+| Stage | Change |
+|---|---|
+| 0 Start of turn | Shows the current planet (name, archetype, traits) in place of the world-traits picker, and the Invaded state from `planet.invasion`. First turn: create the starting planet (archetype + name) instead of the old "generate the starting world" question. |
+| 1.1 Flee Invasion | Names the invading enemy. On escape, the planet's Patrons and Rivals are lost (removed from it); the planet stays Invaded and is tracked for the Galactic War. |
+| 1.2 Travel | Destination: a **new world** (archetype or Random, plus a name) or a **saved planet** (not Lost to Unity). Fuel, Bureaucratic mess and so on come from the current planet's traits. |
+| 1.3 Travel event | Rolls among the departure planet's allowed travel events. Escape pod and Distress call recruits use the departure planet's species weights. |
+| 1.4 New world arrival | Each **named Rival** rolls 1D6 to follow (5+ moves to the new planet). **Persistent** Patrons come along. A new planet rolls licence and traits from its archetype (Wild Galaxy: two). A revisited planet skips those rolls and brings back what was left there. Sets the current planet. |
+| 2.1 Upkeep | No change. |
+| 2.2 Crew tasks | Patron search: each offer creates a **new named Patron** from the archetype; known Patrons are counted from the planet. Recruit: one roll on the combined species table using the archetype's weights. Exploration and Trade use the archetype's allowed results. "Got yourself noticed" picks a named Rival; "Pick a fight" creates one. Track: success lets you choose **which** Rival. |
+| 2.3 Job offers | Each offer is from a named Patron (new or existing). An existing Patron's type and Benefit carry over ("the Benefit always remains the same", p.83). Persistent, One-time Contract and Vengeful are stored on the Patron. |
+| 2.6 Choose your battle | Rival checks count the planet's Rivals. A Rival attack picks a **named** Rival at random. "Attack a Rival" lets you choose the tracked one. The chosen Rival goes to the Battle tab. |
+
+## Battle tab integration
+- **Header:** shows the current planet and its traits, which also drive the existing number modifiers.
+- **Rival battles:** the enemy is locked to the named Rival's type ("Set by: Rival *Black Dragon Mercs*"). Their Unique Individuals pool is used.
+- **Invasion battles:** the enemy is locked to the planet's invading enemy.
+- **Patron jobs:** enemies roll normally. If a Vengeful Patron has become a Rival, they're handled as a Rival.
+- **Hated Rivals** (double 1s) add +1 to their numbers.
+- **Without a current planet,** everything works as it does now.
+
+## Post-Battle integration
+| Step | Change |
+|---|---|
+| 4.0 Battle result | Pre-fills the named Rival or Patron involved. |
+| 4.1 Rival status | Creates the named Rival on the planet, matched to the enemy you fought (a hate flag on double 1s), or removes the Rival you chased off. |
+| 4.2 Patron status | A won job keeps the Patron as a contact (unless it was a One-time Contract). A failed Vengeful job turns the Patron into a Rival, using their forces. |
+| 4.6 Check for Invasion | An invasion sets `planet.invasion = { status: 'invaded', enemy: <the Invasion Threat you fought> }`. Liberated planets get −2 here. |
+| 4.12 / 4.13 Events | Roll among the archetype's allowed events. "Add a Rival / Patron" results create named records; "remove a Rival" offers a choice of names. |
+| 4.14 Galactic War | Rolls for **every Invaded planet** except the current one, with that planet's own Making Ground count and its traits (Military outpost +2, Imminent invasion −1). Lost → **Lost to Unity** (can't be visited). Victorious → **Liberated** (−2 to future invasion rolls there). |
+
+## Tab bar
+- Seven tabs: Characters · Models · Species · Archetypes · Planets · Campaign Turn · Battle.
+- On phones the bar scrolls sideways, with a fade at the edge, rather than squeezing the labels.
+
+## Build order
+1. **Rules and data:** `archetypes.js`, `planets.js`, migration, the `exclude` option for follow-up tables, and archetype species weights. Tests for:
+   - the default archetype's contents
+   - restricted rolls, and species weights matching the two-step odds
+   - Patron and Rival creation and matching
+   - follow checks
+   - invasion progress
+   - migration from the remembered counts
+2. **Species tab** and the shared `speciesTable()` helper.
+3. **Archetypes tab.**
+4. **Planets tab**, including the name generator.
+5. **Turn: Start and Travel** (0, 1.1–1.4).
+6. **Turn: World** (2.2, 2.3, 2.6).
+7. **Battle tab:** planet header, Rival and invasion locks, Unique pools.
+8. **Post-Battle:** 4.1, 4.2, 4.6, 4.12–4.14.
+9. **Full-turn tests** with planets; browser check on desktop and phone.
+
+## Decisions (answered)
+1. **Fleeing an invasion deletes** that planet's Patrons and Rivals, as the book says. The planet itself stays, tracked for the Galactic War.
+2. **Running out of names:** entries are reused with a number ("Pirates (2)").
+3. **Species weights:** one combined table, shown on the Species tab. Archetypes hold a weight per species, with All to 0 and Reset to default buttons.

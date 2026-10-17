@@ -136,7 +136,7 @@
     T.confirm(small, { tasks: { recruit: 2 } });
     const text = linesText(last(small).output);
     assert.equal((text.match(/Crew Type Table/g) || []).length, 0, 'table name is in line.table, not text');
-    assert.equal(JSON.stringify(last(small).output.fu.lines).split('"table":"Crew Type Table"').length - 1, 2);
+    assert.equal(JSON.stringify(last(small).output.fu.lines).split('"table":"Species"').length - 1, 2, 'one species roll per recruit');
 
     const full = atUpkeep();
     upkeep(full, { crewCount: 6 });

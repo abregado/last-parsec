@@ -56,11 +56,25 @@
   }
 
   function env(ctx, extra) {
+    const archetype = ctx.planet && LP.planets ? LP.planets.archetypeOf(ctx.campaign, ctx.planet) : null;
     return Object.assign({
       crewSize: ctx.settings.crewSize,
       crewCount: ctx.facts.crewCount || ctx.memory.crewCount || ctx.settings.crewSize,
-      disabled: ctx.campaign && ctx.campaign.models ? ctx.campaign.models.disabled : {}
+      disabled: LP.archetypes ? LP.archetypes.disabledMap(ctx.campaign, archetype) : (ctx.campaign && ctx.campaign.models ? ctx.campaign.models.disabled : {}),
+      speciesWeights: LP.archetypes ? LP.archetypes.speciesWeights(archetype) : null,
+      rivalNames: ctx.planet ? ctx.planet.rivals.map((r) => r.name) : null
     }, extra);
+  }
+
+  /** Named Rivals and Patrons gained from events. */
+  function addGained(ctx, gains) {
+    if (!ctx.planet || !gains) return;
+    for (let i = 0; i < (gains.rivals || 0); i++) LP.planets.newRival(ctx.campaign, ctx.planet);
+    for (let i = 0; i < (gains.patrons || 0); i++) LP.planets.newPatron(ctx.campaign, ctx.planet);
+  }
+
+  function clone(value) {
+    return JSON.parse(JSON.stringify(value));
   }
 
   function runOutput(headline, run, lines) {
@@ -123,6 +137,18 @@
         { key: 'payTwice', type: 'yesno', label: 'Danger Pay lets you roll twice for pay (10+ result)?', value: false, showIf: isType('patron') },
         { key: 'hotJob', type: 'yesno', label: 'Was it a Hot Job (enemies become Rivals on 1–2)?', value: false, showIf: isType('patron') },
         { key: 'questRumors', type: 'number', label: 'Quest Rumors gathered on this Quest', min: 0, max: 30, value: ctx.memory.rumors || 0, showIf: isType('quest') },
+        ctx.planet && ctx.planet.rivals.length ? {
+          key: 'rivalId', type: 'select', label: 'Which Rival did you fight?',
+          value: ctx.facts.rivalId || (s && s.rivalId) || '',
+          options: [{ value: '', label: 'An unnamed Rival' }].concat(ctx.planet.rivals.map((r) => ({ value: r.id, label: r.name }))),
+          showIf: isType('rival', 'rival-attack')
+        } : null,
+        ctx.planet && ctx.planet.patrons.length ? {
+          key: 'patronId', type: 'select', label: 'Which Patron was the job for?',
+          value: (ctx.facts.jobPatronIds && ctx.facts.jobPatronIds[0]) || '',
+          options: [{ value: '', label: 'Not recorded' }].concat(ctx.planet.patrons.map((p) => ({ value: p.id, label: p.name }))),
+          showIf: isType('patron')
+        } : null,
         { key: 'bounty', type: 'number', label: 'Criminal bounty (credits, if any)', min: 0, max: 3, value: s && s.bounty ? s.bounty : 0, showIf: (v) => v.category === 'criminal-elements' && v.type !== 'invasion' }
       ];
     },
@@ -159,7 +185,10 @@
           questRumors: input.questRumors || 0,
           bounty: input.bounty || 0,
           extraLoot: !!s.extraLoot,
-          extraFinds: !!s.extraFinds
+          extraFinds: !!s.extraFinds,
+          enemy: input.type === 'invasion' ? null : s.enemy || null,
+          rivalId: input.rivalId || null,
+          patronId: input.patronId || null
         }
       };
     }
@@ -185,6 +214,7 @@
     },
     fields(ctx) {
       const p = pb(ctx);
+      if (ctx.planet) return [{ key: 'note', type: 'info', text: isRivalFight(p) ? 'Roll to see if they give up.' : 'Roll to see if the enemy holds a grudge.' }];
       return [{ key: 'rivals', type: 'number', label: 'Rivals you have now', min: 0, max: 30, value: ctx.memory.rivals || 0, showIf: () => isRivalFight(p) }];
     },
     resolve(input, ctx) {
@@ -202,9 +232,15 @@
           failText: 'They’ll be back.'
         });
         data.removed = roll.success ? 1 : 0;
-        data.rivals = Math.max(0, (input.rivals || 0) - data.removed);
+        const named = ctx.planet && p.rivalId ? ctx.planet.rivals.find((r) => r.id === p.rivalId) : null;
+        if (named) {
+          data.removeId = roll.success ? named.id : null;
+          roll.label = 'Chase off ' + named.name + ' (4+)';
+        } else {
+          data.rivals = Math.max(0, (input.rivals || 0) - data.removed);
+        }
         const lines = [roll, L.text('Vigilantes are Persistent: −1 to this roll against them.', 'note')];
-        return { output: { headline: roll.success ? 'Rival removed' : 'The Rival remains', tone: roll.success ? 'good' : undefined, lines, data } };
+        return { output: { headline: roll.success ? (named ? named.name + ' removed' : 'Rival removed') : 'The Rival remains', tone: roll.success ? 'good' : undefined, lines, data } };
       }
 
       const threshold = hasTrait(ctx, 'vendetta-system') || p.hotJob ? 2 : 1;
@@ -227,12 +263,23 @@
         lines.push(roll);
         if (p.category === 'criminal-elements') lines.push(L.text('Heavily enforced: Criminal Elements only roll a single die here.', 'note'));
       }
-      return { output: { headline: data.gained ? 'New Rival!' : 'No new Rival', tone: data.gained ? 'bad' : 'good', lines, data } };
+      if (data.gained && ctx.planet) {
+        const scratch = clone(ctx.planet);
+        data.newRival = LP.planets.newRival(ctx.campaign, scratch, { enemy: p.enemy, hates: data.hate });
+        lines.push(L.text(data.newRival.name + ' are now your Rivals on ' + ctx.planet.name + '.', 'bad'));
+      }
+      return { output: { headline: data.gained ? 'New Rival' + (data.newRival ? ': ' + data.newRival.name : '!') : 'No new Rival', tone: data.gained ? 'bad' : 'good', lines, data } };
     },
     remember(input, output, ctx) {
       const d = output.data;
       if (d.rivals !== undefined) return { rivals: d.rivals };
       return { rivals: (ctx.memory.rivals || 0) + d.gained };
+    },
+    apply(input, output, ctx) {
+      const d = output.data;
+      if (!ctx.planet) return;
+      if (d.removeId) LP.planets.removeRival(ctx.planet, d.removeId);
+      if (d.newRival && !ctx.planet.rivals.some((r) => r.id === d.newRival.id)) ctx.planet.rivals.push(clone(d.newRival));
     }
   });
 
@@ -252,8 +299,10 @@
       return p.type === 'patron' ? true : 'Not a Patron job.';
     },
     fields(ctx) {
-      return pb(ctx).won
-        ? [{ key: 'oneTime', type: 'yesno', label: 'Was it a One-time Contract?', value: false }]
+      const p = pb(ctx);
+      if (p.won) return [{ key: 'oneTime', type: 'yesno', label: 'Was it a One-time Contract?', value: false }];
+      return ctx.planet && p.patronId
+        ? [{ key: 'vengeful', type: 'yesno', label: 'Did the job have the Vengeful condition (the Patron becomes a Rival)?', value: false }]
         : [{ key: 'note', type: 'info', text: 'The job wasn’t a success.' }];
     },
     resolve(input, ctx) {
@@ -265,12 +314,18 @@
           lines: [L.text(added
             ? 'Add the Patron to your contacts on this world. Patrons stay behind when you travel unless they are Persistent.'
             : (p.won ? 'One-time Contract: they can’t be kept as a contact.' : 'Failed jobs don’t earn a contact. A Vengeful Patron becomes a Rival.'))],
-          data: { added }
+          data: { added, removeId: p.won && input.oneTime ? p.patronId : null, vengefulId: !p.won && input.vengeful ? p.patronId : null }
         }
       };
     },
     remember(input, output, ctx) {
       return output.data.added ? { patrons: (ctx.memory.patrons || 0) + 1 } : {};
+    },
+    apply(input, output, ctx) {
+      const d = output.data;
+      if (!ctx.planet) return;
+      if (d.removeId) LP.planets.removePatron(ctx.planet, d.removeId);
+      if (d.vengefulId) LP.planets.patronToRival(ctx.campaign, ctx.planet, d.vengefulId);
     }
   });
 
@@ -471,7 +526,8 @@
           { label: 'Invasion risk', value: hasTrait(ctx, 'invasion-risk') ? 1 : 0 },
           { label: 'Imminent invasion', value: hasTrait(ctx, 'imminent-invasion') ? 2 : 0 },
           { label: 'Military outpost', value: hasTrait(ctx, 'military-outpost') ? 2 : 0 },
-          { label: 'Rumors of war', value: input.warRumors ? 2 : 0 }
+          { label: 'Rumors of war', value: input.warRumors ? 2 : 0 },
+          { label: 'Liberated world', value: ctx.planet && ctx.planet.invasion && ctx.planet.invasion.status === 'liberated' ? -2 : 0 }
         ],
         successText: 'The world is about to be Invaded! Next campaign turn you must try to Flee Invasion.',
         failText: 'No invasion this time.'
@@ -480,6 +536,9 @@
     },
     remember(input, output) {
       return output.data.invaded ? { invadedNext: true } : {};
+    },
+    apply(input, output, ctx) {
+      if (output.data.invaded && ctx.planet) LP.planets.startInvasion(ctx.planet, pb(ctx).enemy);
     }
   });
 
@@ -685,6 +744,9 @@
       if (g.patrons) keep.patrons = (ctx.memory.patrons || 0) + g.patrons;
       if (g.rumors) keep.rumors = (ctx.memory.rumors || 0) + g.rumors;
       return keep;
+    },
+    apply(input, output, ctx) {
+      addGained(ctx, output.fu.gains);
     }
   });
 
@@ -724,6 +786,9 @@
       if (g.patrons) keep.patrons = (ctx.memory.patrons || 0) + g.patrons;
       if (g.rumors) keep.rumors = (ctx.memory.rumors || 0) + g.rumors;
       return keep;
+    },
+    apply(input, output, ctx) {
+      addGained(ctx, output.fu.gains);
     }
   });
 
@@ -739,6 +804,13 @@
     page: 126,
     applies: needs,
     fields(ctx) {
+      if (planetsOn(ctx)) {
+        const tracked = LP.planets.invadedPlanets(ctx.campaign, ctx.campaign.currentPlanetId);
+        return [{
+          key: 'note', type: 'info',
+          text: tracked.length ? 'Invaded planets: ' + tracked.map((p) => p.name + (p.invasion.enemy ? ' (' + LP.archetypes.enemyName(p.invasion.enemy) + ')' : '')).join(', ') + '.' : 'No other planets are being Invaded.'
+        }];
+      }
       const leftBehind = ctx.facts.fled || ctx.facts.fleeFailed ? 1 : 0;
       return [{
         key: 'planets', type: 'number', label: 'Invaded planets you are tracking', min: 0, max: 20,
@@ -746,7 +818,8 @@
         help: leftBehind ? 'Includes the world you fled this turn.' : 'Planets you left while they were being Invaded.'
       }];
     },
-    resolve(input) {
+    resolve(input, ctx) {
+      if (planetsOn(ctx)) return warByPlanet(ctx);
       if (!input.planets) return { output: { headline: 'No invaded planets', lines: [L.text('Nothing to track.')], data: { planets: 0 } } };
       const steps = [];
       for (let i = 1; i <= input.planets; i++) steps.push({ group: 'Planet ' + i, steps: [{ table: 'Galactic War Progress Table' }] });
@@ -755,8 +828,42 @@
       return runOutput(plural(input.planets, 'planet', 'planets') + ' checked', run);
     },
     choose: chooseInRun,
-    remember(input) {
+    remember(input, output) {
+      if (output.data && output.data.results) return {};
       return { invadedPlanets: input.planets || 0 };
+    },
+    apply(input, output, ctx) {
+      const results = output.data && output.data.results;
+      if (!results) return;
+      for (const r of results) {
+        const planet = LP.planets.get(ctx.campaign, r.planetId);
+        if (planet) LP.planets.applyWarResult(planet, r.rowId);
+      }
     }
   });
+
+  function planetsOn(ctx) {
+    return !!(LP.planets && Array.isArray(ctx.campaign.planets));
+  }
+
+  /** One Galactic War roll per invaded planet, with that planet's own modifiers. */
+  function warByPlanet(ctx) {
+    const tracked = LP.planets.invadedPlanets(ctx.campaign, ctx.campaign.currentPlanetId);
+    if (!tracked.length) return { output: { headline: 'No invaded planets', lines: [L.text('Nothing to track.')], data: { results: [] } } };
+    const lines = [];
+    const results = [];
+    for (const planet of tracked) {
+      const traits = planet.worldTraits || [];
+      const modifier = (planet.invasion.makingGround || 0) + (traits.includes('military-outpost') ? 2 : 0) - (traits.includes('imminent-invasion') ? 1 : 0);
+      const line = L.table('Galactic War Progress Table', { modifier: modifier, textColumn: 'effect', label: planet.name });
+      const notes = [];
+      if (planet.invasion.makingGround) notes.push('+' + planet.invasion.makingGround + ' Making Ground');
+      if (traits.includes('military-outpost')) notes.push('+2 Military outpost');
+      if (traits.includes('imminent-invasion')) notes.push('\u22121 Imminent invasion');
+      if (notes.length) line.children = [L.text(notes.join(', '), 'note')];
+      lines.push(line);
+      results.push({ planetId: planet.id, rowId: line.rowId });
+    }
+    return { output: { headline: plural(tracked.length, 'planet', 'planets') + ' checked', lines, data: { results } } };
+  }
 })(window.LP);

@@ -25,6 +25,12 @@
    *   choose(record, value, ctx) -> { output, pending? }             (if it can be pending)
    *   facts(input, output, ctx)  -> values later stages read         (optional)
    *   remember(input, output, ctx) -> values kept for the next turn  (optional)
+   *   apply(input, output, ctx)  -> changes planets (campaign.planets / currentPlanetId).
+   *                                 Runs after resolve and again after each choice, always
+   *                                 starting from the planets as they were before the stage,
+   *                                 so it must only depend on input and output. (optional)
+   *
+   * Undo and Restart restore planets as well as turnMemory.
    *
    * ctx = { settings, memory, facts, campaign }, where facts merges the facts
    * of every earlier confirmed stage in order.
@@ -49,10 +55,22 @@
     return value === undefined ? undefined : JSON.parse(JSON.stringify(value));
   }
 
+  /** Snapshot of the planets a stage may change (null for campaigns without planets). */
+  function geo(campaign) {
+    return Array.isArray(campaign.planets) ? { planets: clone(campaign.planets), currentPlanetId: campaign.currentPlanetId || null } : null;
+  }
+
+  function setGeo(campaign, snapshot) {
+    if (!snapshot) return;
+    campaign.planets = clone(snapshot.planets);
+    campaign.currentPlanetId = snapshot.currentPlanetId;
+  }
+
   function newTurn(campaign) {
     return {
       startedAt: new Date().toISOString(),
       memoryAtStart: clone(campaign.turnMemory),
+      geoAtStart: geo(campaign),
       draft: null,
       records: []
     };
@@ -75,10 +93,24 @@
     return campaign.turn;
   }
 
+  /**
+   * ctx.memory is turnMemory, with Rivals, Patrons, world traits and the
+   * invasion taken from the current planet when there is one.
+   */
   function context(campaign, records) {
     const facts = {};
     for (const record of records) Object.assign(facts, record.facts || {});
-    return { settings: campaign.settings, memory: campaign.turnMemory, facts: facts, campaign: campaign };
+    const planet = LP.planets && Array.isArray(campaign.planets) ? LP.planets.current(campaign) : null;
+    let memory = campaign.turnMemory;
+    if (planet) {
+      memory = Object.assign({}, campaign.turnMemory, {
+        rivals: planet.rivals.length,
+        patrons: planet.patrons.length,
+        worldTraits: planet.worldTraits.slice(),
+        invadedNext: !!(planet.invasion && planet.invasion.status === 'invaded')
+      });
+    }
+    return { settings: campaign.settings, memory: memory, facts: facts, campaign: campaign, planet: planet };
   }
 
   /**
@@ -119,7 +151,7 @@
     const w = walk(campaign);
     if (!w.current) return null;
     const ctx = context(campaign, campaign.turn.records);
-    const fields = w.current.fields ? w.current.fields(ctx) : [];
+    const fields = (w.current.fields ? w.current.fields(ctx) : []).filter(Boolean);
     const draft = campaign.turn.draft;
     if (draft && draft.id === w.current.id) {
       for (const field of fields) {
@@ -134,6 +166,10 @@
     record.pending = result.pending || null;
     record.facts = def.facts ? def.facts(record.input, record.output, ctx) || {} : {};
     if (def.remember) Object.assign(campaign.turnMemory, def.remember(record.input, record.output, ctx) || {});
+    if (def.apply && record.geoBefore) {
+      setGeo(campaign, record.geoBefore);
+      def.apply(record.input, record.output, context(campaign, campaign.turn.records.filter((r) => r !== record)));
+    }
   }
 
   /** Confirm the current stage. Returns { ok: true } or { error }. */
@@ -153,7 +189,8 @@
       pending: null,
       facts: {},
       history: [],
-      memoryBefore: clone(campaign.turnMemory)
+      memoryBefore: clone(campaign.turnMemory),
+      geoBefore: geo(campaign)
     };
     applyResult(campaign, def, record, def.resolve(clone(input), ctx), ctx);
     turn.records.push(record);
@@ -173,7 +210,8 @@
       output: clone(record.output),
       pending: clone(record.pending),
       facts: clone(record.facts),
-      memory: clone(campaign.turnMemory)
+      memory: clone(campaign.turnMemory),
+      geo: geo(campaign)
     });
     applyResult(campaign, def, record, def.choose(record, value, ctx), ctx);
     return { ok: true };
@@ -197,10 +235,12 @@
       record.pending = previous.pending;
       record.facts = previous.facts;
       campaign.turnMemory = previous.memory;
+      setGeo(campaign, previous.geo);
       return true;
     }
     turn.records.pop();
     campaign.turnMemory = record.memoryBefore || {};
+    setGeo(campaign, record.geoBefore);
     turn.draft = { id: record.id, input: record.input };
     return true;
   }
@@ -209,6 +249,7 @@
   function restart(campaign) {
     ensure(campaign);
     campaign.turnMemory = clone(campaign.turn.memoryAtStart) || {};
+    setGeo(campaign, campaign.turn.geoAtStart);
     campaign.turn = newTurn(campaign);
   }
 

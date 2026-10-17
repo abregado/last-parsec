@@ -37,8 +37,10 @@
    *   { group: 'World 1', steps: [...] }
    *   { choice: { prompt, options: [{ value, label, then? }] } }   pauses the run
    *   { randomCrew: true, label?, count? }       "Crew member 3 of 6" from env.crewCount
-   *   { randomRival: true }                      from env.rivals
+   *   { randomRival: true }                      a name from env.rivalNames, or "n of N" from env.rivals
    *   { enemyNumbers: true, plus? }              highest of (crew size - 3) D6
+   *   { species: true, label? }                  a species from the combined table, using
+   *                                              env.speciesWeights (or the book defaults)
    *
    * env: { crewCount, rivals, crewSize, disabled (campaign.models.disabled), table, depth }
    */
@@ -240,9 +242,25 @@
     }
 
     if (step.randomRival) {
-      const n = env.rivals;
-      const text = n ? 'Rival ' + (LP.rng.int(n) + 1) + ' of ' + n + ' (in your list order).' : 'If you have Rivals, pick one at random.';
+      const names = env.rivalNames;
+      const n = names ? names.length : env.rivals;
+      let text;
+      if (names && names.length) text = 'Rival: ' + names[LP.rng.int(names.length)] + '.';
+      else text = n ? 'Rival ' + (LP.rng.int(n) + 1) + ' of ' + n + ' (in your list order).' : 'If you have Rivals, pick one at random.';
       append(state, frame.target, { type: 'text', text: text });
+      return;
+    }
+
+    if (step.species) {
+      const weights = env.speciesWeights || LP.archetypes.defaultSpeciesWeights();
+      const pickRow = LP.rng.weightedPick(Object.entries(weights).map(([id, weight]) => ({ id, weight })));
+      const s = pickRow ? LP.data.species.byId[pickRow.id] : null;
+      const groups = { 'human': 'Human', 'bot': 'Bot', 'primary-alien': 'Primary Alien', 'strange': 'Strange Character' };
+      append(state, frame.target, {
+        type: 'table', table: 'Species', die: null, natural: null, label: step.label,
+        rowId: s ? s.id : null,
+        title: s ? s.name + ' (' + groups[s.group] + ')' : 'No species can be recruited here'
+      });
       return;
     }
 

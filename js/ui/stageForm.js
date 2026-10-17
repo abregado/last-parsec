@@ -12,6 +12,7 @@
    *   type 'select'      options: [{ value, label }]
    *   type 'multiselect' options: [{ value, label, hint? }], value: [..]
    *   type 'info'        text (no value)
+   *   type 'text'        free text; placeholder
    *   type 'tasks'       tasks: [{ key, label, hint? }], perTask (max per task),
    *                      total (crew available), value: { taskKey: count }
    *
@@ -53,6 +54,16 @@
           input.addEventListener('input', () => {
             const n = parseInt(input.value, 10);
             values[field.key] = isNaN(n) ? null : n;
+            refreshVisibility();
+          });
+          return labelled(field, id, input);
+        }
+
+        case 'text': {
+          const input = el('input', { id: id, class: 'input', type: 'text', maxlength: '60', autocomplete: 'off', placeholder: field.placeholder || null, 'data-focus': 'field:' + field.key });
+          input.value = field.value || '';
+          input.addEventListener('input', () => {
+            values[field.key] = input.value;
             refreshVisibility();
           });
           return labelled(field, id, input);

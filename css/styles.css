@@ -1716,3 +1716,221 @@ main:focus {
     width: 100%;
   }
 }
+
+/* ==========================================================================
+   Species tab
+   ========================================================================== */
+
+.species-grid .group-row th {
+  padding-top: 14px;
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.species-grid .group-row td {
+  padding-top: 14px;
+  color: var(--text-muted);
+}
+
+/* Seven tabs: let the bar scroll sideways on narrow screens, with a fade. */
+@media (max-width: 860px) {
+  .tabs {
+    -webkit-mask-image: linear-gradient(to right, #000 85%, transparent);
+    mask-image: linear-gradient(to right, #000 85%, transparent);
+    padding-right: 24px;
+  }
+}
+
+/* ==========================================================================
+   Archetypes tab
+   ========================================================================== */
+
+.arch-editor {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.arch-title {
+  display: grid;
+  gap: 8px;
+}
+
+.arch-warnings {
+  color: var(--text-muted);
+}
+
+.arch-section {
+  display: grid;
+  gap: 10px;
+}
+
+.arch-body {
+  display: grid;
+  gap: 10px;
+}
+
+.check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 6px 14px;
+}
+
+.species-group h4,
+.event-group h4,
+.entry-edit h4 {
+  margin: 4px 0;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.species-weights {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 6px 16px;
+}
+
+.species-weight-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 90px 56px 80px;
+  align-items: center;
+  gap: 8px;
+}
+
+.species-weight-row.is-off .species-name {
+  color: var(--text-muted);
+}
+
+.species-weight {
+  width: 90px;
+}
+
+.event-group {
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+.entry-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entry-card {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.entry-card.open {
+  border-color: var(--accent);
+}
+
+.entry-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.entry-head .input[type="text"] {
+  flex: 1 1 200px;
+  width: auto;
+}
+
+.entry-head .select {
+  width: auto;
+}
+
+.entry-edit {
+  display: grid;
+  gap: 8px;
+}
+
+.force-group {
+  display: grid;
+  gap: 4px;
+}
+
+@media (max-width: 600px) {
+  .species-weight-row {
+    grid-template-columns: minmax(0, 1fr) 80px 52px;
+  }
+
+  .species-default {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Planets tab
+   ========================================================================== */
+
+.planet-block {
+  display: grid;
+  gap: 10px;
+}
+
+.planet-block > h3 {
+  color: var(--accent);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.planet-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.planet-head .input {
+  flex: 1 1 220px;
+  width: auto;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.planet-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.planet-badges .badge {
+  justify-self: auto;
+}
+
+.badge-accent {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.badge-invaded,
+.badge-lost {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.badge-liberated {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.planet-notes {
+  resize: vertical;
+}

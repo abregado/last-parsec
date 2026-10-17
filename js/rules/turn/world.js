@@ -23,12 +23,26 @@
     return ctx.memory.crewCount || ctx.settings.crewSize;
   }
 
-  /** Env for follow-up runs. */
+  /** Env for follow-up runs: Models and archetype restrictions, species weights, Rival names. */
   function env(ctx, extra) {
+    const archetype = ctx.planet && LP.planets ? LP.planets.archetypeOf(ctx.campaign, ctx.planet) : null;
     return Object.assign({
       crewSize: ctx.settings.crewSize,
-      disabled: ctx.campaign && ctx.campaign.models ? ctx.campaign.models.disabled : {}
+      disabled: LP.archetypes ? LP.archetypes.disabledMap(ctx.campaign, archetype) : (ctx.campaign && ctx.campaign.models ? ctx.campaign.models.disabled : {}),
+      speciesWeights: LP.archetypes ? LP.archetypes.speciesWeights(archetype) : null,
+      rivalNames: ctx.planet ? ctx.planet.rivals.map((r) => r.name) : null
     }, extra);
+  }
+
+  /** Named Rivals and Patrons gained from follow-ups (Pick a fight, events...). */
+  function addGained(ctx, gains) {
+    if (!ctx.planet || !gains) return;
+    for (let i = 0; i < (gains.rivals || 0); i++) LP.planets.newRival(ctx.campaign, ctx.planet);
+    for (let i = 0; i < (gains.patrons || 0); i++) LP.planets.newPatron(ctx.campaign, ctx.planet);
+  }
+
+  function newId() {
+    return LP.storage ? LP.storage.newId() : 'id-' + Math.random().toString(36).slice(2, 10);
   }
 
   /** Shared resolve/choose for stages whose output is one follow-up run. */
@@ -258,7 +272,7 @@
         if (crewCount < 6) {
           const auto = Math.min(t.recruit, 6 - crewCount);
           recruitSteps.push({ text: 'Fewer than 6 crew: ' + plural(auto, 'recruit joins', 'recruits join') + ' automatically.' });
-          for (let i = 1; i <= auto; i++) recruitSteps.push({ group: 'Recruit ' + i, steps: [{ table: 'Crew Type Table' }] });
+          for (let i = 1; i <= auto; i++) recruitSteps.push({ group: 'Recruit ' + i, steps: [{ species: true }] });
         } else {
           recruitSteps.push({
             roll: '1D6', label: 'Recruiting', target: 6,
@@ -267,7 +281,7 @@
               { label: 'Easy recruiting', value: hasTrait(ctx, 'easy-recruiting') ? 1 : 0 }
             ],
             outcomes: [
-              { min: 6, text: 'A new recruit joins:', tone: 'good', then: [{ table: 'Crew Type Table' }] },
+              { min: 6, text: 'A new recruit joins:', tone: 'good', then: [{ species: true }] },
               { max: 5, text: 'Nobody suitable this time. (A Luxury trinket would add +2.)' }
             ]
           });
@@ -340,6 +354,9 @@
       const base = input.rivals !== undefined ? input.rivals : (ctx.memory.rivals || 0);
       keep.rivals = base + ((output.fu.gains || {}).rivals || 0);
       return keep;
+    },
+    apply(input, output, ctx) {
+      addGained(ctx, { rivals: (output.fu.gains || {}).rivals || 0 });
     }
   });
 
@@ -355,6 +372,19 @@
     page: 83,
     applies: trapped,
     fields(ctx) {
+      if (ctx.planet) {
+        return [
+          {
+            key: 'offers', type: 'number', label: 'Offers from new Patrons', min: 0, max: 6,
+            value: ctx.facts.patronOffers || 0,
+            help: 'Pre-filled from this turn’s Patron search and Exploration. Each becomes a named Patron on ' + ctx.planet.name + '.'
+          },
+          {
+            key: 'known', type: 'select', label: 'Is a Patron you know offering a job?', value: '',
+            options: [{ value: '', label: 'No' }].concat(ctx.planet.patrons.map((p) => ({ value: p.id, label: p.name + (p.patronType ? ' (' + LP.planets.patronTypeName(p.patronType) + ')' : '') })))
+          }
+        ];
+      }
       return [{
         key: 'offers', type: 'number', label: 'Job offers to generate', min: 0, max: 6,
         value: ctx.facts.patronOffers || 0,
@@ -362,6 +392,7 @@
       }];
     },
     resolve(input, ctx) {
+      if (ctx.planet) return namedOffers(input, ctx);
       if (!input.offers) {
         return { output: { headline: 'No job offers', lines: [L.text('No Patron jobs this turn.')] } };
       }
@@ -372,10 +403,53 @@
       return runOutput(plural(input.offers, 'job offer', 'job offers'), run);
     },
     choose: chooseInRun,
-    facts(input) {
-      return { jobsOffered: input.offers || 0 };
+    facts(input, output) {
+      const d = output.data || {};
+      const ids = (d.patronIds || []).slice();
+      return { jobsOffered: (input.offers || 0) + (input.known ? 1 : 0), jobPatronIds: ids };
+    },
+    apply(input, output, ctx) {
+      const d = output.data || {};
+      if (!ctx.planet || !d.newPatrons) return;
+      for (const p of d.newPatrons) if (!ctx.planet.patrons.some((x) => x.id === p.id)) ctx.planet.patrons.push(JSON.parse(JSON.stringify(p)));
     }
   });
+
+  /**
+   * Job offers from named Patrons: new ones are created from the archetype,
+   * a known one keeps its Patron type. Each offer rolls Danger Pay, Time Frame
+   * and Benefits/Hazards/Conditions for that type.
+   */
+  function namedOffers(input, ctx) {
+    const P = LP.planets;
+    const scratch = JSON.parse(JSON.stringify(ctx.planet));
+    const offers = [];
+    if (input.known) {
+      const known = ctx.planet.patrons.find((p) => p.id === input.known);
+      if (known) offers.push(known);
+    }
+    const newPatrons = [];
+    for (let i = 0; i < (input.offers || 0); i++) {
+      const p = P.newPatron(ctx.campaign, scratch);
+      newPatrons.push(p);
+      offers.push(p);
+    }
+    if (!offers.length) {
+      return { output: { headline: 'No job offers', lines: [L.text('No Patron jobs this turn.')], data: { patronIds: [], newPatrons: [] } } };
+    }
+    const steps = offers.map((p) => {
+      const type = p.patronType || LP.rng.rollTable('Patron Table').id;
+      return {
+        group: p.name + ' (' + P.patronTypeName(type) + (newPatrons.includes(p) ? ', new' : '') + ')',
+        steps: F.scriptFor('Patron Table', type)
+      };
+    });
+    steps.push({ text: 'Benefits are only paid if the mission succeeds. You may turn any job down after seeing the details.', tone: 'note' });
+    const run = F.start(steps, env(ctx, {}));
+    const result = runOutput(plural(offers.length, 'job offer', 'job offers') + ': ' + offers.map((p) => p.name).join(', '), run);
+    result.output.data = { patronIds: offers.map((p) => p.id), newPatrons: newPatrons };
+    return result;
+  }
 
   /* ---------------------------------------------------------------------- */
   /* 2.4 Assign equipment                                                   */
@@ -466,6 +540,18 @@
       if (ctx.facts.fleeFailed) {
         return [{ key: 'note', type: 'info', text: 'You failed to flee the invasion: this turn’s battle is an Invasion Battle.' }];
       }
+      if (ctx.planet) {
+        return [
+          { key: 'rivalsInfo', type: 'info', text: ctx.planet.rivals.length ? 'Rivals on ' + ctx.planet.name + ': ' + ctx.planet.rivals.map((r) => r.name).join(', ') + '.' : 'You have no Rivals on ' + ctx.planet.name + '.' },
+          {
+            key: 'privateTransport', type: 'yesno', value: false,
+            label: 'Are you taking a Patron job with the Private Transport hazard?',
+            help: 'If so, Rivals can’t find you this turn.',
+            showIf: () => ctx.planet.rivals.length > 0 && (ctx.facts.jobsOffered || 0) > 0
+          },
+          { key: 'patronJob', type: 'yesno', value: (ctx.facts.jobsOffered || 0) > 0, label: 'Do you have a Patron job you can take?' }
+        ];
+      }
       return [
         { key: 'rivals', type: 'number', label: 'Rivals you have', min: 0, max: 30, value: ctx.memory.rivals || 0 },
         {
@@ -492,7 +578,8 @@
       }
 
       const lines = [];
-      const rivals = input.rivals || 0;
+      const named = ctx.planet ? ctx.planet.rivals : null;
+      const rivals = named ? named.length : (input.rivals || 0);
       const decoys = ctx.facts.decoys || 0;
       if (rivals > 0 && input.privateTransport) {
         lines.push(L.text('Private Transport: your Rivals can’t track you this turn.', 'good'));
@@ -506,16 +593,21 @@
         check.text = found ? 'A Rival has tracked you down.' : 'You slip past your Rivals.';
         lines.push(check);
         if (found) {
-          const which = 1 + LP.rng.int(rivals);
-          lines.push(L.text('Rival ' + which + ' of ' + rivals + ' (in your list order) attacks. Patron jobs fail if their time runs out; Quests and Rumors wait.', 'bad'));
-          return { output: { headline: 'Rival attack!', tone: 'bad', lines, data: { battle: 'rival-attack' } } };
+          const which = LP.rng.int(rivals);
+          const who = named ? named[which].name : 'Rival ' + (which + 1) + ' of ' + rivals + ' (in your list order)';
+          lines.push(L.text(who + ' attacks. Patron jobs fail if their time runs out; Quests and Rumors wait.', 'bad'));
+          return { output: { headline: 'Rival attack!' + (named ? ' ' + named[which].name : ''), tone: 'bad', lines, data: { battle: 'rival-attack', rivalId: named ? named[which].id : null } } };
         }
       } else {
         lines.push(L.text('No Rivals to worry about.'));
       }
 
       const options = [{ value: 'opportunity', label: BATTLES.opportunity }];
-      if (ctx.facts.tracked) options.push({ value: 'rival', label: BATTLES.rival });
+      if (ctx.facts.tracked && named && named.length) {
+        for (const r of named) options.push({ value: 'rival:' + r.id, label: 'Attack ' + r.name });
+      } else if (ctx.facts.tracked) {
+        options.push({ value: 'rival', label: BATTLES.rival });
+      }
       if (ctx.facts.onQuest || ctx.memory.onQuest) options.push({ value: 'quest', label: BATTLES.quest });
       if (input.patronJob) options.push({ value: 'patron', label: BATTLES.patron });
       lines.push(L.text('If an Exploration result (Got yourself noticed) forces a Rival fight, take that instead.', 'note'));
@@ -531,12 +623,19 @@
     },
     choose(record, value) {
       const output = JSON.parse(JSON.stringify(record.output));
-      output.headline = 'Battle: ' + BATTLES[value];
-      output.data.battle = value;
+      if (value.startsWith('rival:')) {
+        const option = record.pending.options.find((o) => o.value === value);
+        output.headline = 'Battle: ' + option.label;
+        output.data.battle = 'rival';
+        output.data.rivalId = value.slice(6);
+      } else {
+        output.headline = 'Battle: ' + BATTLES[value];
+        output.data.battle = value;
+      }
       return { output };
     },
     facts(input, output) {
-      return { battleType: output.data.battle };
+      return { battleType: output.data.battle, rivalId: output.data.rivalId || null };
     },
     remember(input) {
       return input.rivals !== undefined ? { rivals: input.rivals } : {};

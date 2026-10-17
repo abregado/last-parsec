@@ -21,6 +21,23 @@
     return n + ' ' + (n === 1 ? one : many);
   }
 
+  /** Planets are in use (every saved campaign has them; bare test campaigns may not). */
+  function planetsOn(ctx) {
+    return !!(LP.planets && Array.isArray(ctx.campaign.planets));
+  }
+
+  function newId() {
+    return LP.storage ? LP.storage.newId() : 'id-' + Math.random().toString(36).slice(2, 10);
+  }
+
+  function archetypeOptions(campaign) {
+    return [{ value: 'random', label: 'Random archetype' }].concat((campaign.archetypes || []).map((a) => ({ value: a.id, label: a.name })));
+  }
+
+  function traitList(ids) {
+    return ids.length ? ids.map((id) => traitRow(id).trait).join(', ') : 'None';
+  }
+
   /* ---------------------------------------------------------------------- */
   /* 0. Start of turn                                                       */
   /* ---------------------------------------------------------------------- */
@@ -33,6 +50,38 @@
     page: 68,
     fields(ctx) {
       const first = !ctx.memory.hasPlayed;
+      const traitOptions = rng.getTable(WORLD_TRAITS).rows.map((r) => ({ value: r.id, label: r.trait, hint: r.description }));
+      if (planetsOn(ctx)) {
+        const planet = ctx.planet;
+        const fields = [{ key: 'firstTurn', type: 'yesno', label: 'Is this the first turn of the campaign?', value: first }];
+        fields.push(
+          { key: 'startArchetype', type: 'select', label: 'Starting world: archetype', options: archetypeOptions(ctx.campaign), value: 'random', showIf: (v) => v.firstTurn },
+          { key: 'startName', type: 'text', label: 'Starting world: name', placeholder: 'Random name', value: '', showIf: (v) => v.firstTurn },
+          {
+            key: 'generateWorld', type: 'yesno', value: true,
+            label: 'Roll its licence and world traits (New World Arrival)?',
+            help: 'Optional on the first turn (p.68). Choose No to start on a world with no special rules.',
+            showIf: (v) => v.firstTurn
+          }
+        );
+        if (planet) {
+          const archetype = LP.planets.archetypeOf(ctx.campaign, planet);
+          const inv = planet.invasion && planet.invasion.status === 'invaded';
+          fields.push({
+            key: 'here', type: 'info', showIf: (v) => !v.firstTurn,
+            text: 'You are on ' + planet.name + ' (' + (archetype ? archetype.name : 'no archetype') + '). Traits: ' + traitList(planet.worldTraits) + '.' +
+              (inv ? ' This world is being Invaded' + (planet.invasion.enemy ? ' by ' + LP.archetypes.enemyName(planet.invasion.enemy) : '') + '!' : '')
+          });
+        } else {
+          fields.push(
+            { key: 'saveNote', type: 'info', text: 'There is no current planet yet: your current world will be saved as one (with placeholder names for the Rivals and Patrons you remember).', showIf: (v) => !v.firstTurn },
+            { key: 'worldName', type: 'text', label: 'Name of the world you are on', placeholder: 'Current world', value: '', showIf: (v) => !v.firstTurn },
+            { key: 'invaded', type: 'yesno', value: !!ctx.memory.invadedNext, label: 'Is this world being Invaded?', showIf: (v) => !v.firstTurn },
+            { key: 'worldTraits', type: 'multiselect', value: ctx.memory.worldTraits || [], label: 'Traits of the world you are on', options: traitOptions, showIf: (v) => !v.firstTurn }
+          );
+        }
+        return fields;
+      }
       return [
         { key: 'firstTurn', type: 'yesno', label: 'Is this the first turn of the campaign?', value: first },
         {
@@ -51,38 +100,77 @@
           key: 'worldTraits', type: 'multiselect', value: ctx.memory.worldTraits || [],
           label: 'Traits of the world you are on',
           help: 'Several traits change rolls during the turn.',
-          options: rng.getTable(WORLD_TRAITS).rows.map((r) => ({ value: r.id, label: r.trait, hint: r.description })),
+          options: traitOptions,
           showIf: (v) => !(v.firstTurn && v.generateWorld)
         }
       ];
     },
     resolve(input, ctx) {
       const first = !!input.firstTurn;
-      const traits = input.worldTraits || [];
-      const lines = [
-        L.facts([
-          ['Difficulty', LP.settings.difficultyLabel(ctx.settings.difficulty)],
-          ['Campaign crew size', String(ctx.settings.crewSize)],
-          ['World traits', first && input.generateWorld ? 'Rolled in New World Arrival' : (traits.length ? traits.map((id) => traitRow(id).trait).join(', ') : 'None')]
-        ])
+      const data = { newPlanet: null, traits: input.worldTraits || [], invaded: !first && !!input.invaded };
+      const items = [
+        ['Difficulty', LP.settings.difficultyLabel(ctx.settings.difficulty)],
+        ['Campaign crew size', String(ctx.settings.crewSize)]
       ];
-      if (!first && input.invaded) lines.push(L.text('This world is being Invaded: you must try to flee.', 'bad'));
+
+      if (planetsOn(ctx)) {
+        if (first) {
+          data.archetypeId = LP.planets.pickArchetype(ctx.campaign, input.startArchetype).id;
+          data.name = input.startName && input.startName.trim() ? input.startName.trim() : LP.planets.randomName(ctx.campaign);
+          data.traits = [];
+          if (!input.generateWorld) {
+            data.newPlanet = { id: newId(), name: data.name, archetypeId: data.archetypeId, worldTraits: [] };
+          }
+          items.push(['Starting world', data.name + ' (' + LP.archetypes.get(ctx.campaign, data.archetypeId).name + ')']);
+        } else if (ctx.planet) {
+          data.traits = ctx.planet.worldTraits.slice();
+          data.invaded = !!(ctx.planet.invasion && ctx.planet.invasion.status === 'invaded');
+          items.push(['Planet', ctx.planet.name]);
+        } else {
+          data.newPlanet = {
+            id: newId(),
+            name: input.worldName && input.worldName.trim() ? input.worldName.trim() : 'Current world',
+            archetypeId: ctx.campaign.archetypes[0].id,
+            worldTraits: data.traits,
+            importRivals: ctx.memory.rivals || 0,
+            importPatrons: ctx.memory.patrons || 0,
+            invaded: data.invaded
+          };
+          items.push(['Planet', data.newPlanet.name + ' (saved)']);
+        }
+      }
+      items.push(['World traits', first && input.generateWorld ? 'Rolled in New World Arrival' : traitList(data.traits)]);
+      const lines = [L.facts(items)];
+      if (data.invaded) lines.push(L.text('This world is being Invaded: you must try to flee.', 'bad'));
       if (first) lines.push(L.text('First turn: skip the Travel steps' + (input.generateWorld ? ', but roll up the starting world.' : '.'), 'note'));
-      return { output: { headline: first ? 'First campaign turn' : 'New campaign turn', lines } };
+      return { output: { headline: first ? 'First campaign turn' : 'New campaign turn', lines, data } };
     },
-    facts(input) {
+    facts(input, output) {
       const first = !!input.firstTurn;
+      const d = output.data || {};
       return {
         firstTurn: first,
         generateWorld: first && !!input.generateWorld,
-        invaded: !first && !!input.invaded,
-        worldTraits: first && input.generateWorld ? [] : (input.worldTraits || [])
+        invaded: !!d.invaded,
+        worldTraits: first && input.generateWorld ? [] : (d.traits || input.worldTraits || []),
+        startArchetype: d.archetypeId || null,
+        startName: d.name || null
       };
     },
-    remember(input) {
+    remember(input, output) {
       const keep = { hasPlayed: true, invadedNext: false };
-      if (!(input.firstTurn && input.generateWorld)) keep.worldTraits = input.worldTraits || [];
+      if (!(input.firstTurn && input.generateWorld)) keep.worldTraits = (output.data && output.data.traits) || input.worldTraits || [];
       return keep;
+    },
+    apply(input, output, ctx) {
+      const np = output.data && output.data.newPlanet;
+      if (!np || !planetsOn(ctx)) return;
+      const planet = LP.planets.normalizePlanet({ id: np.id, name: np.name, archetypeId: np.archetypeId, worldTraits: np.worldTraits });
+      for (let i = 1; i <= (np.importRivals || 0); i++) planet.rivals.push({ id: np.id + '-r' + i, entryId: null, name: 'Rival ' + i, enemy: null, uniques: [], hates: false });
+      for (let i = 1; i <= (np.importPatrons || 0); i++) planet.patrons.push({ id: np.id + '-p' + i, entryId: null, name: 'Patron ' + i, patronType: null, persistent: false, oneTimeContract: false, benefit: null, forces: [], uniques: [] });
+      if (np.invaded) LP.planets.startInvasion(planet, null);
+      ctx.campaign.planets.push(planet);
+      ctx.campaign.currentPlanetId = planet.id;
     }
   });
 
@@ -141,6 +229,13 @@
       const keep = { hasShip: !!input.hasShip };
       if (output.lines[0].success) Object.assign(keep, { rivals: 0, patrons: 0 });
       return keep;
+    },
+    apply(input, output, ctx) {
+      // Rivals, Patrons and other contacts on an invaded world are lost (p.69).
+      if (output.lines[0].success && ctx.planet) {
+        ctx.planet.rivals = [];
+        ctx.planet.patrons = [];
+      }
     }
   });
 
@@ -195,7 +290,17 @@
           help: 'Commercial passage costs 1 credit per crew member.',
           showIf: (v) => v.mode === 'commercial'
         }
-      ];
+      ].concat(planetsOn(ctx) ? [
+        {
+          key: 'destination', type: 'select', label: 'Destination', value: 'new',
+          options: [{ value: 'new', label: 'A new world' }].concat(ctx.campaign.planets
+            .filter((p) => p.id !== ctx.campaign.currentPlanetId && LP.planets.canVisit(p))
+            .map((p) => ({ value: p.id, label: 'Return to ' + p.name }))),
+          showIf: (v) => v.mode !== 'stay'
+        },
+        { key: 'destArchetype', type: 'select', label: 'New world: archetype', options: archetypeOptions(ctx.campaign), value: 'random', showIf: (v) => v.mode !== 'stay' && v.destination === 'new' },
+        { key: 'destName', type: 'text', label: 'New world: name', placeholder: 'Random name', value: '', showIf: (v) => v.mode !== 'stay' && v.destination === 'new' }
+      ] : []);
     },
     validate(input, ctx) {
       if (ctx.facts.fled && input.mode === 'stay') return 'You must leave: the world is being Invaded.';
@@ -255,7 +360,13 @@
       return travelOutcome(record, value === 'pay');
     },
     facts(input, output) {
-      return { traveling: !!output.data.traveling, travelMode: output.data.mode };
+      return {
+        traveling: !!output.data.traveling,
+        travelMode: output.data.mode,
+        destination: input.destination || 'new',
+        destArchetype: input.destArchetype || 'random',
+        destName: input.destName || ''
+      };
     },
     remember(input) {
       return input.mode === 'commercial' ? { crewCount: input.crewCount } : {};
@@ -285,10 +396,12 @@
       }];
     },
     resolve(input, ctx) {
+      const archetype = ctx.planet ? LP.planets.archetypeOf(ctx.campaign, ctx.planet) : null;
       const run = LP.followup.start([{ table: 'Starship Travel Events Table' }], {
         crewCount: input.crewCount,
         crewSize: ctx.settings.crewSize,
-        disabled: ctx.campaign.models ? ctx.campaign.models.disabled : {}
+        disabled: LP.archetypes ? LP.archetypes.disabledMap(ctx.campaign, archetype) : (ctx.campaign.models ? ctx.campaign.models.disabled : {}),
+        speciesWeights: LP.archetypes ? LP.archetypes.speciesWeights(archetype) : null
       });
       return {
         output: { headline: run.lines[0].title, lines: [], fu: run },
@@ -324,9 +437,18 @@
     { max: 10, name: 'Swift' }
   ];
 
-  /** World trait roll plus any dice the trait itself calls for. */
-  function rollTrait(label) {
-    const line = L.table(WORLD_TRAITS, { textColumn: 'description', label });
+  /**
+   * World trait roll plus any dice the trait itself calls for.
+   * rolled: { natural, id } from LP.planets.rollWorld, or nothing to roll here.
+   */
+  function rollTrait(label, rolled) {
+    let line;
+    if (rolled) {
+      const row = traitRow(rolled.id);
+      line = { type: 'table', table: WORLD_TRAITS, die: 'D100', natural: rolled.natural, modifier: 0, total: rolled.natural, rowId: row.id, title: row.trait, text: row.description, label: label };
+    } else {
+      line = L.table(WORLD_TRAITS, { textColumn: 'description', label });
+    }
     line.children = [];
     if (line.rowId === 'alien-species-restricted') {
       const d = L.roll('1D10', { label: 'Restricted species' });
@@ -340,6 +462,90 @@
     return line;
   }
 
+  /** New world arrival fields when planets are in use. */
+  function planetFields(ctx) {
+    const revisit = !ctx.facts.firstTurn && ctx.facts.destination && ctx.facts.destination !== 'new';
+    if (revisit) {
+      const dest = LP.planets.get(ctx.campaign, ctx.facts.destination);
+      return [{ key: 'note', type: 'info', text: 'Returning to ' + (dest ? dest.name : 'a saved world') + '. Its traits, licence, Patrons and Rivals are as you left them.' }];
+    }
+    return [{
+      key: 'wildGalaxy', type: 'yesno', value: !!ctx.memory.wildGalaxy,
+      label: 'Use the Wild Galaxy optional rule (roll twice for world traits)?'
+    }];
+  }
+
+  /** New world arrival with planets: Rivals follow by name, then a new or saved world. */
+  function arrive(input, ctx) {
+    const P = LP.planets;
+    const lines = [];
+    const from = ctx.facts.firstTurn ? null : ctx.planet;
+    const data = { fromId: from ? from.id : null, followIds: [], persistentIds: [], licence: null, traits: [], newPlanet: null, destinationId: null };
+
+    if (from) {
+      if (!from.rivals.length) {
+        lines.push(L.text('1. Check for Rivals: you have no Rivals.'));
+      } else {
+        const rolls = from.rivals.map((r) => {
+          const roll = L.roll('1D6', { label: r.name, target: 5, successText: 'Follows you.', failText: 'Stays behind on ' + from.name + '.', invert: true });
+          if (roll.success) data.followIds.push(r.id);
+          return roll;
+        });
+        lines.push(Object.assign(L.text('1. Check for Rivals: ' + data.followIds.length + ' of ' + from.rivals.length + ' follow you.', data.followIds.length ? 'bad' : 'good'), { children: rolls }));
+      }
+      const persistent = from.patrons.filter((p) => p.persistent);
+      data.persistentIds = persistent.map((p) => p.id);
+      lines.push(L.text('2. Dismiss Patrons: ' + (persistent.length ? persistent.map((p) => p.name).join(', ') + ' (Persistent) come with you; the rest stay behind.' : 'all Patrons stay behind on ' + from.name + '.')));
+    }
+
+    const revisit = !ctx.facts.firstTurn && ctx.facts.destination && ctx.facts.destination !== 'new' ? P.get(ctx.campaign, ctx.facts.destination) : null;
+    if (revisit) {
+      data.destinationId = revisit.id;
+      data.traits = revisit.worldTraits.slice();
+      lines.push(L.text('Back on ' + revisit.name + ': ' + plural(revisit.patrons.length, 'Patron', 'Patrons') + ' and ' + plural(revisit.rivals.length, 'Rival', 'Rivals') + ' were waiting here.'));
+      lines.push(L.facts([
+        ['Traits', traitList(revisit.worldTraits)],
+        ['License', revisit.licence.required ? (revisit.licence.owned ? 'Owned' : 'Required (' + revisit.licence.cost + ' credits)') : 'Not needed']
+      ]));
+      return { output: { headline: 'Returned to ' + revisit.name, lines, data } };
+    }
+
+    const archetype = P.pickArchetype(ctx.campaign, ctx.facts.firstTurn ? ctx.facts.startArchetype : ctx.facts.destArchetype);
+    const world = P.rollWorld(archetype, { wildGalaxy: input.wildGalaxy });
+    const typed = ctx.facts.firstTurn ? ctx.facts.startName : (ctx.facts.destName || '').trim();
+    data.newPlanet = { id: newId(), name: typed || P.randomName(ctx.campaign), archetypeId: archetype.id, worldTraits: world.traits, licence: world.licence };
+    data.destinationId = data.newPlanet.id;
+    data.traits = world.traits;
+
+    lines.push(L.facts([['World', data.newPlanet.name], ['Archetype', archetype.name]]));
+    const licence = { type: 'roll', label: '3. Licensing requirements', notation: '1D6', dice: [world.rolls.licence], base: world.rolls.licence, modifiers: [], total: world.rolls.licence };
+    if (world.licence.required) {
+      licence.text = 'This world requires a Freelancer License for Patron jobs.';
+      licence.children = [{ type: 'roll', label: 'Freelancer License cost', notation: '1D6', dice: [world.rolls.cost], base: world.rolls.cost, modifiers: [], total: world.rolls.cost, text: 'Credits to buy the License. Once bought it lasts for good.' }];
+      data.licence = world.rolls.cost;
+    } else {
+      licence.text = 'No License needed.';
+    }
+    lines.push(licence);
+    world.rolls.traits.forEach((t, i) => {
+      const line = rollTrait(i === 0 ? '4. World trait' : 'Wild Galaxy: second trait', t);
+      if (i > 0) line.children.push(L.text(t.id === world.rolls.traits[0].id ? 'Same trait again: no extra effect.' : 'If this contradicts the first trait, ignore it.', 'note'));
+      lines.push(line);
+    });
+
+    const output = { headline: 'New world: ' + data.newPlanet.name + ' (' + traitList(world.traits) + ')', lines, data };
+    if (data.licence !== null) {
+      return {
+        output,
+        pending: {
+          prompt: 'Try to obtain a forged License? One attempt only: 1D6 + Savvy, 6+ gets it free; a natural 1 adds a Rival.',
+          options: [{ value: 'forge', label: 'Try forging' }, { value: 'skip', label: 'No, pay or go without' }]
+        }
+      };
+    }
+    return { output };
+  }
+
   T.register({
     id: 'new-world',
     step: 'travel',
@@ -351,6 +557,7 @@
       return ctx.facts.traveling ? true : 'Not travelling to a new world.';
     },
     fields(ctx) {
+      if (planetsOn(ctx)) return planetFields(ctx);
       const fields = [];
       if (!ctx.facts.firstTurn) {
         fields.push({
@@ -365,6 +572,7 @@
       return fields;
     },
     resolve(input, ctx) {
+      if (planetsOn(ctx)) return arrive(input, ctx);
       const lines = [];
       // rivalsBase: Rivals after arrival, before any forged-License Rival.
       const data = { followers: null, licence: null, traits: [], rivalsBase: ctx.memory.rivals || 0 };
@@ -442,12 +650,24 @@
     facts(input, output) {
       return { worldTraits: output.data.traits, newWorld: true, licenceCost: output.data.licence };
     },
+    apply(input, output, ctx) {
+      const d = output.data;
+      if (!planetsOn(ctx) || !d.destinationId) return;
+      const P = LP.planets;
+      if (d.newPlanet && !P.get(ctx.campaign, d.newPlanet.id)) ctx.campaign.planets.push(P.normalizePlanet(d.newPlanet));
+      const dest = P.get(ctx.campaign, d.destinationId);
+      const from = d.fromId ? P.get(ctx.campaign, d.fromId) : null;
+      if (from && dest && from !== dest) P.moveContacts(from, dest, d.followIds || [], d.persistentIds || []);
+      if (dest) {
+        P.setCurrent(ctx.campaign, dest.id);
+        if (d.forgeRival) P.newRival(ctx.campaign, dest);
+      }
+    },
     remember(input, output) {
-      return {
-        worldTraits: output.data.traits,
-        wildGalaxy: !!input.wildGalaxy,
-        rivals: output.data.rivalsBase + (output.data.forgeRival || 0)
-      };
+      const keep = { worldTraits: output.data.traits };
+      if (input.wildGalaxy !== undefined) keep.wildGalaxy = !!input.wildGalaxy;
+      if (output.data.rivalsBase !== undefined) keep.rivals = output.data.rivalsBase + (output.data.forgeRival || 0);
+      return keep;
     }
   });
 })(window.LP);

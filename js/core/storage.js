@@ -41,6 +41,13 @@
     return { disabled: idLists(models.disabled), invasion: idLists(models.invasion) };
   }
 
+  /** Archetypes, planets and the current planet; every campaign gets the default archetype. */
+  function geography(raw) {
+    const geo = { archetypes: raw.archetypes, planets: raw.planets, currentPlanetId: raw.currentPlanetId || null };
+    if (LP.planets) LP.planets.ensure(geo);
+    return geo;
+  }
+
   /** Fill in any missing fields so older or hand-edited data is safe to use. */
   function normalizeCampaign(raw) {
     if (!raw || typeof raw !== 'object') throw new Error('Campaign entry is not an object.');
@@ -57,7 +64,8 @@
       models: normalizeModels(raw.models),
       turn: raw.turn && typeof raw.turn === 'object' && !Array.isArray(raw.turn) ? raw.turn : null,
       turnMemory: raw.turnMemory && typeof raw.turnMemory === 'object' && !Array.isArray(raw.turnMemory) ? raw.turnMemory : {},
-      battle: raw.battle && typeof raw.battle === 'object' && !Array.isArray(raw.battle) ? raw.battle : null
+      battle: raw.battle && typeof raw.battle === 'object' && !Array.isArray(raw.battle) ? raw.battle : null,
+      ...geography(raw)
     };
   }
 

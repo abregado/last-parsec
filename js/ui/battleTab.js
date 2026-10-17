@@ -26,6 +26,20 @@
     return facts.battleType ? B.FROM_TURN[facts.battleType] || null : null;
   }
 
+  /** The named Rival chosen in the current Campaign Turn, if any. */
+  function turnRival(campaign) {
+    if (!LP.turn || !campaign.turn) return null;
+    return LP.turn.context(campaign, LP.turn.ensure(campaign).records).facts.rivalId || null;
+  }
+
+  /** Use the turn's choice: mission and named Rival. */
+  function useTurn(battle, ctx, campaign) {
+    const mission = turnMission(campaign);
+    if (!mission) return;
+    battle.options.rivalId = turnRival(campaign);
+    B.setMission(battle, ctx, mission);
+  }
+
   /* ---------------------------------------------------------------------- */
   /* Field rows                                                             */
   /* ---------------------------------------------------------------------- */
@@ -133,23 +147,39 @@
     });
 
     const fromTurn = turnMission(campaign);
+    const planet = B.planetOf(ctx);
+    const rival = B.namedRival(battle, ctx);
+    let rivalPicker = null;
+    if (planet && (battle.mission === 'rival' || battle.mission === 'rival-attack') && planet.rivals.length) {
+      rivalPicker = el('select', { id: 'battle-rival', class: 'input select', 'data-focus': 'battle.rival' },
+        el('option', { value: '' }, 'Unknown Rival (roll the enemy)'),
+        planet.rivals.map((r) => el('option', { value: r.id }, r.name)));
+      rivalPicker.value = battle.options.rivalId || '';
+      rivalPicker.addEventListener('change', () => {
+        B.setOption(battle, ctx, 'rivalId', rivalPicker.value || null);
+        commit(state);
+      });
+    }
     const option = (key, label) => checkbox(label, !!battle.options[key], (v) => {
       B.setOption(battle, ctx, key, v);
       commit(state);
     }, 'battle.opt.' + key);
 
     return el('section', { class: 'panel battle-mission' },
+      planet ? el('p', { class: 'field-detail' }, 'On ' + planet.name + (planet.worldTraits.length ? ' \u00b7 traits: ' + planet.worldTraits.map((id) => rng.getTable('World Traits Table').rows.find((r) => r.id === id).trait).join(', ') : '')) : null,
       el('div', { class: 'battle-mission-row' },
         el('label', { class: 'field' }, el('span', { class: 'field-label' }, 'Mission'), select),
+        rivalPicker ? el('label', { class: 'field' }, el('span', { class: 'field-label' }, 'Rival'), rivalPicker) : null,
         el('label', { class: 'field' }, el('span', { class: 'field-label' }, 'Crew in the field'), crew)
       ),
+      rival && !rival.enemy ? el('p', { class: 'field-detail' }, rival.name + ' has no enemy type yet: roll it, then set it on the Planets tab.') : null,
       fromTurn && fromTurn !== battle.mission
         ? el('p', { class: 'turn-link' },
           'This turn’s choice: ' + B.missionLabel(fromTurn) + '. ',
           el('button', {
             type: 'button', class: 'btn btn-sm',
             onclick: () => {
-              B.setMission(battle, ctx, fromTurn);
+              useTurn(battle, ctx, campaign);
               commit(state);
             }
           }, 'Use it'))
@@ -380,10 +410,11 @@
   LP.tabs.battle = function render(container, campaign) {
     const ctx = ctxOf(campaign);
     let battle = B.normalize(campaign.battle, ctx);
-    if (!battle) battle = B.newBattle(ctx, turnMission(campaign) || 'opportunity');
-    else if (!battle.generated) {
-      const fromTurn = turnMission(campaign);
-      if (fromTurn) B.setMission(battle, ctx, fromTurn);
+    if (!battle) {
+      battle = B.newBattle(ctx, 'opportunity');
+      useTurn(battle, ctx, campaign);
+    } else if (!battle.generated) {
+      useTurn(battle, ctx, campaign);
     }
     campaign.battle = battle;
     draw({ container, campaign, battle, ctx });
