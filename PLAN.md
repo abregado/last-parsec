@@ -1,6 +1,6 @@
 # Last Parsec — Five Parsecs From Home companion app
 
-Plan only. Nothing has been implemented yet.
+Phase 1 (campaigns + Characters tab, build steps 1–6 below) is **done**. Phase 2 is planned at the end of this file: campaign settings and the Models tab (2A) are **done**; the Campaign Turn tab's engine, UI (Restart/Undo, pending choices) and the Start + Travel stages (0, 1.1-1.4) are **done**. The follow-up executor and scripts (Starship Travel Events, Trade, Exploration, Loot chain, Rewards) are **done**, and the travel event stage uses them. The World stages (2.1-2.6) are **done**. Phase 3 (Battle tab) and the Post-Battle stages (2C, pre-filled from the battle) are **done**: a campaign turn now runs from Start to Turn complete.
 
 ## Goals and constraints
 
@@ -193,3 +193,260 @@ Items     Plasma Rifle
 3. **Names** — Free text only.
 4. **Starting items** — Shown on the character who rolled them **and** in the crew equipment pool.
 5. **Forced results** — Fully locked. The field shows the value and the species that sets it, and has no dropdown and no reroll button.
+
+---
+
+# Phase 2 — Models tab and Campaign Turn tab
+
+## Decisions so far
+- **Turn scope:** the Campaign Turn tab covers Step 1 (Travel) and Step 2 (World). After the battle it picks up again with Step 4 (Post-Battle). Step 3 (the battle itself) stays in the Battle tab. These are built in two phases: **2B** (Travel and World) and **2C** (Post-Battle).
+- **Crew is generic.** Stages ask for *counts* (e.g. "2 crew Exploring"), not named characters. When Savvy or species could change a result, the output says so. For example: *"Rolled 4, needs 6+: succeeds if the character has Savvy +2 or better (+1 or better for an Engineer)."*
+- **Follow-up dice are rolled automatically** (e.g. Escape pod's 1D6, Trade → Gear Table). When the player must decide first ("Rescue the pod?"), the output shows the choice and rolls once it's made.
+- **The turn in progress is saved.** Reloading resumes where you left off, and **Restart turn** clears it. No history of past turns is kept.
+
+## 2A — Models tab
+
+**Purpose:** switch off enemy entries you have no models for, so later rolls (Battle tab) only land on enemies you can put on the table.
+
+- The four tables are Criminal Elements (15 entries), Hired Muscle (16), Interested Parties (16) and Roving Threats (13).
+- **Storage:** `campaign.models = { disabled: { "Criminal Elements": ["gangers", …], … } }`. Storing *disabled* ids means anything new in the data defaults to on.
+- **Rules module `js/rules/models.js`:**
+  - `isEnabled(campaign, table, rowId)`, `setEnabled(...)`, `setAll(campaign, table, on)`
+  - `enabledRows(campaign, table)`, and `odds(campaign, table)`, which gives each enabled row's chance as weight ÷ enabled total
+  - `rollEnemy(campaign, table)`, the helper the Battle tab will use. It's `rng.weightedPick` with the disabled ids excluded, and returns null if everything is off.
+- **UI `js/ui/modelsTab.js`:** one collapsible section per table. The header shows "Criminal Elements · 13 of 15 enabled" with **All** / **None** buttons. Each row has:
+  - a checkbox and the enemy name
+  - the book's d100 range (e.g. `1-10`) and its fixed weight
+  - its **current chance**, recalculated live: turning entries off raises the others' chances, and disabled rows show "—"
+  - a small expandable line with the profile (Numbers, Speed, CS, Toughness, AI, Weapons) to help match models
+- **Warning:** if a table has no entries enabled, a warning says rolls on it are impossible. Later, the Battle tab will also skip that category on the Enemy Encounter Category Table.
+- **Data fix:** "Roid- gangers" → "Roid-gangers" in `Hired Muscle.json`, then re-run `build-tables.py`. I'll check the other enemy names for similar text-extraction glitches.
+- **Tests:** chances add up to 100% over the enabled rows, disabled rows are never rolled, and all-off returns null.
+
+## 2B/2C — Campaign Turn tab
+
+### Interaction
+- A vertical sequence of **stages**. Only the current stage shows its **input widget** and a **Confirm** button.
+- Confirm makes the rolls and swaps the input for an **output card**, which stays read-only. The next stage's input then appears below it.
+- Stages that don't apply are skipped automatically, with a one-line note saying why (e.g. "Starship travel event — skipped: not travelling").
+- **Restart turn** at the top, with a confirm step, clears the turn and starts again at the first stage. **Undo last stage** steps back one confirmed stage (see Decisions).
+- Output cards show for each roll:
+  - the dice and the result (`D100 → 57: Escape pod`)
+  - the table name and page
+  - the rule text
+  - any follow-up rolls, indented, with conditional notes ("needs 6+ …", "if you have a Precursor …")
+- Stages ask only for what they need. Values entered earlier in the turn, or **remembered from last turn** (crew size, Rivals, Patrons, Quest Rumors, current world traits), are pre-filled and can be edited. This is convenience memory only; the app still doesn't track the campaign.
+
+### Architecture
+```
+js/rules/turn/engine.js     stage registry, state machine, next-stage logic, persistence shape
+js/rules/turn/travel.js     Step 1 stage definitions
+js/rules/turn/world.js      Step 2 stage definitions
+js/rules/turn/postBattle.js Step 4 stage definitions (phase 2C)
+js/core/followup.js         runs scripted follow-ups for table rows
+js/data/followups.js        hand-written follow-up scripts per table row
+js/ui/turnTab.js            the tab: stage list, restart
+js/ui/stageForm.js          renders a stage's input schema
+js/ui/resultCard.js         renders a stage's output (rolls, follow-ups, choices)
+```
+A **stage definition** is plain data plus functions:
+```js
+{
+  id: 'travel-event', step: 1, title: 'Starship travel event', page: 70,
+  applies(turn)  -> true | 'reason it is skipped',
+  inputs(turn)   -> [field schema, pre-filled from turn.facts / memory],
+  resolve(input, turn) -> output   // all dice rolled here, via LP.rng
+  facts(output)  -> values later stages need (e.g. rumorsGained, patronOffers)
+}
+```
+**Input field types:** number (min/max), yes/no, select, multi-select (world traits), and a **task allocation** grid (count per crew task; at most 2 per task; the total can't exceed available crew).
+
+**Stored turn:** `campaign.turn = { startedAt, facts, stages: [{ id, input, output }] }`, plus `campaign.turnMemory` for the pre-fills.
+
+**Follow-up scripts:** a small declarative language, so rules live in data rather than code:
+- `{ roll: '1D6', outcomes: [{ range: '1', text, then: [...] }, …] }`
+- `{ table: 'Gear Subtable', times: 2, note: 'damaged, needs Repair' }`
+- `{ check: { dice: '1D6', add: 'Savvy', target: 6, times: 3 } }`: gives the conditional Savvy text
+- `{ choice: { prompt: 'Rescue the escape pod?', options: [{ label: 'Rescue', then: [...] }, { label: 'Leave it' }] } }`
+- `{ rollAgain: true }`: e.g. Navigation trouble, which rolls on the same table again
+- `{ randomCrew: true }`: "crew member 3 of 5" from the crew count
+
+Rows without a script just show their text.
+
+**Event table data cleanup:** in the event tables, the title and description have been merged into one field (e.g. "Asteroids Rocky debris…"). I'll add a separate `title` to the JSON for Starship Travel Events, then check the Campaign Events and Character Events tables. I'll also check the two-column tables (Trade, Exploration) against the book.
+
+### Stages — Phase 2B (Travel and World)
+
+| # | Stage | Asks for | Rolls / works out |
+|---|---|---|---|
+| 0 | Start of turn | First turn of the campaign? Current world's traits (multi-select, remembered). Is this world being Invaded? | Nothing. Sets up the facts. On the first turn, skips Travel and offers optional New World Arrival. |
+| 1.1 | Flee Invasion *(only if Invaded)* | Have a ship? | 2D6 vs 8+. On a fail: only Assign Equipment, then an Invasion Battle. On a success: travel. |
+| 1.2 | Decide whether to travel | Stay, own ship, or commercial passage; crew count | Cost (5 credits; Fuel refinery 3; Fuel shortage +1D3; commercial 1 per crew). Bureaucratic mess: 2D6, 2–4 = delayed or bribe. |
+| 1.3 | Starship travel event *(own ship only)* | — | D100 Starship Travel Events, with scripted follow-ups (Asteroids, Distress call, Escape pod, Patrol ship, Time to read a book…) and "roll again" chains |
+| 1.4 | New world arrival | Number of Rivals; any Persistent Patrons; try a forged License? | Each Rival 1D6, 5+ follows. Licence 1D6, 5–6 required, cost 1D6. Forged licence 1D6 (+Savvy text, natural 1 = Rival). World Trait D100 (optional Wild Galaxy: roll twice), including trait dice (Alien species restricted 1D10, Interdiction 1D3). The new traits replace the remembered ones. |
+| 2.1 | Upkeep and ship repairs | Crew count (not in Sick Bay); ship debt; payment; Hull damage | Upkeep (1 for 4–6 crew, +1 per crew over 6; High cost counts 2 more). Debt interest +1 (+2 at 31+). At 75+, 2D6 2–6 = ship seized. 1 free Hull repair. |
+| 2.2 | Crew tasks | Task allocation: Find a Patron, Train, Trade, Recruit, Explore, Track, Repair, Decoy. Plus known Patrons, credits spent, current crew size, Rivals. | **Patron:** 1D6 + searchers + Patrons + credits (+1 Opportunities, +2 Corporate state): 5+ = 1 offer, 6+ = 2. **Train:** +1 XP each. **Trade:** one Trade Table roll each, with follow-ups. **Recruit:** automatic below 6 crew, otherwise 1D6 + recruiters ≥ 6; recruits are rolled as species only (p.78). **Explore:** one Exploration Table roll each, with follow-ups. **Track:** 1D6 + trackers + credits ≥ 6. **Repair:** 1D6 each, with Savvy/Engineer text, natural 1 = destroyed. **Decoy:** count kept for 2.6. |
+| 2.3 | Job offers *(per Patron offer from 2.2/Exploration, or an existing Patron)* | Number of offers (pre-filled) | Each offer: Patron D10. Danger Pay D10 (+1 Corporation). Time Frame D10 (+1 Secretive Group). BHC: D10 per category against that Patron type's target, then the Benefit / Hazard / Condition subtable (Negotiable rerolls Danger Pay, best kept). |
+| 2.4 | Assign equipment | — | No rolls. A reminder with a **Done** button. |
+| 2.5 | Resolve Rumors | On a Quest? Rumors (pre-filled + gained this turn) | If not on a Quest: D6 ≤ Rumors gives a Quest. |
+| 2.6 | Choose your battle | Rivals; Decoys (pre-filled); Private Transport hazard? | D6 + Decoys ≤ Rivals means a Rival attacks: a random Rival "n of N". Lists the battles you can choose (Opportunity always, Rival if Tracked, Quest if active, Patron if offered). Your choice is stored for the Battle tab and post-battle. |
+
+### Stages — Phase 2C (Post-Battle, p.119)
+These start with a **Battle result** input: battle type, enemy category, Held the Field, Won, Invasion Threat enemy, Unique Individual killed, number of casualties (and how many are Bots/Soulless), Tracked the Rival, Quest finale, Danger Pay. If the Battle tab produced the battle, these are pre-filled from it.
+
+1. Rival status: 1D6, with the +1s
+2. Patron status: no roll
+3. Quest progress: D6 + Rumors (−2 if not Won), then D6 for "next world"
+4. Get paid: 1D6, with Quest-finale best of two +1, Won minimum 3, Easy +1, Booming economy, Danger Pay
+5. Battlefield finds: D100, with Consumables subtable and 1D3 credits follow-ups
+6. Check for Invasion: 2D6 (+evidence, −1 Held the Field, Hardcore +2, Insanity +3, trait modifiers) vs 9+
+7. Gather the loot: Loot Table with its subtable chain (three rolls after a Quest finale, none after Invasion)
+8. Injuries: one roll per casualty on the Injury or Bot Injury table, with Sick Bay dice and surgery cost
+9. Experience: XP per outcome group (casualty / survived / won), plus first-blood, Unique, Easy and Quest bonuses
+10. Advanced training: optional application, 2D6 vs 4+ (6+ with Restricted education), fee notes
+11. Purchase items: number of 3-credit rolls on the Military, Gear and Gadget tables
+12. Campaign event: D100 with follow-ups
+13. Character event: D100, a random non-Bot crew member, Precursor "roll 2, pick one" option
+14. Galactic War progress: 2D6 per Invaded planet, with modifiers
+
+### Build order
+1. **Campaign settings** (difficulty, crew size): storage defaults, header badge, settings dialog, and handling in export/import.
+2. **2A Models tab:** rules, UI, tests, data-name fix.
+3. **Turn engine and UI shell:** stage registry, persistence, input renderer, result card, Restart and Undo. Proven with stages 0 and 1.2.
+4. **Follow-up executor + scripts** for Starship Travel Events, Trade and Exploration. Data cleanup for event titles.
+5. **The rest of the Travel and World stages** (1.1–2.6), with tests: every stage's resolve() against a seeded RNG, every follow-up script parsed and run.
+6. **2C Post-Battle stages** and follow-up scripts for Loot, Battlefield Finds, Injury, Campaign Events and Character Events.
+
+### Decisions (answered)
+1. **Difficulty mode and campaign crew size are campaign settings.**
+   - Stored as `campaign.settings = { difficulty, crewSize }`.
+   - `difficulty` is one of Easy, Normal, Challenging, Hardcore or Insanity (p.65). `crewSize` is 4, 5 or 6 (p.63).
+   - New campaigns still ask only for a name and default to Normal / 6.
+   - A **Settings** button in the campaign header opens a dialog to change them. The header shows them as a small badge, e.g. "Normal · crew 6".
+   - Turn stages read them directly instead of asking:
+     - Easy: +1 pay and +1 XP
+     - Hardcore / Insanity: +2 / +3 to Invasion rolls
+     - Hardcore: story point notes
+     - crew size: used later for enemy numbers in the Battle tab
+2. **Undo last stage**, next to Restart turn:
+   - Removes the most recent confirmed stage, including its rolls, and shows its input form again with the values you entered, so you can correct them and confirm again.
+   - Rerolls happen on that confirm.
+   - When a stage is waiting on a follow-up choice, Undo goes back to before the choice instead.
+   - Stages skipped because of the undone stage are worked out again.
+   - Disabled when nothing has been confirmed.
+
+---
+
+# Phase 3 — Battle tab
+
+## Decisions
+- **Character-generator style:**
+  - One list of fields, each with a dropdown (Random first) and a reroll button.
+  - **Generate** rolls every field set to Random. Fixed fields stay as they are.
+  - Fields that depend on others are rebuilt when those change, the same way character children are.
+- **Linked both ways with the Campaign Turn:**
+  - The mission type defaults to the turn's "Choose your battle" result (Opportunity, Patron, Quest, Attack a Rival, Rival attack, Invasion).
+  - The generated battle feeds the Post-Battle stages.
+  - A stand-alone battle can be generated at any time.
+- **Extras:** Battle Events tracker, Seize the Initiative helper, Varied Armaments, and setup helpers.
+- **Saving:** the current battle is saved per campaign (`campaign.battle`) and survives reloads. Generating a new one replaces it.
+
+## What the rules need (pp.87–112, 116–118)
+
+| Step | Table | Depends on |
+|---|---|---|
+| Mission type | — (from the turn, or chosen) | Opportunity · Patron · Quest · Quest finale · Attack a Rival · Rival attack · Invasion |
+| Rival attack type | Rival Attacks (D10) | Only for a Rival attack. Attack a Rival is always a Showdown (locked). |
+| Deployment condition | Deployment Conditions (D100) | Column: Opportunity/Patron, Rival or Quest. None in an Invasion. |
+| Notable sight | Notable Sights (D100) | Same columns. None in an Invasion. Placed 2D6+2" in a random direction from the centre. |
+| Objective | Opportunity / Patron / Quest Mission Objectives (D10) | Quest finale is locked to Fight Off. Rival fights have no objective. Invasion: survive 6 rounds. |
+| Enemy category | Enemy Encounter Category (D100) | Column by mission. Rival fights use the "Unknown Rival" column, or you fix your Rival's category. Categories with no enabled models are skipped. |
+| Enemy | Criminal Elements / Hired Muscle / Interested Parties / Roving Threats (D100) | Category. Disabled entries (Models tab) are never rolled, and are shown as "(no models)" in the dropdown. |
+| Enemy numbers | Dice by crew size | 6: 2D6 keep higher · 5: 1D6 · 4: 2D6 keep lower. Challenging and harder reroll 1s and 2s. Interested Parties on a Quest reroll 1s once. |
+| Specialists / Lieutenant | Worked out | 1–2 foes: no Specialist · 3–6: one · 7+: two (Insanity +1) · 4+ foes: one Lieutenant (+1 CS and a Blade) |
+| Weapons | Varied Armaments (D6, column 1–3) and Specialists (D6, column A–C) | The enemy's code, e.g. "2 B". Some enemies list fixed weapons instead (e.g. "Claws (Damage +1)"). Aggressive AI with CS above +0 adds a Blade; Rampage/Psycho always adds a Blade. With **Varied Armaments** on, the regular enemies split into two groups with a roll each. |
+| Unique Individual | 2D6 (9+), then Unique Individuals (D100) | Not in Invasions or against Roving Threats (except Insanity, where one is always present, and 2D6 11–12 means two). +1 Interested Parties, +1 Hardcore. |
+| Criminal bounty | 1D6 | Criminal Elements only: on 1–3, that many bonus credits if you Hold the Field. |
+
+**Enemy number modifiers** are shown as a labelled breakdown, like the Patron search:
+- The enemy's Numbers.
+- Mission: Defend objective +1, Quest finale +1, Brought friends +1, Assault +1, Invasion +2.
+- Deployment: Small encounter −1 (−2 if the enemy outnumbers you).
+- Job hazards (inputs): Dangerous Job +1, Security Team −1, Low Priority −1.
+- Crew fielded 2 or more below the campaign crew size: −1 (input).
+- Difficulty: Easy −1 at 5+, Hardcore/Insanity +1.
+- World traits (from the turn's memory): Heavily enforced −1 and Rampant crime +1 against Criminal Elements; Dangerous +1 against Roving Threats.
+
+### Enemy profile card
+The full stat line, with the AI code spelled out:
+- A Aggressive · C Cautious · D Defensive · G Guardian · R Rampage · T Tactical · B Beast
+
+The force is listed as a breakdown, e.g. "7 Feral Mercenaries: 4 × Military rifle · 2 Specialists × Rattle gun · 1 Lieutenant: Military rifle + Blade, CS +1". Below that: the enemy's special rules, the Unique Individual's profile if present, and the category rules (Criminal bounty and Rival roll, Hired Muscle −1 to Seize, Roving Threats never become Rivals).
+
+### Setup helpers
+- **Battlefield edge:** a random edge for you; the enemy takes the opposite one.
+- **Enemy deployment pattern** for the AI type (p.110):
+  - Aggressive / Rampage: one cluster, 1" apart
+  - Tactical / Defensive: three teams, 8" apart
+  - Cautious: two groups, 6" apart
+  - Beast: pairs spread across thirds
+- **Notable sight placement:** 2D6+2" in a direction (a D12 clock face).
+- **Terrain reminder:** the standard terrain set for 2×2 / 2.5×2.5 / 3×3 ft tables (p.109). Text only.
+
+### Seize the Initiative helper (p.112)
+- **Inputs:** highest Savvy in the crew, outnumbered?, a Feral in the crew?, and Motion tracker / Scanner bot.
+- **Automatic modifiers:**
+  - Hired Muscle −1
+  - the enemy's own notes ("Careless +1", "Alert −1", "cannot Seize", "always unmodified")
+  - Hardcore −2, Insanity −3
+  - a Feral in the crew ignores the enemy's penalties
+- **Roll:** 2D6 + modifiers, with a ✓ on 10+ and the rule reminder.
+
+### Battle Events tracker (p.116, optional)
+Two buttons, **End of round 2** and **End of round 4**, each rolling once on the Battle Events Table. Results stay on the battle. A note says to discard the second event if it contradicts the first.
+
+### Links with the turn
+- The Battle tab pre-selects the mission type from the current turn's 2.6 result and shows "From this turn's choice: Patron job".
+- The turn's "Time to fight" card gets a **Generate this battle** link to the Battle tab.
+- For Phase 2C (Post-Battle), the battle summary pre-fills:
+  - battle type and enemy category
+  - Invasion Threat
+  - Unique Individual present
+  - Criminal bounty
+  - notable-sight gains
+  - enemy perks: Pirates' extra Loot, Raiders' second Battlefield Finds roll, Cultists' Intrigue roll
+
+## Architecture
+```
+js/rules/battle.js      battle model (slots like characters), dependencies, generate/reroll, resolve()
+js/rules/enemies.js     parse enemy rows: weapon code or fixed weapon, AI name, Seize the Initiative
+                        modifiers, Invasion Threat, Saving Throw, etc. (regex over notes + small overrides)
+js/ui/battleTab.js      mission panel, field list (LP.ui.rollField), enemy card, setup helpers,
+                        Seize the Initiative, Battle Events
+```
+`campaign.battle = { generated, createdAt, fromTurn, inputs: {...}, slots: {...}, events: [...], seize: {...} }`.
+
+## Build order
+1. **Data review:**
+   - Check every enemy row's weapon field parses (code or fixed weapon).
+   - Check that the notes give Seize modifiers and Invasion Threat cleanly.
+   - Check the multi-column Deployment Conditions / Notable Sights / Encounter Category ranges against pp.88–96.
+   - Split Battle Events titles out of the text, as for travel events.
+2. **`enemies.js` and `battle.js` with tests:**
+   - mission → column choices and locked fields
+   - numbers dice by crew size and difficulty, and every modifier
+   - Specialist and Lieutenant thresholds
+   - weapon parsing and Varied Armaments
+   - Unique Individual rules (including Insanity)
+   - Models exclusions
+3. **Battle tab UI:** mission panel, fields, enemy card, setup helpers. Phone layout.
+4. **Seize the Initiative helper and Battle Events tracker.**
+5. **Turn links:** mission pre-fill, "Generate this battle" link, and the battle summary for Post-Battle.
+
+## Decisions (answered)
+1. **Invasion forces are chosen on the Models tab.**
+   - Each enemy entry gets a second tick box, **Invasion**, to mark which enemy types can invade.
+   - The default selection is the entries the book marks "Invasion Threat": K’Erin Colonists, Converted Acquisition, Converted Infiltrators, Abductor Raiders and Swarm Brood.
+   - For an Invasion battle, Random rolls among entries that are ticked for invasions **and** enabled, weighted by their printed weights.
+   - Stored as `campaign.models.invasion = { tableName: [rowId, ...] }`. Until you change a table, it uses the defaults.
+2. **Rival enemy types:** not remembered for now. For a Rival fight you fix the enemy in its dropdown, or roll on the Unknown Rival column.

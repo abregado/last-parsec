@@ -20,13 +20,25 @@ PAGES = ["index.html", "tests.html"]
 PATTERN = re.compile(r'((?:src|href)="(?!https?:|data:|#)[^"?]+\.(?:js|css))(?:\?v=[^"]*)?"')
 
 
+def write_with_retry(path, text, attempts=5):
+    """Editors and file watchers on Windows can hold a file open for a moment."""
+    for attempt in range(attempts):
+        try:
+            path.write_text(text, encoding="utf-8", newline="\n")
+            return
+        except OSError:
+            if attempt == attempts - 1:
+                raise
+            time.sleep(0.3)
+
+
 def main():
     version = time.strftime("%Y%m%d%H%M%S")
     for name in PAGES:
         path = ROOT / name
         text = path.read_text(encoding="utf-8")
         stamped, count = PATTERN.subn(r'\1?v=' + version + '"', text)
-        path.write_text(stamped, encoding="utf-8", newline="\n")
+        write_with_retry(path, stamped)
         print("%s: stamped %d files with v=%s" % (name, count, version))
     return 0
 

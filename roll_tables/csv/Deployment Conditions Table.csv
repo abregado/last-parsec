@@ -1,12 +1,12 @@
-weight_opportunity_patron,weight_rival,weight_quest,deployment_condition
-40,10,5,No Condition
-5,5,5,Small encounter: A random crew member must sit out this fight. Reduce enemy numbers by -1 (-2 if they initially outnumber you)
-5,5,15,Poor visibility: Maximum visibility is 1D6+8”. Reroll at the start of each round.
-5,5,5,"Brief engagement: At the end of each round, roll 2D6. If the roll is equal or below the round number, the game ends inconclusively."
-5,5,10,"Toxic environment: Whenever a combatant is Stunned, roll 1D6+Savvy skill (0 for enemies). Failure to roll a 4+ becomes a casualty."
-5,15,10,Surprise encounter: The enemy can’t act in the first round.
-10,5,10,"Delayed: 2 random crew members won’t start on the table. At the end of each round, roll 1D6: If the roll is equal or below the round number, they may be placed at any point of your own battlefield edge."
-5,10,5,Slippery ground: All movement at ground level is -1 Speed.
-5,15,15,Bitter struggle: Enemy Morale is +1.
-5,15,10,Caught off guard: Your squad all act in the Slow Actions phase in Round 1.
-10,10,10,"Gloomy: Maximum visibility is 9”. Characters that fire can be fired upon at any range, however."
+weight_opportunity_patron,weight_rival,weight_quest,title,effect
+40,10,5,No Condition,
+5,5,5,Small encounter,A random crew member must sit out this fight. Reduce enemy numbers by -1 (-2 if they initially outnumber you)
+5,5,15,Poor visibility,Maximum visibility is 1D6+8”. Reroll at the start of each round.
+5,5,5,Brief engagement,"At the end of each round, roll 2D6. If the roll is equal or below the round number, the game ends inconclusively."
+5,5,10,Toxic environment,"Whenever a combatant is Stunned, roll 1D6+Savvy skill (0 for enemies). Failure to roll a 4+ becomes a casualty."
+5,15,10,Surprise encounter,The enemy can’t act in the first round.
+10,5,10,Delayed,"2 random crew members won’t start on the table. At the end of each round, roll 1D6: If the roll is equal or below the round number, they may be placed at any point of your own battlefield edge."
+5,10,5,Slippery ground,All movement at ground level is -1 Speed.
+5,15,15,Bitter struggle,Enemy Morale is +1.
+5,15,10,Caught off guard,Your squad all act in the Slow Actions phase in Round 1.
+10,10,10,Gloomy,"Maximum visibility is 9”. Characters that fire can be fired upon at any range, however."

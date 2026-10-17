@@ -1,9 +1,9 @@
-weight,find
-15,Weapon: Randomly select a slain (but not Bailed) enemy from the battle. You may keep any weapons they were carrying.
-10,Usable goods: Roll on the Consumables Table in the “Loot” chapter of the rules. You receive 1 dosage of the item indicated.
-10,"Curious data stick / Invasion Evidence: You obtain a Quest Rumor. If the enemy is an Invasion Threat, you instead find Invasion Evidence. Earn +1 credit, and add +1 when checking for Invasion in the next step."
-10,Starship part: Redeemable as equivalent to 2 credits only when installing a Starship Component (see page 60).
-15,"Personal trinket: On each planet you visit in the future, roll 2D6. On a 9+ you find the owner and receive a Loot roll (p.131) as payment."
-15,Debris: 1D3 credits’ worth on the scrap market.
-15,"Vital info / Invasion Evidence: Turn in this information to get a Corporate Patron automatically on this world. If the enemy is an Invasion Threat, you instead find Invasion Evidence; if so, earn +1 credit and add +1 when checking for Invasion in the next step."
-10,Nothing of value: …not one thing!
+weight,title,effect
+15,Weapon,Randomly select a slain (but not Bailed) enemy from the battle. You may keep any weapons they were carrying.
+10,Usable goods,Roll on the Consumables Table in the “Loot” chapter of the rules. You receive 1 dosage of the item indicated.
+10,Curious data stick / Invasion Evidence,"You obtain a Quest Rumor. If the enemy is an Invasion Threat, you instead find Invasion Evidence. Earn +1 credit, and add +1 when checking for Invasion in the next step."
+10,Starship part,Redeemable as equivalent to 2 credits only when installing a Starship Component (see page 60).
+15,Personal trinket,"On each planet you visit in the future, roll 2D6. On a 9+ you find the owner and receive a Loot roll (p.131) as payment."
+15,Debris,1D3 credits’ worth on the scrap market.
+15,Vital info / Invasion Evidence,"Turn in this information to get a Corporate Patron automatically on this world. If the enemy is an Invasion Threat, you instead find Invasion Evidence; if so, earn +1 credit and add +1 when checking for Invasion in the next step."
+10,Nothing of value,…not one thing!

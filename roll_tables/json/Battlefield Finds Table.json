@@ -5,40 +5,49 @@
   ],
   "columns": [
     "weight",
-    "find"
+    "title",
+    "effect"
   ],
   "rows": [
     {
       "weight": 15,
-      "find": "Weapon: Randomly select a slain (but not Bailed) enemy from the battle. You may keep any weapons they were carrying."
+      "title": "Weapon",
+      "effect": "Randomly select a slain (but not Bailed) enemy from the battle. You may keep any weapons they were carrying."
     },
     {
       "weight": 10,
-      "find": "Usable goods: Roll on the Consumables Table in the “Loot” chapter of the rules. You receive 1 dosage of the item indicated."
+      "title": "Usable goods",
+      "effect": "Roll on the Consumables Table in the “Loot” chapter of the rules. You receive 1 dosage of the item indicated."
     },
     {
       "weight": 10,
-      "find": "Curious data stick / Invasion Evidence: You obtain a Quest Rumor. If the enemy is an Invasion Threat, you instead find Invasion Evidence. Earn +1 credit, and add +1 when checking for Invasion in the next step."
+      "title": "Curious data stick / Invasion Evidence",
+      "effect": "You obtain a Quest Rumor. If the enemy is an Invasion Threat, you instead find Invasion Evidence. Earn +1 credit, and add +1 when checking for Invasion in the next step."
     },
     {
       "weight": 10,
-      "find": "Starship part: Redeemable as equivalent to 2 credits only when installing a Starship Component (see page 60)."
+      "title": "Starship part",
+      "effect": "Redeemable as equivalent to 2 credits only when installing a Starship Component (see page 60)."
     },
     {
       "weight": 15,
-      "find": "Personal trinket: On each planet you visit in the future, roll 2D6. On a 9+ you find the owner and receive a Loot roll (p.131) as payment."
+      "title": "Personal trinket",
+      "effect": "On each planet you visit in the future, roll 2D6. On a 9+ you find the owner and receive a Loot roll (p.131) as payment."
     },
     {
       "weight": 15,
-      "find": "Debris: 1D3 credits’ worth on the scrap market."
+      "title": "Debris",
+      "effect": "1D3 credits’ worth on the scrap market."
     },
     {
       "weight": 15,
-      "find": "Vital info / Invasion Evidence: Turn in this information to get a Corporate Patron automatically on this world. If the enemy is an Invasion Threat, you instead find Invasion Evidence; if so, earn +1 credit and add +1 when checking for Invasion in the next step."
+      "title": "Vital info / Invasion Evidence",
+      "effect": "Turn in this information to get a Corporate Patron automatically on this world. If the enemy is an Invasion Threat, you instead find Invasion Evidence; if so, earn +1 credit and add +1 when checking for Invasion in the next step."
     },
     {
       "weight": 10,
-      "find": "Nothing of value: …not one thing!"
+      "title": "Nothing of value",
+      "effect": "…not one thing!"
     }
   ]
 }

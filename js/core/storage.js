@@ -25,6 +25,22 @@
     return JSON.parse(JSON.stringify(value));
   }
 
+  /** { disabled: {...}, invasion: {...} } keyed by table — older saves stored an empty array here. */
+  function normalizeModels(raw) {
+    const idLists = (source) => {
+      const out = {};
+      if (source && typeof source === 'object') {
+        for (const [table, ids] of Object.entries(source)) {
+          if (Array.isArray(ids)) out[table] = ids.filter((id) => typeof id === 'string');
+        }
+      }
+      return out;
+    };
+    const models = raw && typeof raw === 'object' ? raw : {};
+    // invasion: tables the player has customised; other tables use the book defaults.
+    return { disabled: idLists(models.disabled), invasion: idLists(models.invasion) };
+  }
+
   /** Fill in any missing fields so older or hand-edited data is safe to use. */
   function normalizeCampaign(raw) {
     if (!raw || typeof raw !== 'object') throw new Error('Campaign entry is not an object.');
@@ -36,10 +52,12 @@
       createdAt: created,
       updatedAt: typeof raw.updatedAt === 'string' ? raw.updatedAt : created,
       characters: Array.isArray(raw.characters) ? raw.characters : [],
+      settings: LP.settings.normalize(raw.settings),
       crew: raw.crew && typeof raw.crew === 'object' ? raw.crew : {},
-      models: Array.isArray(raw.models) ? raw.models : [],
-      turns: Array.isArray(raw.turns) ? raw.turns : [],
-      battles: Array.isArray(raw.battles) ? raw.battles : []
+      models: normalizeModels(raw.models),
+      turn: raw.turn && typeof raw.turn === 'object' && !Array.isArray(raw.turn) ? raw.turn : null,
+      turnMemory: raw.turnMemory && typeof raw.turnMemory === 'object' && !Array.isArray(raw.turnMemory) ? raw.turnMemory : {},
+      battle: raw.battle && typeof raw.battle === 'object' && !Array.isArray(raw.battle) ? raw.battle : null
     };
   }
 

@@ -18,6 +18,35 @@
     ));
   }
 
+  async function editSettings(campaign, container, route) {
+    const values = await LP.ui.form({
+      title: 'Campaign settings',
+      message: 'These change several rolls: invasion checks, pay, XP and enemy numbers (pp.63–65).',
+      fields: [
+        {
+          key: 'difficulty',
+          label: 'Difficulty mode',
+          value: campaign.settings.difficulty,
+          options: LP.settings.DIFFICULTIES.map((d) => ({ value: d.id, label: d.label }))
+        },
+        {
+          key: 'crewSize',
+          label: 'Campaign crew size',
+          value: campaign.settings.crewSize,
+          options: LP.settings.CREW_SIZES.map((n) => ({ value: n, label: String(n) }))
+        }
+      ]
+    });
+    if (!values) return;
+    campaign.settings = LP.settings.normalize({
+      difficulty: values.difficulty,
+      crewSize: parseInt(values.crewSize, 10)
+    });
+    LP.storage.touchCampaign(campaign);
+    LP.dom.clear(container);
+    render(container, route);
+  }
+
   function render(container, route) {
     const campaign = LP.storage.getCampaign(route.id);
     if (!campaign) {
@@ -35,7 +64,17 @@
     document.title = campaign.name + ' · ' + tab.label + ' · Last Parsec';
 
     container.appendChild(el('a', { class: 'back-link', href: LP.router.homePath }, '← All campaigns'));
-    container.appendChild(el('div', { class: 'page-header' }, el('h1', { text: campaign.name })));
+    container.appendChild(el('div', { class: 'page-header' },
+      el('h1', { text: campaign.name }),
+      el('div', { class: 'campaign-settings' },
+        el('span', { class: 'badge', title: 'Difficulty mode and campaign crew size' }, LP.settings.summary(campaign.settings)),
+        el('button', {
+          type: 'button',
+          class: 'btn btn-sm',
+          onclick: () => editSettings(campaign, container, route)
+        }, 'Settings')
+      )
+    ));
 
     container.appendChild(el('nav', { 'aria-label': 'Campaign tools' },
       el('ul', { class: 'tabs' },

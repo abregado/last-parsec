@@ -1,11 +1,11 @@
-weight,rewards
-10,Documents 1 Rumor
-10,Data Files 2 Rumors
-5,Scrap 3 credits
-15,Cargo Crate 1D6 credits
-15,Valuable Materials 1D6+2 credits
-15,Rare Substance Roll 2D6. Receive credits equal to highest roll.
-15,Ship Parts Discount your next ship component purchase by 1D6 credits. Establish value now.
-5,Military Ship Part Discount your next ship component purchase by 1D6+2 credits. Establish the value now.
-5,Mysterious Items 2 story points
-5,Personal Item 3 story points
+weight,reward,effect
+10,Documents,1 Rumor
+10,Data Files,2 Rumors
+5,Scrap,3 credits
+15,Cargo Crate,1D6 credits
+15,Valuable Materials,1D6+2 credits
+15,Rare Substance,Roll 2D6. Receive credits equal to highest roll.
+15,Ship Parts,Discount your next ship component purchase by 1D6 credits. Establish value now.
+5,Military Ship Part,Discount your next ship component purchase by 1D6+2 credits. Establish the value now.
+5,Mysterious Items,2 story points
+5,Personal Item,3 story points

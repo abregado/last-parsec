@@ -304,202 +304,227 @@ window.LP.data.tables = {
   ],
   "columns": [
    "weight",
+   "title",
    "effect"
   ],
-  "labelColumn": "effect",
+  "labelColumn": "title",
   "weightColumns": [
    "weight"
   ],
   "die": "D100",
   "rows": [
    {
-    "id": "renewed-efforts-the-enemy-is-making-a-concerted-effort-to-push-you-back-for-the-rest-of-the-battle-after-all-enemy-figures-have-acted-select-a-random-figure-that-may-immediately-take-a-second-move-and-second-combat-action",
+    "id": "renewed-efforts",
     "weight": 5,
-    "effect": "Renewed efforts: The enemy is making a concerted effort to push you back. For the rest of the battle, after all enemy figures have acted, select a random figure that may immediately take a second Move and second Combat Action.",
+    "title": "Renewed efforts",
+    "effect": "The enemy is making a concerted effort to push you back. For the rest of the battle, after all enemy figures have acted, select a random figure that may immediately take a second Move and second Combat Action.",
     "ranges": {
      "weight": "1-5"
     }
    },
    {
-    "id": "enemy-reinforcements-an-additional-2-enemy-figures-arrive-at-the-center-of-the-opposing-battlefield-edge-one-is-armed-as-a-specialist-if-applicable-to-the-enemy-type",
+    "id": "enemy-reinforcements",
     "weight": 4,
-    "effect": "Enemy reinforcements: An additional 2 enemy figures arrive at the center of the opposing battlefield edge. One is armed as a Specialist (if applicable to the enemy type).",
+    "title": "Enemy reinforcements",
+    "effect": "An additional 2 enemy figures arrive at the center of the opposing battlefield edge. One is armed as a Specialist (if applicable to the enemy type).",
     "ranges": {
      "weight": "6-9"
     }
    },
    {
-    "id": "change-of-plans-the-enemy-switches-to-the-cautious-ai-type-for-the-rest-of-the-battle-if-they-were-already-cautious-they-instead-switch-to-tactical-ai-enemies-with-no-ranged-attacks-are-unaffected-by-this-event",
+    "id": "change-of-plans",
     "weight": 4,
-    "effect": "Change of plans: The enemy switches to the Cautious AI type for the rest of the battle. If they were already Cautious, they instead switch to Tactical AI. Enemies with no ranged attacks are unaffected by this event.",
+    "title": "Change of plans",
+    "effect": "The enemy switches to the Cautious AI type for the rest of the battle. If they were already Cautious, they instead switch to Tactical AI. Enemies with no ranged attacks are unaffected by this event.",
     "ranges": {
      "weight": "10-13"
     }
    },
    {
-    "id": "lost-heart-the-enemy-has-had-enough-of-this-fight-at-the-end-of-the-next-round-they-will-leave-the-field",
+    "id": "lost-heart",
     "weight": 3,
-    "effect": "Lost heart: The enemy has had enough of this fight. At the end of the next round, they will leave the field.",
+    "title": "Lost heart",
+    "effect": "The enemy has had enough of this fight. At the end of the next round, they will leave the field.",
     "ranges": {
      "weight": "14-16"
     }
    },
    {
-    "id": "seized-the-moment-select-a-crew-member-who-may-move-and-act-in-both-the-quick-and-slow-actions-phases-next-round",
+    "id": "seized-the-moment",
     "weight": 4,
-    "effect": "Seized the moment: Select a crew member who may move and act in both the Quick and Slow Actions phases next round.",
+    "title": "Seized the moment",
+    "effect": "Select a crew member who may move and act in both the Quick and Slow Actions phases next round.",
     "ranges": {
      "weight": "17-20"
     }
    },
    {
-    "id": "critters-place-1d3-vent-crawlers-p-102-in-the-center-of-the-table-and-move-each-of-them-1d6-in-a-random-direction-at-the-beginning-of-the-enemy-actions-phase-they-will-move-towards-the-nearest-figure-and-attack-regardless-of-which-side-the-figure-is-on-if-you-are-already-fighting-vent-crawlers-this-is-bad-news-as-they-are-of-course-part-of-the-enemy-brood",
+    "id": "critters",
     "weight": 6,
-    "effect": "Critters! Place 1D3 Vent Crawlers (p.102) in the center of the table, and move each of them 1D6\u201d in a random direction. At the beginning of the Enemy Actions phase, they will move towards the nearest figure and attack, regardless of which side the figure is on. If you are already fighting Vent Crawlers, this is bad news, as they are of course part of the enemy brood.",
+    "title": "Critters!",
+    "effect": "Place 1D3 Vent Crawlers (p.102) in the center of the table, and move each of them 1D6\u201d in a random direction. At the beginning of the Enemy Actions phase, they will move towards the nearest figure and attack, regardless of which side the figure is on. If you are already fighting Vent Crawlers, this is bad news, as they are of course part of the enemy brood.",
     "ranges": {
      "weight": "21-26"
     }
    },
    {
-    "id": "ammo-fault-select-a-random-figure-in-your-crew-if-they-fired-a-weapon-last-round-it-cannot-be-used-for-the-rest-of-the-battle-if-they-did-not-select-a-random-carried-weapon-which-can-be-fired-only-once-this-battle",
+    "id": "ammo-fault",
     "weight": 4,
-    "effect": "Ammo fault: Select a random figure in your crew. If they fired a weapon last round, it cannot be used for the rest of the battle. If they did not, select a random carried weapon, which can be fired only once this battle.",
+    "title": "Ammo fault",
+    "effect": "Select a random figure in your crew. If they fired a weapon last round, it cannot be used for the rest of the battle. If they did not, select a random carried weapon, which can be fired only once this battle.",
     "ranges": {
      "weight": "27-30"
     }
    },
    {
-    "id": "visibility-change-if-visibility-is-currently-reduced-increase-the-vision-range-by-1d6-if-visibility-is-currently-unlimited-reduce-it-to-1d6-6",
+    "id": "visibility-change",
     "weight": 4,
-    "effect": "Visibility change: If visibility is currently reduced, increase the vision range by +1D6\u201d. If visibility is currently unlimited, reduce it to 1D6+6\u201d.",
+    "title": "Visibility change",
+    "effect": "If visibility is currently reduced, increase the vision range by +1D6\u201d. If visibility is currently unlimited, reduce it to 1D6+6\u201d.",
     "ranges": {
      "weight": "31-34"
     }
    },
    {
-    "id": "tougher-than-expected-select-a-random-enemy-figure-they-receive-1-toughness-to-a-maximum-of-6-and-remove-all-current-stun-markers-on-that-figure",
+    "id": "tougher-than-expected",
     "weight": 4,
-    "effect": "Tougher than expected: Select a random enemy figure. They receive +1 Toughness (to a maximum of 6) and remove all current stun markers on that figure.",
+    "title": "Tougher than expected",
+    "effect": "Select a random enemy figure. They receive +1 Toughness (to a maximum of 6) and remove all current stun markers on that figure.",
     "ranges": {
      "weight": "35-38"
     }
    },
    {
-    "id": "snap-shot-select-a-figure-in-your-crew-they-may-fire-a-weapon-immediately-if-the-weapon-is-a-pistol-it-hits-automatically-otherwise-roll-to-hit-normally",
+    "id": "snap-shot",
     "weight": 4,
-    "effect": "Snap shot: Select a figure in your crew. They may fire a weapon immediately. If the weapon is a Pistol, it Hits automatically, otherwise roll to Hit normally.",
+    "title": "Snap shot",
+    "effect": "Select a figure in your crew. They may fire a weapon immediately. If the weapon is a Pistol, it Hits automatically, otherwise roll to Hit normally.",
     "ranges": {
      "weight": "39-42"
     }
    },
    {
-    "id": "cunning-plan-in-the-next-round-do-not-roll-for-initiative-each-of-your-crew-acts-in-the-quick-or-slow-actions-phase-as-you-prefer",
+    "id": "cunning-plan",
     "weight": 4,
-    "effect": "Cunning plan: In the next round, do not roll for Initiative. Each of your crew acts in the Quick or Slow Actions phase as you prefer.",
+    "title": "Cunning plan",
+    "effect": "In the next round, do not roll for Initiative. Each of your crew acts in the Quick or Slow Actions phase as you prefer.",
     "ranges": {
      "weight": "43-46"
     }
    },
    {
-    "id": "possible-reinforcements-place-3-markers-evenly-spaced-along-the-opposing-battlefield-edge-at-the-start-of-the-enemy-actions-phase-next-round-select-a-random-marker-and-roll-1d6-on-a-5-6-a-new-basic-enemy-figure-is-placed-on-the-marker-otherwise-it-is-removed-roll-for-one-marker-per-round-until-they-are-all-gone-if-a-crew-member-moves-within-3-of-a-marker-it-is-removed-instantly",
+    "id": "possible-reinforcements",
     "weight": 4,
-    "effect": "Possible reinforcements: Place 3 markers evenly spaced along the opposing battlefield edge. At the start of the Enemy Actions phase next round, select a random marker, and roll 1D6. On a 5-6, a new basic enemy figure is placed on the marker, otherwise it is removed. Roll for one marker per round until they are all gone. If a crew member moves within 3\u201d of a marker, it is removed instantly.",
+    "title": "Possible reinforcements",
+    "effect": "Place 3 markers evenly spaced along the opposing battlefield edge. At the start of the Enemy Actions phase next round, select a random marker, and roll 1D6. On a 5-6, a new basic enemy figure is placed on the marker, otherwise it is removed. Roll for one marker per round until they are all gone. If a crew member moves within 3\u201d of a marker, it is removed instantly.",
     "ranges": {
      "weight": "47-50"
     }
    },
    {
-    "id": "clock-is-running-out-at-the-end-of-the-next-round-and-each-round-thereafter-roll-1d6-on-a-6-the-game-ends-immediately-and-you-are-unable-to-complete-any-objectives-you-will-not-count-as-holding-the-field-unless-you-clear-the-table-of-enemies-before-this-happens",
+    "id": "clock-is-running-out",
     "weight": 4,
-    "effect": "Clock is running out: At the end of the next round and each round thereafter, roll 1D6. On a 6, the game ends immediately, and you are unable to complete any objectives. You will not count as Holding the Field unless you clear the table of enemies before this happens.",
+    "title": "Clock is running out",
+    "effect": "At the end of the next round and each round thereafter, roll 1D6. On a 6, the game ends immediately, and you are unable to complete any objectives. You will not count as Holding the Field unless you clear the table of enemies before this happens.",
     "ranges": {
      "weight": "51-54"
     }
    },
    {
-    "id": "environmental-hazard-select-a-random-terrain-feature-any-figure-currently-in-on-or-within-1-of-the-feature-must-roll-1d6-savvy-and-achieve-a-5-enemies-roll-1d6-and-must-roll-a-4-or-take-a-damage-1-hit-ignoring-any-armor-saving-throws-the-feature-is-safe-afterwards",
+    "id": "environmental-hazard",
     "weight": 6,
-    "effect": "Environmental hazard: Select a random terrain feature. Any figure currently in, on, or within 1\u201d of the feature must roll 1D6+Savvy and achieve a 5+ (enemies roll 1D6 and must roll a 4+) or take a Damage +1 Hit, ignoring any Armor Saving Throws. The feature is safe afterwards.",
+    "title": "Environmental hazard",
+    "effect": "Select a random terrain feature. Any figure currently in, on, or within 1\u201d of the feature must roll 1D6+Savvy and achieve a 5+ (enemies roll 1D6 and must roll a 4+) or take a Damage +1 Hit, ignoring any Armor Saving Throws. The feature is safe afterwards.",
     "ranges": {
      "weight": "55-60"
     }
    },
    {
-    "id": "a-desperate-plan-a-random-figure-in-your-crew-cannot-act-next-round-but-instead-select-another-figure-of-choice-that-may-act-in-both-the-quick-and-slow-actions-phases",
+    "id": "a-desperate-plan",
     "weight": 5,
-    "effect": "A desperate plan: A random figure in your crew cannot act next round, but instead select another figure of choice that may act in both the Quick and Slow Actions phases.",
+    "title": "A desperate plan",
+    "effect": "A random figure in your crew cannot act next round, but instead select another figure of choice that may act in both the Quick and Slow Actions phases.",
     "ranges": {
      "weight": "61-65"
     }
    },
    {
-    "id": "a-moment-of-hesitation-next-round-select-a-single-figure-that-acts-in-the-quick-actions-phase-if-any-feral-are-in-the-squad-you-must-select-a-feral-all-other-figures-acts-in-the-slow-actions-phase",
+    "id": "a-moment-of-hesitation",
     "weight": 5,
-    "effect": "A moment of hesitation: Next round, select a single figure that acts in the Quick Actions phase (if any Feral are in the squad, you must select a Feral). All other figures acts in the Slow Actions phase.",
+    "title": "A moment of hesitation",
+    "effect": "Next round, select a single figure that acts in the Quick Actions phase (if any Feral are in the squad, you must select a Feral). All other figures acts in the Slow Actions phase.",
     "ranges": {
      "weight": "66-70"
     }
    },
    {
-    "id": "fumbled-grenade-a-random-enemy-fumbles-a-grenade-the-figure-in-question-runs-6-in-a-random-direction-and-is-then-stunned-every-figure-crew-and-enemy-within-4-of-the-initial-position-will-immediately-run-4-directly-away-the-grenade-then-goes-off-harmlessly-if-the-enemy-is-one-that-would-not-use-grenades-nothing-happens",
+    "id": "fumbled-grenade",
     "weight": 3,
-    "effect": "Fumbled grenade: A random enemy fumbles a grenade. The figure in question runs 6\u201d in a random direction and is then Stunned. Every figure, crew and enemy within 4\u201d of the initial position will immediately run 4\u201d directly away. The grenade then goes off harmlessly. If the enemy is one that would not use grenades, nothing happens.",
+    "title": "Fumbled grenade",
+    "effect": "A random enemy fumbles a grenade. The figure in question runs 6\u201d in a random direction and is then Stunned. Every figure, crew and enemy within 4\u201d of the initial position will immediately run 4\u201d directly away. The grenade then goes off harmlessly. If the enemy is one that would not use grenades, nothing happens.",
     "ranges": {
      "weight": "71-73"
     }
    },
    {
-    "id": "back-up-if-you-have-spare-crew-not-taking-part-in-the-battle-you-may-have-one-crew-member-arrive-place-them-on-the-center-of-your-own-battlefield-edge",
+    "id": "back-up",
     "weight": 4,
-    "effect": "Back up: If you have spare crew not taking part in the battle, you may have one crew member arrive. Place them on the center of your own battlefield edge.",
+    "title": "Back up",
+    "effect": "If you have spare crew not taking part in the battle, you may have one crew member arrive. Place them on the center of your own battlefield edge.",
     "ranges": {
      "weight": "74-77"
     }
    },
    {
-    "id": "enemy-vip-a-unique-individual-immediately-joins-the-enemy-force-place-them-on-the-center-of-their-battlefield-edge",
+    "id": "enemy-vip",
     "weight": 3,
-    "effect": "Enemy VIP: A Unique Individual immediately joins the enemy force. Place them on the center of their battlefield edge.",
+    "title": "Enemy VIP",
+    "effect": "A Unique Individual immediately joins the enemy force. Place them on the center of their battlefield edge.",
     "ranges": {
      "weight": "78-80"
     }
    },
    {
-    "id": "fog-cloud-a-dense-cloud-of-fog-envelops-the-center-of-the-table-for-the-rest-of-the-battle-it-extends-6-in-every-direction-and-blocks-all-visibility-past-2",
+    "id": "fog-cloud",
     "weight": 5,
-    "effect": "Fog cloud: A dense cloud of fog envelops the center of the table for the rest of the battle. It extends 6\u201d in every direction and blocks all visibility past 2\u201d.",
+    "title": "Fog cloud",
+    "effect": "A dense cloud of fog envelops the center of the table for the rest of the battle. It extends 6\u201d in every direction and blocks all visibility past 2\u201d.",
     "ranges": {
      "weight": "81-85"
     }
    },
    {
-    "id": "lost-a-random-crew-member-loses-their-way-and-misses-the-rest-of-the-battle-remove-the-figure-from-the-battlefield-they-rejoin-you-safely-afterwards-looking-a-bit-sheepish-ignore-this-event-if-you-are-currently-outnumbered",
+    "id": "lost",
     "weight": 4,
-    "effect": "Lost! A random crew member loses their way and misses the rest of the battle. Remove the figure from the battlefield. They rejoin you safely afterwards, looking a bit sheepish. Ignore this event if you are currently outnumbered.",
+    "title": "Lost!",
+    "effect": "A random crew member loses their way and misses the rest of the battle. Remove the figure from the battlefield. They rejoin you safely afterwards, looking a bit sheepish. Ignore this event if you are currently outnumbered.",
     "ranges": {
      "weight": "86-89"
     }
    },
    {
-    "id": "i-found-something-randomly-select-a-crew-member-then-place-a-marker-1d6-from-them-in-a-random-direction-the-enemy-will-ignore-it-if-any-crew-member-moves-into-contact-and-spends-a-non-combat-action-roll-for-a-loot-item-p-131-and-claim-it-for-use-immediately",
+    "id": "i-found-something",
     "weight": 4,
-    "effect": "I found something! Randomly select a crew member, then place a marker 1D6\u201d from them in a random direction. The enemy will ignore it. If any crew member moves into contact and spends a non-Combat Action, roll for a Loot item (p.131) and claim it for use immediately.",
+    "title": "I found something!",
+    "effect": "Randomly select a crew member, then place a marker 1D6\u201d from them in a random direction. The enemy will ignore it. If any crew member moves into contact and spends a non-Combat Action, roll for a Loot item (p.131) and claim it for use immediately.",
     "ranges": {
      "weight": "90-93"
     }
    },
    {
-    "id": "looks-valuable-randomly-select-a-crew-member-then-place-a-marker-1d6-from-them-in-a-random-direction-the-enemy-will-ignore-it-if-any-crew-member-moves-into-contact-and-spends-a-non-combat-action-obtain-1d3-credits",
+    "id": "looks-valuable",
     "weight": 4,
-    "effect": "Looks valuable: Randomly select a crew member, then place a marker 1D6\u201d from them in a random direction. The enemy will ignore it. If any crew member moves into contact and spends a non-Combat Action, obtain 1D3 credits.",
+    "title": "Looks valuable",
+    "effect": "Randomly select a crew member, then place a marker 1D6\u201d from them in a random direction. The enemy will ignore it. If any crew member moves into contact and spends a non-Combat Action, obtain 1D3 credits.",
     "ranges": {
      "weight": "94-97"
     }
    },
    {
-    "id": "you-want-me-to-check-that-out-select-a-random-crew-member-they-may-opt-to-go-check-out-something-they-insist-they-saw-if-they-do-they-are-removed-from-the-battle-after-the-battle-ends-they-may-roll-once-on-the-loot-table-p-131-if-you-opt-not-to-go-you-cannot-send-a-different-character-and-the-chance-is-lost",
+    "id": "you-want-me-to-check-that-out",
     "weight": 3,
-    "effect": "You want me to check that out? Select a random crew member. They may opt to go check out something they insist they saw. If they do, they are removed from the battle. After the battle ends, they may roll once on the Loot table (p.131). If you opt not to go, you cannot send a different character, and the chance is lost.",
+    "title": "You want me to check that out?",
+    "effect": "Select a random crew member. They may opt to go check out something they insist they saw. If they do, they are removed from the battle. After the battle ends, they may roll once on the Loot table (p.131). If you opt not to go, you cannot send a different character, and the chance is lost.",
     "ranges": {
      "weight": "98-100"
     }
@@ -513,74 +538,83 @@ window.LP.data.tables = {
   ],
   "columns": [
    "weight",
-   "find"
+   "title",
+   "effect"
   ],
-  "labelColumn": "find",
+  "labelColumn": "title",
   "weightColumns": [
    "weight"
   ],
   "die": "D100",
   "rows": [
    {
-    "id": "weapon-randomly-select-a-slain-but-not-bailed-enemy-from-the-battle-you-may-keep-any-weapons-they-were-carrying",
+    "id": "weapon",
     "weight": 15,
-    "find": "Weapon: Randomly select a slain (but not Bailed) enemy from the battle. You may keep any weapons they were carrying.",
+    "title": "Weapon",
+    "effect": "Randomly select a slain (but not Bailed) enemy from the battle. You may keep any weapons they were carrying.",
     "ranges": {
      "weight": "1-15"
     }
    },
    {
-    "id": "usable-goods-roll-on-the-consumables-table-in-the-loot-chapter-of-the-rules-you-receive-1-dosage-of-the-item-indicated",
+    "id": "usable-goods",
     "weight": 10,
-    "find": "Usable goods: Roll on the Consumables Table in the \u201cLoot\u201d chapter of the rules. You receive 1 dosage of the item indicated.",
+    "title": "Usable goods",
+    "effect": "Roll on the Consumables Table in the \u201cLoot\u201d chapter of the rules. You receive 1 dosage of the item indicated.",
     "ranges": {
      "weight": "16-25"
     }
    },
    {
-    "id": "curious-data-stick-invasion-evidence-you-obtain-a-quest-rumor-if-the-enemy-is-an-invasion-threat-you-instead-find-invasion-evidence-earn-1-credit-and-add-1-when-checking-for-invasion-in-the-next-step",
+    "id": "curious-data-stick-invasion-evidence",
     "weight": 10,
-    "find": "Curious data stick / Invasion Evidence: You obtain a Quest Rumor. If the enemy is an Invasion Threat, you instead find Invasion Evidence. Earn +1 credit, and add +1 when checking for Invasion in the next step.",
+    "title": "Curious data stick / Invasion Evidence",
+    "effect": "You obtain a Quest Rumor. If the enemy is an Invasion Threat, you instead find Invasion Evidence. Earn +1 credit, and add +1 when checking for Invasion in the next step.",
     "ranges": {
      "weight": "26-35"
     }
    },
    {
-    "id": "starship-part-redeemable-as-equivalent-to-2-credits-only-when-installing-a-starship-component-see-page-60",
+    "id": "starship-part",
     "weight": 10,
-    "find": "Starship part: Redeemable as equivalent to 2 credits only when installing a Starship Component (see page 60).",
+    "title": "Starship part",
+    "effect": "Redeemable as equivalent to 2 credits only when installing a Starship Component (see page 60).",
     "ranges": {
      "weight": "36-45"
     }
    },
    {
-    "id": "personal-trinket-on-each-planet-you-visit-in-the-future-roll-2d6-on-a-9-you-find-the-owner-and-receive-a-loot-roll-p-131-as-payment",
+    "id": "personal-trinket",
     "weight": 15,
-    "find": "Personal trinket: On each planet you visit in the future, roll 2D6. On a 9+ you find the owner and receive a Loot roll (p.131) as payment.",
+    "title": "Personal trinket",
+    "effect": "On each planet you visit in the future, roll 2D6. On a 9+ you find the owner and receive a Loot roll (p.131) as payment.",
     "ranges": {
      "weight": "46-60"
     }
    },
    {
-    "id": "debris-1d3-credits-worth-on-the-scrap-market",
+    "id": "debris",
     "weight": 15,
-    "find": "Debris: 1D3 credits\u2019 worth on the scrap market.",
+    "title": "Debris",
+    "effect": "1D3 credits\u2019 worth on the scrap market.",
     "ranges": {
      "weight": "61-75"
     }
    },
    {
-    "id": "vital-info-invasion-evidence-turn-in-this-information-to-get-a-corporate-patron-automatically-on-this-world-if-the-enemy-is-an-invasion-threat-you-instead-find-invasion-evidence-if-so-earn-1-credit-and-add-1-when-checking-for-invasion-in-the-next-step",
+    "id": "vital-info-invasion-evidence",
     "weight": 15,
-    "find": "Vital info / Invasion Evidence: Turn in this information to get a Corporate Patron automatically on this world. If the enemy is an Invasion Threat, you instead find Invasion Evidence; if so, earn +1 credit and add +1 when checking for Invasion in the next step.",
+    "title": "Vital info / Invasion Evidence",
+    "effect": "Turn in this information to get a Corporate Patron automatically on this world. If the enemy is an Invasion Threat, you instead find Invasion Evidence; if so, earn +1 credit and add +1 when checking for Invasion in the next step.",
     "ranges": {
      "weight": "76-90"
     }
    },
    {
-    "id": "nothing-of-value-not-one-thing",
+    "id": "nothing-of-value",
     "weight": 10,
-    "find": "Nothing of value: \u2026not one thing!",
+    "title": "Nothing of value",
+    "effect": "\u2026not one thing!",
     "ranges": {
      "weight": "91-100"
     }
@@ -608,7 +642,7 @@ window.LP.data.tables = {
     "id": "fringe-benefit",
     "weight": 2,
     "benefits": "Fringe Benefit",
-    "effects": "Roll on the Loot Table (p.131",
+    "effects": "Roll on the Loot Table (p.131).",
     "ranges": {
      "weight": "1-2"
     }
@@ -808,234 +842,263 @@ window.LP.data.tables = {
   ],
   "columns": [
    "weight",
-   "event"
+   "title",
+   "effect"
   ],
-  "labelColumn": "event",
+  "labelColumn": "title",
   "weightColumns": [
    "weight"
   ],
   "die": "D100",
   "rows": [
    {
-    "id": "youve-met-a-friendly-doc-who-doesnt-ask-too-many-questions-select-up-to-two-crew-members-in-sick-bay-and-reduce-their-recovery-time-by-one-campaign-turn-each-if-they-recover-they-can-act-normally-next-campaign-turn",
+    "id": "youve-met-a-friendly-doc-who-doesnt-ask-too-many-questions",
     "weight": 3,
-    "event": "You\u2019ve met a friendly doc who doesn\u2019t ask too many questions. Select up to two crew members in Sick Bay and reduce their Recovery time by one campaign turn each. If they recover, they can act normally next campaign turn.",
+    "title": "You\u2019ve met a friendly doc who doesn\u2019t ask too many questions.",
+    "effect": "Select up to two crew members in Sick Bay and reduce their Recovery time by one campaign turn each. If they recover, they can act normally next campaign turn.",
     "ranges": {
      "weight": "1-3"
     }
    },
    {
-    "id": "the-life-support-system-on-the-ship-needs-upgrading-badly-upgrading-the-life-support-system-will-cost-1d6-credits-the-ship-cannot-be-flown-until-this-is-paid-if-your-crew-has-an-engineer-modify-the-roll-by-1",
+    "id": "the-life-support-system-on-the-ship-needs-upgrading-badly",
     "weight": 5,
-    "event": "The life support system on the ship needs upgrading badly. Upgrading the life support system will cost 1D6 credits. The ship cannot be flown until this is paid. If your crew has an Engineer, modify the roll by -1.",
+    "title": "The life support system on the ship needs upgrading badly.",
+    "effect": "Upgrading the life support system will cost 1D6 credits. The ship cannot be flown until this is paid. If your crew has an Engineer, modify the roll by -1.",
     "ranges": {
      "weight": "4-8"
     }
    },
    {
-    "id": "a-chance-meeting-turns-into-a-new-ally-roll-up-a-new-character-and-add-them-to-the-crew-or-add-1-story-point-you-may-decide-after-rolling-up-the-new-character",
+    "id": "a-chance-meeting-turns-into-a-new-ally",
     "weight": 4,
-    "event": "A chance meeting turns into a new ally. Roll up a new character and add them to the crew, OR add +1 story point. You may decide after rolling up the new character.",
+    "title": "A chance meeting turns into a new ally.",
+    "effect": "Roll up a new character and add them to the crew, OR add +1 story point. You may decide after rolling up the new character.",
     "ranges": {
      "weight": "9-12"
     }
    },
    {
-    "id": "youve-made-friends-among-the-locals-1-story-point",
+    "id": "youve-made-friends-among-the-locals",
     "weight": 4,
-    "event": "You\u2019ve made friends among the locals. +1 story point.",
+    "title": "You\u2019ve made friends among the locals.",
+    "effect": "+1 story point.",
     "ranges": {
      "weight": "13-16"
     }
    },
    {
-    "id": "you-managed-to-mouth-off-to-the-wrong-people-add-a-rival",
+    "id": "you-managed-to-mouth-off-to-the-wrong-people",
     "weight": 4,
-    "event": "You managed to mouth off to the wrong people. Add a Rival.",
+    "title": "You managed to mouth off to the wrong people.",
+    "effect": "Add a Rival.",
     "ranges": {
      "weight": "17-20"
     }
    },
    {
-    "id": "an-old-nemesis-has-tracked-you-down-select-a-prior-rival-or-roll-up-a-new-one-they-will-follow-you-from-planet-to-planet-until-resolved-and-receive-1-when-rolling-for-the-number-of-enemies-in-a-battle",
+    "id": "an-old-nemesis-has-tracked-you-down",
     "weight": 3,
-    "event": "An old nemesis has tracked you down. Select a prior Rival, or roll up a new one. They will follow you from planet to planet until resolved and receive +1 when rolling for the number of enemies in a battle.",
+    "title": "An old nemesis has tracked you down.",
+    "effect": "Select a prior Rival, or roll up a new one. They will follow you from planet to planet until resolved and receive +1 when rolling for the number of enemies in a battle.",
     "ranges": {
      "weight": "21-23"
     }
    },
    {
-    "id": "a-shady-character-offers-you-a-deal-give-him-any-one-item-of-equipment-then-roll-on-the-trade-table-p-79",
+    "id": "a-shady-character-offers-you-a-deal",
     "weight": 3,
-    "event": "A shady character offers you a deal. Give him any one item of equipment, then roll on the Trade Table (p.79).",
+    "title": "A shady character offers you a deal.",
+    "effect": "Give him any one item of equipment, then roll on the Trade Table (p.79).",
     "ranges": {
      "weight": "24-26"
     }
    },
    {
-    "id": "you-sell-off-some-cargo-you-acquired-on-the-last-planet-earn-1d6-credits",
+    "id": "you-sell-off-some-cargo-you-acquired-on-the-last-planet",
     "weight": 4,
-    "event": "You sell off some cargo you acquired on the last planet. Earn 1D6 credits.",
+    "title": "You sell off some cargo you acquired on the last planet.",
+    "effect": "Earn 1D6 credits.",
     "ranges": {
      "weight": "27-30"
     }
    },
    {
-    "id": "one-of-the-crew-overheard-something-interesting-add-1-rumor",
+    "id": "one-of-the-crew-overheard-something-interesting",
     "weight": 5,
-    "event": "One of the crew overheard something interesting. Add 1 Rumor.",
+    "title": "One of the crew overheard something interesting.",
+    "effect": "Add 1 Rumor.",
     "ranges": {
      "weight": "31-35"
     }
    },
    {
-    "id": "youve-managed-to-settle-some-old-business-if-you-have-any-you-may-remove-one-rival-of-your-choice-if-you-have-no-rivals-your-captain-earns-1-xp-instead",
+    "id": "youve-managed-to-settle-some-old-business",
     "weight": 3,
-    "event": "You\u2019ve managed to settle some old \u201cbusiness\u201d. If you have any, you may remove one Rival of your choice. If you have no Rivals, your captain earns +1 XP instead.",
+    "title": "You\u2019ve managed to settle some old \u201cbusiness\u201d.",
+    "effect": "If you have any, you may remove one Rival of your choice. If you have no Rivals, your captain earns +1 XP instead.",
     "ranges": {
      "weight": "36-38"
     }
    },
    {
-    "id": "an-admirer-wants-to-come-along-gain-a-new-crew-member-if-desired-they-have-only-the-base-profile-with-no-extra-rolls-and-bring-no-equipment-if-your-crew-has-any-feral-members-the-new-member-is-also-feral",
+    "id": "an-admirer-wants-to-come-along",
     "weight": 3,
-    "event": "An admirer wants to come along. Gain a new crew member, if desired. They have only the base profile with no extra rolls, and bring no equipment. If your crew has any Feral members, the new member is also Feral.",
+    "title": "An admirer wants to come along.",
+    "effect": "Gain a new crew member, if desired. They have only the base profile with no extra rolls, and bring no equipment. If your crew has any Feral members, the new member is also Feral.",
     "ranges": {
      "weight": "39-41"
     }
    },
    {
-    "id": "an-alien-merchant-offers-you-some-strange-device-if-you-want-to-buy-it-pay-4-credits-and-then-roll-on-the-loot-table",
+    "id": "an-alien-merchant-offers-you-some-strange-device",
     "weight": 3,
-    "event": "An alien merchant offers you some strange device. If you want to buy it, pay 4 credits and then roll on the Loot Table.",
+    "title": "An alien merchant offers you some strange device.",
+    "effect": "If you want to buy it, pay 4 credits and then roll on the Loot Table.",
     "ranges": {
      "weight": "42-44"
     }
    },
    {
-    "id": "equipment-malfunction-if-there-are-any-items-in-your-stash-a-random-item-is-damaged-and-must-be-repaired",
+    "id": "equipment-malfunction",
     "weight": 4,
-    "event": "Equipment malfunction. If there are any items in your Stash, a random item is damaged and must be Repaired.",
+    "title": "Equipment malfunction.",
+    "effect": "If there are any items in your Stash, a random item is damaged and must be Repaired.",
     "ranges": {
      "weight": "45-48"
     }
    },
    {
-    "id": "youve-earned-a-bit-of-a-bad-reputation-if-you-know-any-patrons-on-the-current-world-randomly-select-one-that-will-no-longer-work-with-you-if-you-have-no-patrons-shrug-and-move-on",
+    "id": "youve-earned-a-bit-of-a-bad-reputation",
     "weight": 3,
-    "event": "You\u2019ve earned a bit of a bad reputation. If you know any Patrons on the current world, randomly select one that will no longer work with you. If you have no Patrons, shrug and move on.",
+    "title": "You\u2019ve earned a bit of a bad reputation.",
+    "effect": "If you know any Patrons on the current world, randomly select one that will no longer work with you. If you have no Patrons, shrug and move on.",
     "ranges": {
      "weight": "49-51"
     }
    },
    {
-    "id": "the-tax-man-is-taking-an-interest-in-your-business-conduct-roll-2d6-and-pay-the-higher-die-in-credits-if-you-have-insufficient-credits-your-ship-is-impounded-until-you-can-pay",
+    "id": "the-tax-man-is-taking-an-interest-in-your-business-conduct",
     "weight": 5,
-    "event": "The tax man is taking an interest in your business conduct. Roll 2D6 and pay the higher die in credits. If you have insufficient credits your ship is impounded until you can pay.",
+    "title": "The tax man is taking an interest in your business conduct.",
+    "effect": "Roll 2D6 and pay the higher die in credits. If you have insufficient credits your ship is impounded until you can pay.",
     "ranges": {
      "weight": "52-56"
     }
    },
    {
-    "id": "the-crew-has-decided-its-time-for-a-new-person-to-be-in-charge-select-a-crew-member-to-be-the-new-captain-they-immediately-receive-3-xp-roll-1d6-on-a-1-the-old-captain-leaves-the-campaign-permanently-taking-any-items-carried-with-them-if-your-crew-has-any-kerin-one-of-them-must-be-selected-or-they-will-leave",
+    "id": "the-crew-has-decided-its-time-for-a-new-person-to-be-in-charge",
     "weight": 3,
-    "event": "The crew has decided it\u2019s time for a new person to be in charge. Select a crew member to be the new captain. They immediately receive 3 XP. Roll 1D6. On a 1, the old captain leaves the campaign permanently, taking any items carried with them. If your crew has any K\u2019Erin, one of them must be selected, or they will leave.",
+    "title": "The crew has decided it\u2019s time for a new person to be in charge.",
+    "effect": "Select a crew member to be the new captain. They immediately receive 3 XP. Roll 1D6. On a 1, the old captain leaves the campaign permanently, taking any items carried with them. If your crew has any K\u2019Erin, one of them must be selected, or they will leave.",
     "ranges": {
      "weight": "57-59"
     }
    },
    {
-    "id": "youve-made-some-business-contacts-add-a-new-patron-to-the-list-of-those-known",
+    "id": "youve-made-some-business-contacts",
     "weight": 4,
-    "event": "You\u2019ve made some business contacts. Add a new Patron to the list of those known.",
+    "title": "You\u2019ve made some business contacts.",
+    "effect": "Add a new Patron to the list of those known.",
     "ranges": {
      "weight": "60-63"
     }
    },
    {
-    "id": "recent-events-made-for-a-good-learning-opportunity-every-crew-member-receives-1-xp",
+    "id": "recent-events-made-for-a-good-learning-opportunity",
     "weight": 3,
-    "event": "Recent events made for a good learning opportunity. Every crew member receives +1 XP.",
+    "title": "Recent events made for a good learning opportunity.",
+    "effect": "Every crew member receives +1 XP.",
     "ranges": {
      "weight": "64-66"
     }
    },
    {
-    "id": "during-routine-maintenance-the-gravitational-adjuster-got-knocked-out-of-alignment-your-ship-suffers-1d6-points-of-hull-point-damage",
+    "id": "during-routine-maintenance-the-gravitational-adjuster-got-knocked-out-of-alignment",
     "weight": 4,
-    "event": "During routine maintenance, the gravitational adjuster got knocked out of alignment. Your ship suffers 1D6 points of Hull Point damage.",
+    "title": "During routine maintenance, the gravitational adjuster got knocked out of alignment.",
+    "effect": "Your ship suffers 1D6 points of Hull Point damage.",
     "ranges": {
      "weight": "67-70"
     }
    },
    {
-    "id": "the-crew-spends-a-night-drinking-watching-movies-and-playing-cards-1-story-point",
+    "id": "the-crew-spends-a-night-drinking-watching-movies-and-playing-cards",
     "weight": 4,
-    "event": "The crew spends a night drinking, watching movies, and playing cards. +1 story point.",
+    "title": "The crew spends a night drinking, watching movies, and playing cards.",
+    "effect": "+1 story point.",
     "ranges": {
      "weight": "71-74"
     }
    },
    {
-    "id": "you-meet-up-with-an-old-arms-dealer-contact-who-owes-you-a-deal-add-your-choice-of-3-weapons-from-the-following-list-hand-cannons-military-rifles-shotguns-or-machine-pistols",
+    "id": "you-meet-up-with-an-old-arms-dealer-contact-who-owes-you-a-deal",
     "weight": 4,
-    "event": "You meet up with an old arms dealer contact who owes you a deal. Add your choice of 3 weapons from the following list: Hand Cannons, Military Rifles, Shotguns, or Machine Pistols.",
+    "title": "You meet up with an old arms dealer contact who owes you a deal.",
+    "effect": "Add your choice of 3 weapons from the following list: Hand Cannons, Military Rifles, Shotguns, or Machine Pistols.",
     "ranges": {
      "weight": "75-78"
     }
    },
    {
-    "id": "you-renegotiate-some-old-debts-if-you-currently-owe-money-reduce-your-debt-by-1d6-1-credits-if-you-owe-nothing-earn-2-credits-for-being-prudent-with-your-money",
+    "id": "you-renegotiate-some-old-debts",
     "weight": 3,
-    "event": "You renegotiate some old debts. If you currently owe money, reduce your debt by 1D6+1 credits. If you owe nothing, earn 2 credits for being prudent with your money.",
+    "title": "You renegotiate some old debts.",
+    "effect": "If you currently owe money, reduce your debt by 1D6+1 credits. If you owe nothing, earn 2 credits for being prudent with your money.",
     "ranges": {
      "weight": "79-81"
     }
    },
    {
-    "id": "the-sector-news-networks-are-awash-with-rumors-of-war-while-you-remain-on-this-planet-any-roll-for-invasion-is-at-2",
+    "id": "the-sector-news-networks-are-awash-with-rumors-of-war",
     "weight": 3,
-    "event": "The sector news networks are awash with rumors of war. While you remain on this planet, any roll for Invasion is at +2.",
+    "title": "The sector news networks are awash with rumors of war.",
+    "effect": "While you remain on this planet, any roll for Invasion is at +2.",
     "ranges": {
      "weight": "82-84"
     }
    },
    {
-    "id": "a-bit-of-time-on-your-hands-the-crew-has-a-few-days-to-do-their-own-thing-select-two-crew-members-at-random-and-have-each-make-a-roll-on-the-exploration-table-p-80",
+    "id": "a-bit-of-time-on-your-hands",
     "weight": 4,
-    "event": "A bit of time on your hands The crew has a few days to do their own thing. Select two crew members at random and have each make a roll on the Exploration Table (p.80).",
+    "title": "A bit of time on your hands.",
+    "effect": "The crew has a few days to do their own thing. Select two crew members at random and have each make a roll on the Exploration Table (p.80).",
     "ranges": {
      "weight": "85-88"
     }
    },
    {
-    "id": "you-got-noticed-by-someone-youd-rather-avoid-add-a-rival-if-you-currently-are-on-a-quest-the-next-campaign-turn-is-automatically-a-battle-against-the-new-rival-and-they-will-add-1-to-the-number-of-enemies",
+    "id": "you-got-noticed-by-someone-youd-rather-avoid",
     "weight": 3,
-    "event": "You got noticed by someone you\u2019d rather avoid. Add a Rival. If you currently are on a Quest, the next campaign turn is automatically a battle against the new Rival, and they will add +1 to the number of enemies.",
+    "title": "You got noticed by someone you\u2019d rather avoid.",
+    "effect": "Add a Rival. If you currently are on a Quest, the next campaign turn is automatically a battle against the new Rival, and they will add +1 to the number of enemies.",
     "ranges": {
      "weight": "89-91"
     }
    },
    {
-    "id": "its-time-to-go-whatever-you-did-every-campaign-turn-you-stay-on-this-planet-you-must-add-an-additional-rival",
+    "id": "its-time-to-go",
     "weight": 3,
-    "event": "It\u2019s time to go! Whatever you did, every campaign turn you stay on this planet, you must add an additional Rival.",
+    "title": "It\u2019s time to go!",
+    "effect": "Whatever you did, every campaign turn you stay on this planet, you must add an additional Rival.",
     "ranges": {
      "weight": "92-94"
     }
    },
    {
-    "id": "unity-government-says-no-ships-are-authorized-to-leave-you-cannot-leave-the-planet-during-the-next-two-campaign-turns",
+    "id": "unity-government-says-no-ships-are-authorized-to-leave",
     "weight": 3,
-    "event": "Unity government says no ships are authorized to leave. You cannot leave the planet during the next two campaign turns.",
+    "title": "Unity government says no ships are authorized to leave.",
+    "effect": "You cannot leave the planet during the next two campaign turns.",
     "ranges": {
      "weight": "95-97"
     }
    },
    {
-    "id": "in-hindsight-itll-make-a-great-story-select-a-crew-member-who-was-a-casualty-last-battle-they-receive-1-luck-if-nobody-got-hurt-receive-1-story-point-instead",
+    "id": "in-hindsight-itll-make-a-great-story",
     "weight": 3,
-    "event": "In hindsight, it\u2019ll make a great story. Select a crew member who was a casualty last battle. They receive +1 Luck. If nobody got hurt, receive +1 story point instead.",
+    "title": "In hindsight, it\u2019ll make a great story.",
+    "effect": "Select a crew member who was a casualty last battle. They receive +1 Luck. If nobody got hurt, receive +1 story point instead.",
     "ranges": {
      "weight": "98-100"
     }
@@ -1051,250 +1114,281 @@ window.LP.data.tables = {
   ],
   "columns": [
    "weight",
-   "event"
+   "title",
+   "effect"
   ],
-  "labelColumn": "event",
+  "labelColumn": "title",
   "weightColumns": [
    "weight"
   ],
   "die": "D100",
   "rows": [
    {
-    "id": "all-this-endless-violence-is-depressing-you-the-character-refuses-to-participate-in-any-battle-during-the-next-campaign-turn-except-for-an-invasion-battle-get-1-story-point-as-they-get-a-new-perspective-on-life-kerin-are-unaffected-by-this",
+    "id": "all-this-endless-violence-is-depressing-you",
     "weight": 3,
-    "event": "All this endless violence is depressing you. The character refuses to participate in any battle during the next campaign turn (except for an Invasion battle). Get +1 story point, as they get a new perspective on life. K\u2019Erin are unaffected by this.",
+    "title": "All this endless violence is depressing you.",
+    "effect": "The character refuses to participate in any battle during the next campaign turn (except for an Invasion battle). Get +1 story point, as they get a new perspective on life. K\u2019Erin are unaffected by this.",
     "ranges": {
      "weight": "1-3"
     }
    },
    {
-    "id": "you-have-some-business-to-attend-to-elsewhere-the-character-is-unavailable-for-the-next-two-campaign-turns-they-require-no-upkeep-during-this-time-and-cannot-be-the-target-of-any-events-when-they-return-award-them-1d6-xp-and-roll-once-on-the-loot-table-if-the-character-is-swift-they-never-return-but-are-replaced-with-a-brand-new-swift-character-rolled-up-normally",
+    "id": "you-have-some-business-to-attend-to-elsewhere",
     "weight": 3,
-    "event": "You have some business to attend to elsewhere. The character is unavailable for the next two campaign turns. They require no Upkeep during this time, and cannot be the target of any events. When they return, award them 1D6 XP, and roll once on the Loot Table. If the character is Swift, they never return but are replaced with a brand new Swift character rolled up normally.",
+    "title": "You have some business to attend to elsewhere.",
+    "effect": "The character is unavailable for the next two campaign turns. They require no Upkeep during this time, and cannot be the target of any events. When they return, award them 1D6 XP, and roll once on the Loot Table. If the character is Swift, they never return but are replaced with a brand new Swift character rolled up normally.",
     "ranges": {
      "weight": "4-6"
     }
    },
    {
-    "id": "you-make-some-local-friends-the-character-earns-1-xp",
+    "id": "you-make-some-local-friends",
     "weight": 4,
-    "event": "You make some local friends. The character earns +1 XP.",
+    "title": "You make some local friends.",
+    "effect": "The character earns +1 XP.",
     "ranges": {
      "weight": "7-10"
     }
    },
    {
-    "id": "you-are-starting-to-wonder-if-it-is-time-to-move-on-if-the-character-is-currently-in-sick-bay-roll-1d6-if-the-roll-is-equal-or-below-the-number-of-campaign-turns-of-recovery-left-they-will-decide-to-leave-the-crew",
+    "id": "you-are-starting-to-wonder-if-it-is-time-to-move-on",
     "weight": 2,
-    "event": "You are starting to wonder if it is time to move on. If the character is currently in Sick Bay, roll 1D6. If the roll is equal or below the number of campaign turns of recovery left, they will decide to leave the crew.",
+    "title": "You are starting to wonder if it is time to move on.",
+    "effect": "If the character is currently in Sick Bay, roll 1D6. If the roll is equal or below the number of campaign turns of recovery left, they will decide to leave the crew.",
     "ranges": {
      "weight": "11-12"
     }
    },
    {
-    "id": "you-get-a-letter-from-home-the-character-earns-1-xp-roll-1d6-on-a-5-6-you-immediately-receive-a-quest",
+    "id": "you-get-a-letter-from-home",
     "weight": 3,
-    "event": "You get a letter from home. The character earns +1 XP. Roll 1D6. On a 5-6 you immediately receive a Quest.",
+    "title": "You get a letter from home.",
+    "effect": "The character earns +1 XP. Roll 1D6. On a 5-6 you immediately receive a Quest.",
     "ranges": {
      "weight": "13-15"
     }
    },
    {
-    "id": "you-argue-with-the-rest-of-the-crew-during-the-next-campaign-turn-the-crew-member-refuses-to-do-any-tasks-but-will-participate-in-battle-normally",
+    "id": "you-argue-with-the-rest-of-the-crew",
     "weight": 4,
-    "event": "You argue with the rest of the crew. During the next campaign turn, the crew member refuses to do any tasks but will participate in battle normally.",
+    "title": "You argue with the rest of the crew.",
+    "effect": "During the next campaign turn, the crew member refuses to do any tasks but will participate in battle normally.",
     "ranges": {
      "weight": "16-19"
     }
    },
    {
-    "id": "you-get-in-a-scrap-with-another-crew-member-randomly-select-another-crew-member-and-roll-1d6-combat-skill-for-each-the-lower-score-must-spend-one-campaign-turn-in-sick-bay-on-a-draw-both-go-to-sick-bay-if-a-kerin-is-in-the-crew-you-must-fight-them",
+    "id": "you-get-in-a-scrap-with-another-crew-member",
     "weight": 4,
-    "event": "You get in a scrap with another crew member. Randomly select another crew member and roll 1D6+Combat Skill for each. The lower score must spend one campaign turn in Sick Bay. On a draw, both go to Sick Bay. If a K\u2019Erin is in the crew, you must fight them.",
+    "title": "You get in a scrap with another crew member.",
+    "effect": "Randomly select another crew member and roll 1D6+Combat Skill for each. The lower score must spend one campaign turn in Sick Bay. On a draw, both go to Sick Bay. If a K\u2019Erin is in the crew, you must fight them.",
     "ranges": {
      "weight": "20-23"
     }
    },
    {
-    "id": "the-local-food-is-sitting-well-with-you-if-in-sick-bay-reduce-your-recovery-time-by-one-campaign-turn-if-not-earn-1-xp-engineers-receive-no-benefit-from-this",
+    "id": "the-local-food-is-sitting-well-with-you",
     "weight": 3,
-    "event": "The local food is sitting well with you. If in Sick Bay, reduce your recovery time by one campaign turn. If not, earn +1 XP. Engineers receive no benefit from this.",
+    "title": "The local food is sitting well with you.",
+    "effect": "If in Sick Bay, reduce your recovery time by one campaign turn. If not, earn +1 XP. Engineers receive no benefit from this.",
     "ranges": {
      "weight": "24-26"
     }
    },
    {
-    "id": "you-are-not-sure-you-are-really-the-same-person-any-longer-roll-on-the-motivation-table-p-26-chapter-and-change-to-that-motivation-you-do-not-receive-any-items-or-resources-but-if-the-new-motivation-would-have-any-ability-score-bonuses-earn-1-xp-for-each-1-ability-score-you-would-have-received-normally-if-you-roll-the-current-motivation-the-character-becomes-particularly-self-assured-earn-1-story-point",
+    "id": "you-are-not-sure-you-are-really-the-same-person-any-longer",
     "weight": 3,
-    "event": "You are not sure you are really the same person any longer. Roll on the Motivation Table (p.26) chapter and change to that motivation. You do not receive any items or resources, but if the new motivation would have any ability score bonuses, earn +1 XP for each +1 ability score you would have received normally. If you roll the current motivation, the character becomes particularly self-assured. Earn +1 story point.",
+    "title": "You are not sure you are really the same person any longer.",
+    "effect": "Roll on the Motivation Table (p.26) chapter and change to that motivation. You do not receive any items or resources, but if the new motivation would have any ability score bonuses, earn +1 XP for each +1 ability score you would have received normally. If you roll the current motivation, the character becomes particularly self-assured. Earn +1 story point.",
     "ranges": {
      "weight": "27-29"
     }
    },
    {
-    "id": "it-is-time-for-a-make-over-the-character-changes-their-clothes-hair-style-or-something-else-this-is-only-cosmetic-if-you-are-able-to-reflect-this-on-the-miniature",
+    "id": "it-is-time-for-a-make-over",
     "weight": 4,
-    "event": "It is time for a make-over! The character changes their clothes, hair-style, or something else. This is only cosmetic. If you are able to, reflect this on the miniature.",
+    "title": "It is time for a make-over!",
+    "effect": "The character changes their clothes, hair-style, or something else. This is only cosmetic. If you are able to, reflect this on the miniature.",
     "ranges": {
      "weight": "30-33"
     }
    },
    {
-    "id": "overhear-something-useful-earn-1-quest-rumor",
+    "id": "overhear-something-useful",
     "weight": 5,
-    "event": "Overhear something useful. Earn 1 Quest Rumor.",
+    "title": "Overhear something useful.",
+    "effect": "Earn 1 Quest Rumor.",
     "ranges": {
      "weight": "34-38"
     }
    },
    {
-    "id": "earn-a-little-on-the-side-receive-2-credits",
+    "id": "earn-a-little-on-the-side",
     "weight": 3,
-    "event": "Earn a little on the side. Receive +2 credits.",
+    "title": "Earn a little on the side.",
+    "effect": "Receive +2 credits.",
     "ranges": {
      "weight": "39-41"
     }
    },
    {
-    "id": "have-a-heart-to-heart-talk-with-a-crew-member-select-a-random-crew-member-both-earn-1-xp",
+    "id": "have-a-heart-to-heart-talk-with-a-crew-member",
     "weight": 4,
-    "event": "Have a heart to heart talk with a crew member. Select a random crew member. Both earn +1 XP.",
+    "title": "Have a heart to heart talk with a crew member.",
+    "effect": "Select a random crew member. Both earn +1 XP.",
     "ranges": {
      "weight": "42-45"
     }
    },
    {
-    "id": "time-spent-exercising-is-never-wasted-earn-2-xp",
+    "id": "time-spent-exercising-is-never-wasted",
     "weight": 3,
-    "event": "Time spent exercising is never wasted. Earn +2 XP.",
+    "title": "Time spent exercising is never wasted.",
+    "effect": "Earn +2 XP.",
     "ranges": {
      "weight": "46-48"
     }
    },
    {
-    "id": "you-pick-up-an-unusual-hobby-earn-1-story-point-and-the-character-talks-about-it-constantly-if-the-character-is-swift-or-precursor-they-also-earn-2-xp",
+    "id": "you-pick-up-an-unusual-hobby",
     "weight": 3,
-    "event": "You pick up an unusual hobby. Earn +1 story point and the character talks about it constantly. If the character is Swift or Precursor, they also earn +2 XP.",
+    "title": "You pick up an unusual hobby.",
+    "effect": "Earn +1 story point and the character talks about it constantly. If the character is Swift or Precursor, they also earn +2 XP.",
     "ranges": {
      "weight": "49-51"
     }
    },
    {
-    "id": "the-scars-tell-the-story-if-the-character-was-injured-in-any-way-last-or-this-campaign-turn-they-earn-2-xp",
+    "id": "the-scars-tell-the-story",
     "weight": 4,
-    "event": "The scars tell the story. If the character was injured in any way last or this campaign turn, they earn +2 XP.",
+    "title": "The scars tell the story.",
+    "effect": "If the character was injured in any way last or this campaign turn, they earn +2 XP.",
     "ranges": {
      "weight": "52-55"
     }
    },
    {
-    "id": "youve-had-time-to-reflect-on-your-adventures-earn-1d3-xp",
+    "id": "youve-had-time-to-reflect-on-your-adventures",
     "weight": 4,
-    "event": "You\u2019ve had time to reflect on your adventures. Earn +1D3 XP.",
+    "title": "You\u2019ve had time to reflect on your adventures.",
+    "effect": "Earn +1D3 XP.",
     "ranges": {
      "weight": "56-59"
     }
    },
    {
-    "id": "youve-made-a-real-personal-breakthrough-select-one-ability-score-that-has-not-been-increased-from-its-starting-value-when-the-character-entered-the-campaign-it-increases-by-1-immediately",
+    "id": "youve-made-a-real-personal-breakthrough",
     "weight": 3,
-    "event": "You\u2019ve made a real personal breakthrough. Select one ability score that has not been increased from its starting value when the character entered the campaign. It increases by +1 immediately.",
+    "title": "You\u2019ve made a real personal breakthrough.",
+    "effect": "Select one ability score that has not been increased from its starting value when the character entered the campaign. It increases by +1 immediately.",
     "ranges": {
      "weight": "60-62"
     }
    },
    {
-    "id": "you-get-hurt-while-working-on-the-ship-spend-one-campaign-turn-in-sick-bay-and-the-ship-takes-1-hull-point-damage",
+    "id": "you-get-hurt-while-working-on-the-ship",
     "weight": 4,
-    "event": "You get hurt while working on the ship. Spend one campaign turn in Sick Bay, and the ship takes 1 Hull Point damage.",
+    "title": "You get hurt while working on the ship.",
+    "effect": "Spend one campaign turn in Sick Bay, and the ship takes 1 Hull Point damage.",
     "ranges": {
      "weight": "63-66"
     }
    },
    {
-    "id": "you-have-finally-found-true-love-in-this-bleak-universe-if-the-characters-motivation-was-true-love-they-earn-1d6-xp-regardless-get-1-story-point-and-its-a-rather-nice-thought-isnt-it",
+    "id": "you-have-finally-found-true-love-in-this-bleak-universe",
     "weight": 2,
-    "event": "You have finally found true love in this bleak universe. If the characters motivation was True Love, they earn +1D6 XP. Regardless, get +1 story point. And it\u2019s a rather nice thought, isn\u2019t it?",
+    "title": "You have finally found true love in this bleak universe.",
+    "effect": "If the characters motivation was True Love, they earn +1D6 XP. Regardless, get +1 story point. And it\u2019s a rather nice thought, isn\u2019t it?",
     "ranges": {
      "weight": "67-68"
     }
    },
    {
-    "id": "a-personal-enemy-has-tracked-you-down-add-a-rival-if-this-character-leaves-your-crew-the-rival-also-leaves",
+    "id": "a-personal-enemy-has-tracked-you-down",
     "weight": 3,
-    "event": "A personal enemy has tracked you down. Add a Rival. If this character leaves your crew, the Rival also leaves.",
+    "title": "A personal enemy has tracked you down.",
+    "effect": "Add a Rival. If this character leaves your crew, the Rival also leaves.",
     "ranges": {
      "weight": "69-71"
     }
    },
    {
-    "id": "someone-has-sent-you-a-gift-roll-once-on-the-loot-table-p-131",
+    "id": "someone-has-sent-you-a-gift",
     "weight": 4,
-    "event": "Someone has sent you a gift. Roll once on the Loot Table (p.131).",
+    "title": "Someone has sent you a gift.",
+    "effect": "Roll once on the Loot Table (p.131).",
     "ranges": {
      "weight": "72-75"
     }
    },
    {
-    "id": "you-feel-great-eating-well-must-be-paying-off-put-a-note-on-your-record-sheet-next-time-this-character-would-be-forced-to-roll-on-the-injury-table-the-roll-is-ignored-engineers-cannot-benefit-from-this-event",
+    "id": "you-feel-great",
     "weight": 3,
-    "event": "You feel great. Eating well must be paying off. Put a note on your record sheet: Next time this character would be forced to roll on the Injury Table, the roll is ignored. Engineers cannot benefit from this event.",
+    "title": "You feel great.",
+    "effect": "Eating well must be paying off. Put a note on your record sheet: Next time this character would be forced to roll on the Injury Table, the roll is ignored. Engineers cannot benefit from this event.",
     "ranges": {
      "weight": "76-78"
     }
    },
    {
-    "id": "you-know-someone-who-knows-someone-add-a-patron",
+    "id": "you-know-someone-who-knows-someone",
     "weight": 4,
-    "event": "You know someone who knows someone. Add a Patron.",
+    "title": "You know someone who knows someone.",
+    "effect": "Add a Patron.",
     "ranges": {
      "weight": "79-82"
     }
    },
    {
-    "id": "maybe-you-are-leading-a-charmed-existence-add-1-luck",
+    "id": "maybe-you-are-leading-a-charmed-existence",
     "weight": 2,
-    "event": "Maybe you are leading a charmed existence? Add +1 Luck.",
+    "title": "Maybe you are leading a charmed existence?",
+    "effect": "Add +1 Luck.",
     "ranges": {
      "weight": "83-84"
     }
    },
    {
-    "id": "youve-put-in-a-lot-of-hard-work-around-here-either-repair-2-hull-point-damage-or-repair-one-damaged-item-in-the-inventory-engineers-may-do-both",
+    "id": "youve-put-in-a-lot-of-hard-work-around-here",
     "weight": 3,
-    "event": "You\u2019ve put in a lot of hard work around here. Either repair 2 Hull Point damage or Repair one damaged item in the inventory. Engineers may do both.",
+    "title": "You\u2019ve put in a lot of hard work around here.",
+    "effect": "Either repair 2 Hull Point damage or Repair one damaged item in the inventory. Engineers may do both.",
     "ranges": {
      "weight": "85-87"
     }
    },
    {
-    "id": "they-dont-make-them-like-they-used-to-a-random-item-carried-by-the-character-is-damaged-and-must-be-repaired-before-it-can-be-used-again-engineers-are-not-affected-by-this-event",
+    "id": "they-dont-make-them-like-they-used-to",
     "weight": 4,
-    "event": "They don\u2019t make them like they used to. A random item carried by the character is damaged, and must be Repaired before it can be used again. Engineers are not affected by this event.",
+    "title": "They don\u2019t make them like they used to.",
+    "effect": "A random item carried by the character is damaged, and must be Repaired before it can be used again. Engineers are not affected by this event.",
     "ranges": {
      "weight": "88-91"
     }
    },
    {
-    "id": "where-did-it-go-a-random-item-carried-by-the-character-has-been-lost-when-rolling-for-a-character-event-next-campaign-turn-roll-1d6-savvy-as-well-on-a-5-the-item-turns-up-again-otherwise-it-is-lost-for-good",
+    "id": "where-did-it-go",
     "weight": 3,
-    "event": "Where did it go? A random item carried by the character has been lost. When rolling for a Character Event next campaign turn, roll 1D6+Savvy as well. On a 5+, the item turns up again, otherwise it is lost for good.",
+    "title": "Where did it go?",
+    "effect": "A random item carried by the character has been lost. When rolling for a Character Event next campaign turn, roll 1D6+Savvy as well. On a 5+, the item turns up again, otherwise it is lost for good.",
     "ranges": {
      "weight": "92-94"
     }
    },
    {
-    "id": "a-deep-feeling-of-melancholy-and-despair-is-afflicting-you-the-character-will-earn-no-xp-next-campaign-turn-kerin-are-not-affected-by-this-event",
+    "id": "a-deep-feeling-of-melancholy-and-despair-is-afflicting-you",
     "weight": 3,
-    "event": "A deep feeling of melancholy and despair is afflicting you. The character will earn no XP next campaign turn. K\u2019Erin are not affected by this event.",
+    "title": "A deep feeling of melancholy and despair is afflicting you.",
+    "effect": "The character will earn no XP next campaign turn. K\u2019Erin are not affected by this event.",
     "ranges": {
      "weight": "95-97"
     }
    },
    {
-    "id": "youve-had-a-lot-of-time-to-burn-next-campaign-turn-the-character-may-perform-an-additional-action-even-if-they-are-in-sick-bay",
+    "id": "youve-had-a-lot-of-time-to-burn",
     "weight": 3,
-    "event": "You\u2019ve had a lot of time to burn. Next campaign turn, the character may perform an additional action, even if they are in Sick Bay.",
+    "title": "You\u2019ve had a lot of time to burn.",
+    "effect": "Next campaign turn, the character may perform an additional action, even if they are in Sick Bay.",
     "ranges": {
      "weight": "98-100"
     }
@@ -2234,9 +2328,10 @@ window.LP.data.tables = {
    "weight_opportunity_patron",
    "weight_rival",
    "weight_quest",
-   "deployment_condition"
+   "title",
+   "effect"
   ],
-  "labelColumn": "deployment_condition",
+  "labelColumn": "title",
   "weightColumns": [
    "weight_opportunity_patron",
    "weight_rival",
@@ -2249,7 +2344,8 @@ window.LP.data.tables = {
     "weight_opportunity_patron": 40,
     "weight_rival": 10,
     "weight_quest": 5,
-    "deployment_condition": "No Condition",
+    "title": "No Condition",
+    "effect": "",
     "ranges": {
      "weight_opportunity_patron": "1-40",
      "weight_rival": "1-10",
@@ -2257,11 +2353,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "small-encounter-a-random-crew-member-must-sit-out-this-fight-reduce-enemy-numbers-by-1-2-if-they-initially-outnumber-you",
+    "id": "small-encounter",
     "weight_opportunity_patron": 5,
     "weight_rival": 5,
     "weight_quest": 5,
-    "deployment_condition": "Small encounter: A random crew member must sit out this fight. Reduce enemy numbers by -1 (-2 if they initially outnumber you)",
+    "title": "Small encounter",
+    "effect": "A random crew member must sit out this fight. Reduce enemy numbers by -1 (-2 if they initially outnumber you)",
     "ranges": {
      "weight_opportunity_patron": "41-45",
      "weight_rival": "11-15",
@@ -2269,11 +2366,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "poor-visibility-maximum-visibility-is-1d6-8-reroll-at-the-start-of-each-round",
+    "id": "poor-visibility",
     "weight_opportunity_patron": 5,
     "weight_rival": 5,
     "weight_quest": 15,
-    "deployment_condition": "Poor visibility: Maximum visibility is 1D6+8\u201d. Reroll at the start of each round.",
+    "title": "Poor visibility",
+    "effect": "Maximum visibility is 1D6+8\u201d. Reroll at the start of each round.",
     "ranges": {
      "weight_opportunity_patron": "46-50",
      "weight_rival": "16-20",
@@ -2281,11 +2379,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "brief-engagement-at-the-end-of-each-round-roll-2d6-if-the-roll-is-equal-or-below-the-round-number-the-game-ends-inconclusively",
+    "id": "brief-engagement",
     "weight_opportunity_patron": 5,
     "weight_rival": 5,
     "weight_quest": 5,
-    "deployment_condition": "Brief engagement: At the end of each round, roll 2D6. If the roll is equal or below the round number, the game ends inconclusively.",
+    "title": "Brief engagement",
+    "effect": "At the end of each round, roll 2D6. If the roll is equal or below the round number, the game ends inconclusively.",
     "ranges": {
      "weight_opportunity_patron": "51-55",
      "weight_rival": "21-25",
@@ -2293,11 +2392,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "toxic-environment-whenever-a-combatant-is-stunned-roll-1d6-savvy-skill-0-for-enemies-failure-to-roll-a-4-becomes-a-casualty",
+    "id": "toxic-environment",
     "weight_opportunity_patron": 5,
     "weight_rival": 5,
     "weight_quest": 10,
-    "deployment_condition": "Toxic environment: Whenever a combatant is Stunned, roll 1D6+Savvy skill (0 for enemies). Failure to roll a 4+ becomes a casualty.",
+    "title": "Toxic environment",
+    "effect": "Whenever a combatant is Stunned, roll 1D6+Savvy skill (0 for enemies). Failure to roll a 4+ becomes a casualty.",
     "ranges": {
      "weight_opportunity_patron": "56-60",
      "weight_rival": "26-30",
@@ -2305,11 +2405,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "surprise-encounter-the-enemy-cant-act-in-the-first-round",
+    "id": "surprise-encounter",
     "weight_opportunity_patron": 5,
     "weight_rival": 15,
     "weight_quest": 10,
-    "deployment_condition": "Surprise encounter: The enemy can\u2019t act in the first round.",
+    "title": "Surprise encounter",
+    "effect": "The enemy can\u2019t act in the first round.",
     "ranges": {
      "weight_opportunity_patron": "61-65",
      "weight_rival": "31-45",
@@ -2317,11 +2418,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "delayed-2-random-crew-members-wont-start-on-the-table-at-the-end-of-each-round-roll-1d6-if-the-roll-is-equal-or-below-the-round-number-they-may-be-placed-at-any-point-of-your-own-battlefield-edge",
+    "id": "delayed",
     "weight_opportunity_patron": 10,
     "weight_rival": 5,
     "weight_quest": 10,
-    "deployment_condition": "Delayed: 2 random crew members won\u2019t start on the table. At the end of each round, roll 1D6: If the roll is equal or below the round number, they may be placed at any point of your own battlefield edge.",
+    "title": "Delayed",
+    "effect": "2 random crew members won\u2019t start on the table. At the end of each round, roll 1D6: If the roll is equal or below the round number, they may be placed at any point of your own battlefield edge.",
     "ranges": {
      "weight_opportunity_patron": "66-75",
      "weight_rival": "46-50",
@@ -2329,11 +2431,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "slippery-ground-all-movement-at-ground-level-is-1-speed",
+    "id": "slippery-ground",
     "weight_opportunity_patron": 5,
     "weight_rival": 10,
     "weight_quest": 5,
-    "deployment_condition": "Slippery ground: All movement at ground level is -1 Speed.",
+    "title": "Slippery ground",
+    "effect": "All movement at ground level is -1 Speed.",
     "ranges": {
      "weight_opportunity_patron": "76-80",
      "weight_rival": "51-60",
@@ -2341,11 +2444,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "bitter-struggle-enemy-morale-is-1",
+    "id": "bitter-struggle",
     "weight_opportunity_patron": 5,
     "weight_rival": 15,
     "weight_quest": 15,
-    "deployment_condition": "Bitter struggle: Enemy Morale is +1.",
+    "title": "Bitter struggle",
+    "effect": "Enemy Morale is +1.",
     "ranges": {
      "weight_opportunity_patron": "81-85",
      "weight_rival": "61-75",
@@ -2353,11 +2457,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "caught-off-guard-your-squad-all-act-in-the-slow-actions-phase-in-round-1",
+    "id": "caught-off-guard",
     "weight_opportunity_patron": 5,
     "weight_rival": 15,
     "weight_quest": 10,
-    "deployment_condition": "Caught off guard: Your squad all act in the Slow Actions phase in Round 1.",
+    "title": "Caught off guard",
+    "effect": "Your squad all act in the Slow Actions phase in Round 1.",
     "ranges": {
      "weight_opportunity_patron": "86-90",
      "weight_rival": "76-90",
@@ -2365,11 +2470,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "gloomy-maximum-visibility-is-9-characters-that-fire-can-be-fired-upon-at-any-range-however",
+    "id": "gloomy",
     "weight_opportunity_patron": 10,
     "weight_rival": 10,
     "weight_quest": 10,
-    "deployment_condition": "Gloomy: Maximum visibility is 9\u201d. Characters that fire can be fired upon at any range, however.",
+    "title": "Gloomy",
+    "effect": "Maximum visibility is 9\u201d. Characters that fire can be fired upon at any range, however.",
     "ranges": {
      "weight_opportunity_patron": "91-100",
      "weight_rival": "91-100",
@@ -3897,7 +4003,7 @@ window.LP.data.tables = {
    {
     "id": "roid-gangers",
     "weight": 5,
-    "enemy": "Roid- gangers",
+    "enemy": "Roid-gangers",
     "numbers": "+1",
     "panic": "1",
     "speed": "4\u201d",
@@ -5188,9 +5294,10 @@ window.LP.data.tables = {
    "weight_opportunity_patron",
    "weight_rival",
    "weight_quest",
-   "notable_sight"
+   "title",
+   "effect"
   ],
-  "labelColumn": "notable_sight",
+  "labelColumn": "title",
   "weightColumns": [
    "weight_opportunity_patron",
    "weight_rival",
@@ -5203,7 +5310,8 @@ window.LP.data.tables = {
     "weight_opportunity_patron": 20,
     "weight_rival": 40,
     "weight_quest": 10,
-    "notable_sight": "Nothing special",
+    "title": "Nothing special",
+    "effect": "",
     "ranges": {
      "weight_opportunity_patron": "1-20",
      "weight_rival": "1-40",
@@ -5211,11 +5319,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "documentation-gain-a-quest-rumor",
+    "id": "documentation",
     "weight_opportunity_patron": 10,
     "weight_rival": 10,
     "weight_quest": 15,
-    "notable_sight": "Documentation: Gain a Quest Rumor.",
+    "title": "Documentation",
+    "effect": "Gain a Quest Rumor.",
     "ranges": {
      "weight_opportunity_patron": "21-30",
      "weight_rival": "41-50",
@@ -5223,11 +5332,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "priority-target-select-a-random-enemy-figure-add-1-to-their-toughness-if-they-are-slain-gain-1d3-credits",
+    "id": "priority-target",
     "weight_opportunity_patron": 10,
     "weight_rival": 10,
     "weight_quest": 10,
-    "notable_sight": "Priority target: Select a random enemy figure. Add +1 to their Toughness. If they are slain, gain 1D3 credits.",
+    "title": "Priority target",
+    "effect": "Select a random enemy figure. Add +1 to their Toughness. If they are slain, gain 1D3 credits.",
     "ranges": {
      "weight_opportunity_patron": "31-40",
      "weight_rival": "51-60",
@@ -5235,11 +5345,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "loot-cache-roll-once-on-the-loot-table-p-131",
+    "id": "loot-cache",
     "weight_opportunity_patron": 10,
     "weight_rival": 10,
     "weight_quest": 15,
-    "notable_sight": "Loot cache: Roll once on the Loot Table (p.131).",
+    "title": "Loot cache",
+    "effect": "Roll once on the Loot Table (p.131).",
     "ranges": {
      "weight_opportunity_patron": "41-50",
      "weight_rival": "61-70",
@@ -5247,11 +5358,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "shiny-bits-gain-1-credit",
+    "id": "shiny-bits",
     "weight_opportunity_patron": 10,
     "weight_rival": 5,
     "weight_quest": 5,
-    "notable_sight": "Shiny bits: Gain 1 credit.",
+    "title": "Shiny bits",
+    "effect": "Gain 1 credit.",
     "ranges": {
      "weight_opportunity_patron": "51-60",
      "weight_rival": "71-75",
@@ -5259,11 +5371,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "really-shiny-bits-gain-2-credits",
+    "id": "really-shiny-bits",
     "weight_opportunity_patron": 10,
     "weight_rival": 5,
     "weight_quest": 10,
-    "notable_sight": "Really shiny bits: Gain 2 credits.",
+    "title": "Really shiny bits",
+    "effect": "Gain 2 credits.",
     "ranges": {
      "weight_opportunity_patron": "61-70",
      "weight_rival": "76-80",
@@ -5271,11 +5384,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "person-of-interest-gain-1-story-point",
+    "id": "person-of-interest",
     "weight_opportunity_patron": 10,
     "weight_rival": 10,
     "weight_quest": 15,
-    "notable_sight": "Person of interest: Gain +1 story point.",
+    "title": "Person of interest",
+    "effect": "Gain +1 story point.",
     "ranges": {
      "weight_opportunity_patron": "71-80",
      "weight_rival": "81-90",
@@ -5283,11 +5397,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "peculiar-item-gain-2-xp",
+    "id": "peculiar-item",
     "weight_opportunity_patron": 10,
     "weight_rival": 5,
     "weight_quest": 10,
-    "notable_sight": "Peculiar item: Gain +2 XP.",
+    "title": "Peculiar item",
+    "effect": "Gain +2 XP.",
     "ranges": {
      "weight_opportunity_patron": "81-90",
      "weight_rival": "91-95",
@@ -5295,11 +5410,12 @@ window.LP.data.tables = {
     }
    },
    {
-    "id": "curious-item-roll-1d6-on-a-1-4-it-can-be-sold-for-1-credit-on-a-5-6-roll-on-the-loot-table-p-131",
+    "id": "curious-item",
     "weight_opportunity_patron": 10,
     "weight_rival": 5,
     "weight_quest": 10,
-    "notable_sight": "Curious item: Roll 1D6. On a 1-4, it can be sold for 1 credit. On a 5-6, roll on the Loot Table (p.131).",
+    "title": "Curious item",
+    "effect": "Roll 1D6. On a 1-4, it can be sold for 1 credit. On a 5-6, roll on the Loot Table (p.131).",
     "ranges": {
      "weight_opportunity_patron": "91-100",
      "weight_rival": "96-100",
@@ -5915,90 +6031,101 @@ window.LP.data.tables = {
   ],
   "columns": [
    "weight",
-   "rewards"
+   "reward",
+   "effect"
   ],
-  "labelColumn": "rewards",
+  "labelColumn": "reward",
   "weightColumns": [
    "weight"
   ],
   "die": "D100",
   "rows": [
    {
-    "id": "documents-1-rumor",
+    "id": "documents",
     "weight": 10,
-    "rewards": "Documents 1 Rumor",
+    "reward": "Documents",
+    "effect": "1 Rumor",
     "ranges": {
      "weight": "1-10"
     }
    },
    {
-    "id": "data-files-2-rumors",
+    "id": "data-files",
     "weight": 10,
-    "rewards": "Data Files 2 Rumors",
+    "reward": "Data Files",
+    "effect": "2 Rumors",
     "ranges": {
      "weight": "11-20"
     }
    },
    {
-    "id": "scrap-3-credits",
+    "id": "scrap",
     "weight": 5,
-    "rewards": "Scrap 3 credits",
+    "reward": "Scrap",
+    "effect": "3 credits",
     "ranges": {
      "weight": "21-25"
     }
    },
    {
-    "id": "cargo-crate-1d6-credits",
+    "id": "cargo-crate",
     "weight": 15,
-    "rewards": "Cargo Crate 1D6 credits",
+    "reward": "Cargo Crate",
+    "effect": "1D6 credits",
     "ranges": {
      "weight": "26-40"
     }
    },
    {
-    "id": "valuable-materials-1d6-2-credits",
+    "id": "valuable-materials",
     "weight": 15,
-    "rewards": "Valuable Materials 1D6+2 credits",
+    "reward": "Valuable Materials",
+    "effect": "1D6+2 credits",
     "ranges": {
      "weight": "41-55"
     }
    },
    {
-    "id": "rare-substance-roll-2d6-receive-credits-equal-to-highest-roll",
+    "id": "rare-substance",
     "weight": 15,
-    "rewards": "Rare Substance Roll 2D6. Receive credits equal to highest roll.",
+    "reward": "Rare Substance",
+    "effect": "Roll 2D6. Receive credits equal to highest roll.",
     "ranges": {
      "weight": "56-70"
     }
    },
    {
-    "id": "ship-parts-discount-your-next-ship-component-purchase-by-1d6-credits-establish-value-now",
+    "id": "ship-parts",
     "weight": 15,
-    "rewards": "Ship Parts Discount your next ship component purchase by 1D6 credits. Establish value now.",
+    "reward": "Ship Parts",
+    "effect": "Discount your next ship component purchase by 1D6 credits. Establish value now.",
     "ranges": {
      "weight": "71-85"
     }
    },
    {
-    "id": "military-ship-part-discount-your-next-ship-component-purchase-by-1d6-2-credits-establish-the-value-now",
+    "id": "military-ship-part",
     "weight": 5,
-    "rewards": "Military Ship Part Discount your next ship component purchase by 1D6+2 credits. Establish the value now.",
+    "reward": "Military Ship Part",
+    "effect": "Discount your next ship component purchase by 1D6+2 credits. Establish the value now.",
     "ranges": {
      "weight": "86-90"
     }
    },
    {
-    "id": "mysterious-items-2-story-points",
+    "id": "mysterious-items",
     "weight": 5,
-    "rewards": "Mysterious Items 2 story points",
+    "reward": "Mysterious Items",
+    "effect": "2 story points",
     "ranges": {
      "weight": "91-95"
     }
    },
    {
-    "id": "personal-item-3-story-points",
+    "id": "personal-item",
     "weight": 5,
-    "rewards": "Personal Item 3 story points",
+    "reward": "Personal Item",
+    "effect": "3 story points",
     "ranges": {
      "weight": "96-100"
     }
@@ -6976,138 +7103,155 @@ window.LP.data.tables = {
   ],
   "columns": [
    "weight",
+   "title",
    "event"
   ],
-  "labelColumn": "event",
+  "labelColumn": "title",
   "weightColumns": [
    "weight"
   ],
   "die": "D100",
   "rows": [
    {
-    "id": "asteroids-rocky-debris-everywhere-maybe-from-a-recent-collision-if-you-wish-to-avoid-it-roll-1d6-requiring-a-5-to-chart-a-safe-path-if-successful-roll-again-on-this-table-to-go-through-the-field-select-a-crew-member-and-roll-1d6-savvy-three-times-requiring-a-4-to-succeed-each-time-each-failed-roll-inflicts-1d6-hull-point-damage-to-the-ship",
+    "id": "asteroids",
     "weight": 7,
-    "event": "Asteroids Rocky debris everywhere, maybe from a recent collision? If you wish to avoid it, roll 1D6, requiring a 5+ to chart a safe path. If successful, roll again on this table. To go through the field, select a crew member and roll 1D6+Savvy three times, requiring a 4+ to succeed each time. Each failed roll inflicts 1D6 Hull Point damage to the ship.",
+    "title": "Asteroids",
+    "event": "Rocky debris everywhere, maybe from a recent collision? If you wish to avoid it, roll 1D6, requiring a 5+ to chart a safe path. If successful, roll again on this table. To go through the field, select a crew member and roll 1D6+Savvy three times, requiring a 4+ to succeed each time. Each failed roll inflicts 1D6 Hull Point damage to the ship.",
     "ranges": {
      "weight": "1-7"
     }
    },
    {
-    "id": "navigation-trouble-is-this-place-even-on-the-star-maps-lose-1-story-point-as-you-drift-through-empty-space-then-roll-again-on-this-table-if-your-ship-is-currently-suffering-from-hull-point-damage-and-you-roll-this-event-a-random-crew-member-must-roll-on-the-injury-table-as-system-failures-cause-life-support-malfunctions-across-the-vessel",
+    "id": "navigation-trouble",
     "weight": 5,
-    "event": "Navigation trouble Is this place even on the star maps? Lose 1 story point as you drift through empty space, then roll again on this table. If your ship is currently suffering from Hull Point damage, and you roll this event, a random crew member must roll on the Injury Table, as system failures cause life support malfunctions across the vessel.",
+    "title": "Navigation trouble",
+    "event": "Is this place even on the star maps? Lose 1 story point as you drift through empty space, then roll again on this table. If your ship is currently suffering from Hull Point damage, and you roll this event, a random crew member must roll on the Injury Table, as system failures cause life support malfunctions across the vessel.",
     "ranges": {
      "weight": "8-12"
     }
    },
    {
-    "id": "raided-your-vessel-catches-the-eye-of-some-pirates-intimidation-might-work-select-a-crew-member-and-roll-1d6-savvy-a-6-is-required-to-avoid-conflict-otherwise-set-up-a-battle-in-cramped-territory-using-the-criminal-elements-encounter-table-p-94-enemy-numbers-are-determined-by-rolling-3d6-picking-the-highest-die-with-campaign-crew-size-5-roll-2d6-and-pick-highest-with-campaign-crew-size-4-roll-1d6-add-the-numbers-indicated-in-the-enemy-table-1-extra-figure-there-is-no-objective-if-you-drive-them-off-they-flee-back-to-their-ship-if-you-lose-you-lose-all-credits-and-everything-in-your-stash-though-you-can-keep-the-ship-if-you-win-you-get-the-normal-rewards-for-winning-an-opportunity-mission-see-p-120-plus-a-bonus-roll-on-the-loot-table-p-131-note-that-this-battle-is-an-out-of-sequence-encounter-and-does-not-count-as-the-main-battle-stage-for-the-campaign-turn",
+    "id": "raided",
     "weight": 5,
-    "event": "Raided Your vessel catches the eye of some pirates. Intimidation might work: Select a crew member and roll 1D6+Savvy. A 6+ is required to avoid conflict. Otherwise, set up a battle in cramped territory, using the Criminal Elements Encounter Table (p.94). Enemy numbers are determined by rolling 3D6, picking the highest die (with campaign crew size 5, roll 2D6 and pick highest; with campaign crew size 4, roll 1D6). Add the numbers indicated in the enemy table, +1 extra figure. There is no objective. If you drive them off, they flee back to their ship. If you lose, you lose all credits and everything in your Stash, though you can keep the ship. If you win, you get the normal rewards for winning an Opportunity mission (see p.120), plus a bonus roll on the Loot Table (p.131). Note that this battle is an \u2018out of sequence\u2019 encounter, and does not count as the main Battle stage for the campaign turn.",
+    "title": "Raided",
+    "event": "Your vessel catches the eye of some pirates. Intimidation might work: Select a crew member and roll 1D6+Savvy. A 6+ is required to avoid conflict. Otherwise, set up a battle in cramped territory, using the Criminal Elements Encounter Table (p.94). Enemy numbers are determined by rolling 3D6, picking the highest die (with campaign crew size 5, roll 2D6 and pick highest; with campaign crew size 4, roll 1D6). Add the numbers indicated in the enemy table, +1 extra figure. There is no objective. If you drive them off, they flee back to their ship. If you lose, you lose all credits and everything in your Stash, though you can keep the ship. If you win, you get the normal rewards for winning an Opportunity mission (see p.120), plus a bonus roll on the Loot Table (p.131). Note that this battle is an \u2018out of sequence\u2019 encounter, and does not count as the main Battle stage for the campaign turn.",
     "ranges": {
      "weight": "13-17"
     }
    },
    {
-    "id": "deep-space-wreckage-you-find-an-old-wreck-drifting-through-empty-space-scanning-it-you-get-2-rolls-on-the-gear-subtable-p-132-both-items-are-damaged-and-need-to-be-repaired",
+    "id": "deep-space-wreckage",
     "weight": 8,
-    "event": "Deep space wreckage You find an old wreck drifting through empty space. Scanning it, you get 2 rolls on the Gear Subtable (p.132). Both items are damaged and need to be Repaired.",
+    "title": "Deep space wreckage",
+    "event": "You find an old wreck drifting through empty space. Scanning it, you get 2 rolls on the Gear Subtable (p.132). Both items are damaged and need to be Repaired.",
     "ranges": {
      "weight": "18-25"
     }
    },
    {
-    "id": "drive-trouble-its-not-supposed-to-make-that-sound-select-3-crew-members-and-have-each-roll-1d6-savvy-a-6-is-required-for-success-for-each-failure-you-are-grounded-on-the-next-world-for-one-campaign-turn-while-the-drive-is-reset-taking-off-before-the-drive-is-reset-inflicts-2d6-hull-point-damage-to-the-ship",
+    "id": "drive-trouble",
     "weight": 4,
-    "event": "Drive trouble It\u2019s not supposed to make that sound. Select 3 crew members and have each roll 1D6+Savvy. A 6+ is required for success. For each failure, you are grounded on the next world for one campaign turn while the drive is reset. Taking off before the drive is reset inflicts 2D6 Hull Point damage to the ship.",
+    "title": "Drive trouble",
+    "event": "It\u2019s not supposed to make that sound. Select 3 crew members and have each roll 1D6+Savvy. A 6+ is required for success. For each failure, you are grounded on the next world for one campaign turn while the drive is reset. Taking off before the drive is reset inflicts 2D6 Hull Point damage to the ship.",
     "ranges": {
      "weight": "26-29"
     }
    },
    {
-    "id": "down-time-its-a-long-time-to-just-sit-here-select-a-crew-member-of-choice-and-add-1-xp-the-crew-has-time-to-do-maintenance-tasks-and-can-repair-1-damaged-item-with-no-roll-required",
+    "id": "down-time",
     "weight": 9,
-    "event": "Down-time It\u2019s a long time to just sit here. Select a crew member of choice and add +1 XP. The crew has time to do maintenance tasks, and can Repair 1 damaged item with no roll required.",
+    "title": "Down-time",
+    "event": "It\u2019s a long time to just sit here. Select a crew member of choice and add +1 XP. The crew has time to do maintenance tasks, and can Repair 1 damaged item with no roll required.",
     "ranges": {
      "weight": "30-38"
     }
    },
    {
-    "id": "distress-call-this-is-licensed-trader-cyberwolf-if-you-come-to-their-aid-roll-1d6-1-the-ships-drive-must-have-detonated-moments-after-you-received-the-signal-your-ship-is-struck-by-a-wave-of-debris-as-you-approach-suffering-1d6-1-hull-point-damage-2-you-only-find-drifting-wreckage-3-4-you-can-rescue-a-crew-member-treat-this-as-the-escape-pod-event-5-6-you-arrive-in-time-to-help-save-the-ship-from-a-drive-malfunction-select-a-crew-member-and-roll-1d6-savvy-a-7-is-required-to-succeed-but-you-may-make-three-attempts-if-you-succeed-the-jubilant-crew-give-you-a-bunch-of-stuff-roll-three-times-on-the-gear-loot-table-if-you-fail-the-drive-detonates-and-your-ship-is-damaged-as-if-you-had-rolled-a-1-on-this-subtable",
+    "id": "distress-call",
     "weight": 6,
-    "event": "Distress call \u201cThis is Licensed Trader Cyberwolf\u201d. If you come to their aid, roll 1D6. 1: The ship\u2019s drive must have detonated moments after you received the signal. Your ship is struck by a wave of debris as you approach, suffering 1D6+1 Hull Point damage. 2: You only find drifting wreckage. 3-4: You can rescue a crew member. Treat this as the Escape Pod event. 5-6: You arrive in time to help save the ship from a drive malfunction. Select a crew member and roll 1D6+Savvy. A 7+ is required to succeed, but you may make three attempts. If you succeed, the jubilant crew give you a bunch of stuff. Roll three times on the gear loot table. If you fail, the drive detonates, and your ship is damaged as if you had rolled a 1 on this subtable.",
+    "title": "Distress call",
+    "event": "\u201cThis is Licensed Trader Cyberwolf\u201d. If you come to their aid, roll 1D6. 1: The ship\u2019s drive must have detonated moments after you received the signal. Your ship is struck by a wave of debris as you approach, suffering 1D6+1 Hull Point damage. 2: You only find drifting wreckage. 3-4: You can rescue a crew member. Treat this as the Escape Pod event. 5-6: You arrive in time to help save the ship from a drive malfunction. Select a crew member and roll 1D6+Savvy. A 7+ is required to succeed, but you may make three attempts. If you succeed, the jubilant crew give you a bunch of stuff. Roll three times on the gear loot table. If you fail, the drive detonates, and your ship is damaged as if you had rolled a 1 on this subtable.",
     "ranges": {
      "weight": "39-44"
     }
    },
    {
-    "id": "patrol-ship-a-unity-patrol-vessel-hails-you-roll-1d6-3-twice-each-die-that-scores-above-a-0-results-in-that-number-of-items-being-confiscated-as-contraband-you-can-give-them-any-items-carried-or-in-your-stash-due-to-the-military-presence-the-next-world-you-visit-cannot-be-invaded",
+    "id": "patrol-ship",
     "weight": 6,
-    "event": "Patrol ship A Unity patrol vessel hails you. Roll 1D6-3 twice. Each die that scores above a 0 results in that number of items being confiscated as contraband. You can give them any items carried or in your Stash. Due to the military presence, the next world you visit cannot be Invaded.",
+    "title": "Patrol ship",
+    "event": "A Unity patrol vessel hails you. Roll 1D6-3 twice. Each die that scores above a 0 results in that number of items being confiscated as contraband. You can give them any items carried or in your Stash. Due to the military presence, the next world you visit cannot be Invaded.",
     "ranges": {
      "weight": "45-50"
     }
    },
    {
-    "id": "cosmic-phenomenon-a-crew-member-sees-a-strange-manifestation-in-space-when-they-ask-around-nobody-else-saw-anything-and-the-ships-computers-confirm-nothing-was-there-the-crew-member-adds-1-luck-if-they-are-able-this-event-can-only-ever-happen-once-in-a-campaign-treat-as-nothing-happening-if-it-happens-again-if-you-have-a-precursor-in-the-crew-they-predict-its-a-good-omen-add-1-story-point-as-well",
+    "id": "cosmic-phenomenon",
     "weight": 3,
-    "event": "Cosmic phenomenon A crew member sees a strange manifestation in space. When they ask around, nobody else saw anything, and the ship\u2019s computers confirm nothing was there. The crew member adds +1 Luck (if they are able). This event can only ever happen once in a campaign. Treat as nothing happening, if it happens again. If you have a Precursor in the crew, they predict it\u2019s a good omen. Add +1 story point as well.",
+    "title": "Cosmic phenomenon",
+    "event": "A crew member sees a strange manifestation in space. When they ask around, nobody else saw anything, and the ship\u2019s computers confirm nothing was there. The crew member adds +1 Luck (if they are able). This event can only ever happen once in a campaign. Treat as nothing happening, if it happens again. If you have a Precursor in the crew, they predict it\u2019s a good omen. Add +1 story point as well.",
     "ranges": {
      "weight": "51-53"
     }
    },
    {
-    "id": "escape-pod-you-find-an-escape-pod-drifting-through-space-if-you-opt-to-rescue-them-roll-1d6-1-theyre-a-wanted-criminal-if-you-let-them-go-when-you-arrive-on-the-next-world-they-might-do-you-a-favor-later-the-next-time-you-make-a-new-rival-roll-4-on-1d6-to-immediately-remove-the-rivals-from-the-campaign-if-you-turn-them-in-claim-1d6-credits-but-get-a-rival-from-their-old-gang-2-3-they-reward-you-with-1d3-credits-and-a-roll-on-the-loot-table-when-you-arrive-on-the-nearest-world-4-they-have-nothing-to-pay-you-with-but-do-have-some-interesting-information-add-1-quest-rumor-and-1-story-point-5-they-are-willing-to-join-your-crew-roll-up-a-new-character-but-they-come-with-no-equipment-at-all-if-you-dont-want-to-hire-them-they-just-leave-at-the-next-world-6-as-entry-5-but-the-character-begins-play-with-10-xp-as-yet-unspent",
+    "id": "escape-pod",
     "weight": 7,
-    "event": "Escape pod You find an escape pod drifting through space. If you opt to rescue them, roll 1D6. 1: They\u2019re a wanted criminal. If you let them go when you arrive on the next world, they might do you a favor later. The next time you make a new Rival, roll 4+ on 1D6 to immediately remove the Rivals from the campaign. If you turn them in, claim 1D6 credits, but get a Rival from their old gang. 2-3: They reward you with 1D3 credits and a roll on the Loot Table when you arrive on the nearest world. 4: They have nothing to pay you with, but do have some interesting information. Add 1 Quest Rumor and 1 story point. 5: They are willing to join your crew. Roll up a new character, but they come with no equipment at all. If you don\u2019t want to hire them, they just leave at the next world. 6: As entry 5, but the character begins play with 10 XP as yet unspent.",
+    "title": "Escape pod",
+    "event": "You find an escape pod drifting through space. If you opt to rescue them, roll 1D6. 1: They\u2019re a wanted criminal. If you let them go when you arrive on the next world, they might do you a favor later. The next time you make a new Rival, roll 4+ on 1D6 to immediately remove the Rivals from the campaign. If you turn them in, claim 1D6 credits, but get a Rival from their old gang. 2-3: They reward you with 1D3 credits and a roll on the Loot Table when you arrive on the nearest world. 4: They have nothing to pay you with, but do have some interesting information. Add 1 Quest Rumor and 1 story point. 5: They are willing to join your crew. Roll up a new character, but they come with no equipment at all. If you don\u2019t want to hire them, they just leave at the next world. 6: As entry 5, but the character begins play with 10 XP as yet unspent.",
     "ranges": {
      "weight": "54-60"
     }
    },
    {
-    "id": "accident-a-crew-member-gets-injured-while-doing-a-routine-maintenance-task-they-must-rest-up-for-one-campaign-turn-to-recover-from-the-injury-and-one-item-they-carry-is-damaged",
+    "id": "accident",
     "weight": 6,
-    "event": "Accident A crew member gets Injured while doing a routine maintenance task. They must rest up for one campaign turn to recover from the Injury, and one item they carry is damaged.",
+    "title": "Accident",
+    "event": "A crew member gets Injured while doing a routine maintenance task. They must rest up for one campaign turn to recover from the Injury, and one item they carry is damaged.",
     "ranges": {
      "weight": "61-66"
     }
    },
    {
-    "id": "travel-time-local-conditions-force-you-to-jump-to-the-very-edge-of-the-system-and-approach-under-standard-drives-any-injured-crew-may-rest-for-one-campaign-turn",
+    "id": "travel-time",
     "weight": 9,
-    "event": "Travel-time Local conditions force you to jump to the very edge of the system and approach under standard drives. Any Injured crew may rest for one campaign turn.",
+    "title": "Travel-time",
+    "event": "Local conditions force you to jump to the very edge of the system and approach under standard drives. Any Injured crew may rest for one campaign turn.",
     "ranges": {
      "weight": "67-75"
     }
    },
    {
-    "id": "uneventful-trip-a-lot-of-time-playing-cards-and-cleaning-guns-you-can-repair-one-damaged-item",
+    "id": "uneventful-trip",
     "weight": 10,
-    "event": "Uneventful trip A lot of time playing cards and cleaning guns. You can Repair one damaged item.",
+    "title": "Uneventful trip",
+    "event": "A lot of time playing cards and cleaning guns. You can Repair one damaged item.",
     "ranges": {
      "weight": "76-85"
     }
    },
    {
-    "id": "time-to-reflect-how-is-the-story-unfolding-what-did-it-all-mean-add-1-story-point",
+    "id": "time-to-reflect",
     "weight": 6,
-    "event": "Time to reflect How is the story unfolding? What did it all mean? Add +1 story point.",
+    "title": "Time to reflect",
+    "event": "How is the story unfolding? What did it all mean? Add +1 story point.",
     "ranges": {
      "weight": "86-91"
     }
    },
    {
-    "id": "time-to-read-a-book-theres-time-to-sit-have-a-read-and-maybe-even-indulge-in-a-bit-of-education-roll-1d6-on-a-1-2-a-random-crew-member-earns-3-xp-on-a-3-4-a-random-crew-member-earns-2-xp-and-a-second-random-crew-member-earns-1-xp-on-a-5-6-three-random-crew-each-earn-1-xp",
+    "id": "time-to-read-a-book",
     "weight": 4,
-    "event": "Time to read a book There\u2019s time to sit, have a read, and maybe even indulge in a bit of education. Roll 1D6. On a 1-2, a random crew member earns +3 XP. On a 3-4, a random crew member earns +2 XP and a second random crew member earns +1 XP. On a 5-6, three random crew each earn +1 XP.",
+    "title": "Time to read a book",
+    "event": "There\u2019s time to sit, have a read, and maybe even indulge in a bit of education. Roll 1D6. On a 1-2, a random crew member earns +3 XP. On a 3-4, a random crew member earns +2 XP and a second random crew member earns +1 XP. On a 5-6, three random crew each earn +1 XP.",
     "ranges": {
      "weight": "92-95"
     }
    },
    {
-    "id": "locked-in-the-library-data-by-night-pouring-over-old-records-and-fragments-of-data-the-captain-has-unearthed-some-intriguing-information-about-the-sector-of-space-you-are-heading-into-you-can-roll-up-the-planetary-info-problems-conveniences-licensing-requirements-for-three-worlds-and-select-which-you-wish-to-visit-but-due-to-fuel-limitations-you-must-visit-one-of-the-three-generated-all-three-generated-worlds-remain-in-the-campaign-and-can-be-visited-later",
+    "id": "locked-in-the-library-data-by-night",
     "weight": 5,
-    "event": "Locked in the library data by night Pouring over old records and fragments of data, the captain has unearthed some intriguing information about the sector of space you are heading into. You can roll up the planetary info (problems, conveniences, licensing requirements) for three worlds and select which you wish to visit, but due to fuel limitations, you must visit one of the three generated. All three generated worlds remain in the campaign, and can be visited later.",
+    "title": "Locked in the library data by night",
+    "event": "Pouring over old records and fragments of data, the captain has unearthed some intriguing information about the sector of space you are heading into. You can roll up the planetary info (problems, conveniences, licensing requirements) for three worlds and select which you wish to visit, but due to fuel limitations, you must visit one of the three generated. All three generated worlds remain in the campaign, and can be visited later.",
     "ranges": {
      "weight": "96-100"
     }

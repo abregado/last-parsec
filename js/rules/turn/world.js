@@ -1,0 +1,545 @@
+(function (LP) {
+  'use strict';
+
+  /* Step 2: World (pp.76-85). */
+
+  const T = LP.turn;
+  const L = T.line;
+  const F = LP.followup;
+
+  function hasTrait(ctx, id) {
+    return (ctx.facts.worldTraits || ctx.memory.worldTraits || []).includes(id);
+  }
+
+  function plural(n, one, many) {
+    return n + ' ' + (n === 1 ? one : many);
+  }
+
+  function trapped(ctx) {
+    return ctx.facts.fleeFailed ? 'Trapped by the invasion: you can only Assign Equipment this turn.' : true;
+  }
+
+  function crewDefault(ctx) {
+    return ctx.memory.crewCount || ctx.settings.crewSize;
+  }
+
+  /** Env for follow-up runs. */
+  function env(ctx, extra) {
+    return Object.assign({
+      crewSize: ctx.settings.crewSize,
+      disabled: ctx.campaign && ctx.campaign.models ? ctx.campaign.models.disabled : {}
+    }, extra);
+  }
+
+  /** Shared resolve/choose for stages whose output is one follow-up run. */
+  function runOutput(headline, run, lines) {
+    return {
+      output: { headline: headline, lines: lines || [], fu: run },
+      pending: F.pendingChoice(run)
+    };
+  }
+
+  function chooseInRun(record, value) {
+    const run = JSON.parse(JSON.stringify(record.output.fu));
+    F.choose(run, value);
+    return { output: Object.assign({}, record.output, { fu: run }), pending: F.pendingChoice(run) };
+  }
+
+  /* ---------------------------------------------------------------------- */
+  /* 2.1 Upkeep and ship repairs                                            */
+  /* ---------------------------------------------------------------------- */
+
+  /** 1 credit for up to 6 crew, +1 per crew member past 6 (p.76). */
+  function upkeepCost(crew) {
+    if (crew <= 0) return 0;
+    return 1 + Math.max(0, crew - 6);
+  }
+
+  T.register({
+    id: 'upkeep',
+    step: 'world',
+    number: '2.1',
+    title: 'Upkeep and ship repairs',
+    page: 76,
+    applies: trapped,
+    fields(ctx) {
+      const hasShip = ctx.facts.hasShip !== undefined ? ctx.facts.hasShip : ctx.memory.hasShip !== false;
+      return [
+        { key: 'crewCount', type: 'number', label: 'Crew members', min: 1, max: 30, value: crewDefault(ctx) },
+        { key: 'sickBay', type: 'number', label: 'In Sick Bay (including Bots under repair)', min: 0, max: 30, value: 0, help: 'They don’t count for Upkeep and can’t take tasks.' },
+        { key: 'hasShip', type: 'yesno', label: 'Do you have a ship?', value: hasShip },
+        { key: 'debt', type: 'number', label: 'Ship debt (credits)', min: 0, max: 999, value: ctx.memory.debt || 0, showIf: (v) => v.hasShip },
+        { key: 'payment', type: 'number', label: 'Paying off the debt this turn (credits)', min: 0, max: 999, value: 0, showIf: (v) => v.hasShip && v.debt > 0 },
+        { key: 'hullDamage', type: 'number', label: 'Hull damage (points)', min: 0, max: 99, value: ctx.memory.hullDamage || 0, showIf: (v) => v.hasShip }
+      ];
+    },
+    validate(input) {
+      if (input.sickBay > input.crewCount) return 'More crew in Sick Bay than in the crew.';
+      if (input.payment > input.debt) return 'You can’t pay more than you owe.';
+      return null;
+    },
+    resolve(input, ctx) {
+      const lines = [];
+      const data = { seized: false, debt: input.hasShip ? input.debt || 0 : 0, hullDamage: input.hasShip ? input.hullDamage || 0 : 0 };
+
+      // Upkeep
+      const paying = input.crewCount - (input.sickBay || 0);
+      const highCost = hasTrait(ctx, 'high-cost');
+      const cost = upkeepCost(paying + (highCost ? 2 : 0));
+      lines.push(L.facts([
+        ['Upkeep', plural(cost, 'credit', 'credits')],
+        ['Counted crew', paying + (highCost ? ' (+2 for High cost)' : '')]
+      ]));
+      lines.push(L.text('For each credit you are short, one crew member refuses to do a task this turn. You may sell items for 1 credit of Upkeep each. Basic supplies (Trade) skip Upkeep once. You may also kick out a crew member now.', 'note'));
+
+      // Debt
+      if (input.hasShip && input.debt > 0) {
+        const remaining = input.debt - (input.payment || 0);
+        if (remaining <= 0) {
+          lines.push(L.text('Ship debt paid off!', 'good'));
+          data.debt = 0;
+        } else {
+          const interest = remaining >= 31 ? 2 : 1;
+          data.debt = remaining + interest;
+          lines.push(L.facts([
+            ['Ship debt', input.debt + (input.payment ? ' − ' + input.payment + ' paid' : '') + ' + ' + interest + ' interest = ' + data.debt + ' credits']
+          ]));
+          if (data.debt >= 75) {
+            const seize = L.roll('2D6', {
+              label: 'Debt of 75+: do they come for the ship? (seized on 2–6)',
+              target: 7,
+              successText: 'Not this time.',
+              failText: 'Your ship is seized and lost permanently.'
+            });
+            lines.push(seize);
+            data.seized = !seize.success;
+          }
+        }
+      }
+
+      // Hull
+      if (input.hasShip && !data.seized && input.hullDamage > 0) {
+        data.hullDamage = input.hullDamage - 1;
+        lines.push(L.text('1 Hull Point repaired for free: ' + plural(data.hullDamage, 'point', 'points') + ' of damage left. Each credit spent repairs 1 more point' +
+          (hasTrait(ctx, 'lacks-starship-facilities') ? ' (no more than 3 credits per turn on this world).' : '.')));
+      }
+
+      // Medical care
+      if (input.sickBay > 0) {
+        const price = hasTrait(ctx, 'medical-science') ? 3 : 4;
+        lines.push(L.text('Medical care: pay ' + price + ' credits to take 1 campaign turn off one character’s recovery, as often as you can afford. Everyone in Sick Bay now marks off one turn; those who finish can fight this turn but take no task.'));
+      }
+
+      return {
+        output: {
+          headline: data.seized ? 'Ship seized!' : 'Upkeep: ' + plural(cost, 'credit', 'credits'),
+          tone: data.seized ? 'bad' : undefined,
+          lines,
+          data
+        }
+      };
+    },
+    facts(input, output) {
+      return {
+        crewCount: input.crewCount,
+        available: input.crewCount - (input.sickBay || 0),
+        hasShip: input.hasShip && !output.data.seized
+      };
+    },
+    remember(input, output) {
+      return {
+        crewCount: input.crewCount,
+        hasShip: !!input.hasShip && !output.data.seized,
+        debt: output.data.seized ? 0 : output.data.debt,
+        hullDamage: output.data.seized ? 0 : output.data.hullDamage
+      };
+    }
+  });
+
+  /* ---------------------------------------------------------------------- */
+  /* 2.2 Crew tasks                                                         */
+  /* ---------------------------------------------------------------------- */
+
+  const TASKS = [
+    { key: 'patron', label: 'Find a Patron', hint: '1D6 + searchers + known Patrons' },
+    { key: 'train', label: 'Train', hint: '+1 XP each' },
+    { key: 'trade', label: 'Trade', hint: 'A Trade Table roll each' },
+    { key: 'recruit', label: 'Recruit', hint: 'Add new crew' },
+    { key: 'explore', label: 'Explore', hint: 'An Exploration Table roll each' },
+    { key: 'track', label: 'Track', hint: 'Find a Rival to fight' },
+    { key: 'repair', label: 'Repair your kit', hint: 'Fix damaged items' },
+    { key: 'decoy', label: 'Decoy', hint: 'Help avoid Rivals' }
+  ];
+
+  const RECRUIT_NOTE = 'Basic profile for their type, armed with a Handgun. No Background, Motivation or Class rolls.';
+
+  function tasksOf(input) {
+    return input.tasks || {};
+  }
+
+  T.register({
+    id: 'crew-tasks',
+    step: 'world',
+    number: '2.2',
+    title: 'Assign and resolve crew tasks',
+    page: 76,
+    applies: trapped,
+    fields(ctx) {
+      const available = ctx.facts.available !== undefined ? ctx.facts.available : crewDefault(ctx);
+      const n = (key) => (v) => v.tasks && v.tasks[key] > 0;
+      return [
+        {
+          key: 'tasks', type: 'tasks', label: 'How many crew on each task?', perTask: 2, total: available,
+          help: 'Up to two crew per task. Crew can also sit this turn out.' + (hasTrait(ctx, 'travel-restricted') ? ' Travel restricted: only one crew member may Explore.' : ''),
+          tasks: TASKS, value: {}
+        },
+        { key: 'patrons', type: 'number', label: 'Patrons you already know', min: 0, max: 20, value: ctx.memory.patrons || 0, showIf: n('patron'), help: 'Each adds +1 to the Patron search.' },
+        { key: 'patronCredits', type: 'number', label: 'Credits spent on the Patron search', min: 0, max: 50, value: 0, showIf: n('patron'), help: '+1 per credit.' },
+        { key: 'extraTrades', type: 'number', label: 'Extra Trade rolls bought (3 credits each)', min: 0, max: 10, value: 0, showIf: n('trade') },
+        { key: 'rivals', type: 'number', label: 'Rivals you have', min: 0, max: 30, value: ctx.memory.rivals || 0, showIf: (v) => n('track')(v) || n('explore')(v) },
+        { key: 'trackCredits', type: 'number', label: 'Credits spent on Tracking', min: 0, max: 50, value: 0, showIf: n('track'), help: '+1 per credit.' },
+        { key: 'repairCredits', type: 'number', label: 'Credits on spare parts, per Repair attempt', min: 0, max: 20, value: 0, showIf: n('repair'), help: '+1 per credit.' }
+      ];
+    },
+    validate(input, ctx) {
+      const t = tasksOf(input);
+      const available = ctx.facts.available !== undefined ? ctx.facts.available : crewDefault(ctx);
+      const used = TASKS.reduce((sum, task) => sum + (t[task.key] || 0), 0);
+      const over = TASKS.find((task) => (t[task.key] || 0) > 2);
+      if (over) return over.label + ': at most 2 crew per task.';
+      if (used > available) return 'Only ' + available + ' crew are available for tasks.';
+      if (hasTrait(ctx, 'travel-restricted') && (t.explore || 0) > 1) return 'Travel restricted: only one crew member may Explore on this world.';
+      return null;
+    },
+    resolve(input, ctx) {
+      const t = tasksOf(input);
+      const crewCount = ctx.facts.crewCount || crewDefault(ctx);
+      const rivals = input.rivals !== undefined ? input.rivals : (ctx.memory.rivals || 0);
+      const steps = [];
+
+      if (t.patron) {
+        steps.push({
+          group: 'Find a Patron (' + plural(t.patron, 'crew member', 'crew') + ')',
+          steps: [{
+            roll: '1D6', label: 'Patron search',
+            add: [
+              { label: 'searchers', value: t.patron },
+              { label: 'known Patrons', value: input.patrons || 0 },
+              { label: 'credits', value: input.patronCredits || 0 },
+              { label: 'Opportunities', value: hasTrait(ctx, 'opportunities') ? 1 : 0 },
+              { label: 'Corporate state', value: hasTrait(ctx, 'corporate-state') ? 2 : 0 }
+            ],
+            outcomes: [
+              { max: 4, text: 'No Patron found.', tone: 'bad' },
+              { min: 5, max: 5, text: 'A Patron offers you a job.', tone: 'good', gain: { patronOffers: 1 } },
+              { min: 6, text: 'Two Patrons offer jobs: you may take either.', tone: 'good', gain: { patronOffers: 2 } }
+            ]
+          }].concat(hasTrait(ctx, 'corporate-state') ? [{ text: 'Corporate state: Patrons here are always Corporations, and failing a mission blacklists you.', tone: 'note' }] : [])
+        });
+      }
+
+      if (t.train) {
+        steps.push({ group: 'Train', steps: [{ text: '+1 XP for each of the ' + plural(t.train, 'crew member', 'crew') + ' training. If that allows a Character Upgrade (p.123), resolve it now.' }] });
+      }
+
+      const trades = (t.trade || 0) + (t.trade ? input.extraTrades || 0 : 0);
+      for (let i = 1; i <= trades; i++) {
+        steps.push({ group: i <= t.trade ? 'Trader ' + i : 'Bought Trade roll ' + (i - t.trade), steps: [{ table: 'Trade Table' }] });
+      }
+      if (t.trade && hasTrait(ctx, 'free-trade-zone')) {
+        steps.push({ when: 'Free trade zone: one trader may roll twice and keep either result', steps: [{ table: 'Trade Table', label: 'Second roll' }] });
+      }
+      if (t.trade && hasTrait(ctx, 'busy-markets')) {
+        steps.push({ text: 'Busy markets: you may also pay 2 credits once for another Trade Table roll.', tone: 'note' });
+      }
+
+      if (t.recruit) {
+        const recruitSteps = [];
+        if (crewCount < 6) {
+          const auto = Math.min(t.recruit, 6 - crewCount);
+          recruitSteps.push({ text: 'Fewer than 6 crew: ' + plural(auto, 'recruit joins', 'recruits join') + ' automatically.' });
+          for (let i = 1; i <= auto; i++) recruitSteps.push({ group: 'Recruit ' + i, steps: [{ table: 'Crew Type Table' }] });
+        } else {
+          recruitSteps.push({
+            roll: '1D6', label: 'Recruiting', target: 6,
+            add: [
+              { label: 'recruiters', value: t.recruit },
+              { label: 'Easy recruiting', value: hasTrait(ctx, 'easy-recruiting') ? 1 : 0 }
+            ],
+            outcomes: [
+              { min: 6, text: 'A new recruit joins:', tone: 'good', then: [{ table: 'Crew Type Table' }] },
+              { max: 5, text: 'Nobody suitable this time. (A Luxury trinket would add +2.)' }
+            ]
+          });
+        }
+        recruitSteps.push({ text: RECRUIT_NOTE, tone: 'note' });
+        if (hasTrait(ctx, 'adventurous-population')) recruitSteps.push({ text: 'Adventurous population: roll up one extra character and choose who to hire.', tone: 'note' });
+        if (hasTrait(ctx, 'alien-species-restricted')) recruitSteps.push({ text: 'Alien species restricted: a recruit of the restricted species counts as a Baseline Human instead.', tone: 'note' });
+        steps.push({ group: 'Recruit', steps: recruitSteps });
+      }
+
+      for (let i = 1; i <= (t.explore || 0); i++) {
+        steps.push({ group: 'Explorer ' + i, steps: [{ table: 'Exploration Table' }] });
+      }
+
+      if (t.track) {
+        steps.push({
+          group: 'Track',
+          steps: rivals > 0
+            ? [{
+              roll: '1D6', label: 'Tracking', target: 6,
+              add: [{ label: 'trackers', value: t.track }, { label: 'credits', value: input.trackCredits || 0 }],
+              outcomes: [
+                { min: 6, text: 'You locate a Rival of your choice: you may fight them this turn.', tone: 'good', gain: { tracked: 1 } },
+                { max: 5, text: 'No trace of them.' }
+              ]
+            }]
+            : [{ text: 'You have no Rivals to track.' }]
+        });
+      }
+
+      for (let i = 1; i <= (t.repair || 0); i++) {
+        steps.push({
+          group: 'Repair ' + i,
+          steps: [{
+            roll: '1D6', label: 'Repair (1D6 + Savvy, needs 6+)', savvy: true, engineer: true, target: 6,
+            add: [
+              { label: 'spare parts', value: input.repairCredits || 0 },
+              { label: 'Technical knowledge', value: hasTrait(ctx, 'technical-knowledge') ? 1 : 0 }
+            ],
+            outcomes: [{ natural: 1, final: true, text: 'Natural 1: the item is beyond fixing.', tone: 'bad' }]
+          }]
+        });
+      }
+
+      if (t.decoy) {
+        steps.push({ group: 'Decoy', steps: [{ text: '+' + t.decoy + ' when checking whether your Rivals find you (stage 2.6).' }] });
+      }
+
+      if (!steps.length) steps.push({ text: 'Nobody took a task this turn.' });
+
+      const run = F.start(steps, env(ctx, { crewCount: crewCount, rivals: rivals }));
+      const busy = TASKS.filter((task) => t[task.key]).map((task) => task.label + ' ' + t[task.key]);
+      return runOutput(busy.length ? busy.join(' · ') : 'No tasks', run);
+    },
+    choose: chooseInRun,
+    facts(input, output, ctx) {
+      const gains = output.fu.gains || {};
+      const travel = ctx.facts.travelGains || {};
+      return {
+        decoys: tasksOf(input).decoy || 0,
+        tracked: (gains.tracked || 0) > 0,
+        patronOffers: gains.patronOffers || 0,
+        rumorsGained: (travel.rumors || 0) + (gains.rumors || 0),
+        rivalsGained: gains.rivals || 0
+      };
+    },
+    remember(input, output, ctx) {
+      const keep = {};
+      if (input.patrons !== undefined) keep.patrons = input.patrons;
+      const base = input.rivals !== undefined ? input.rivals : (ctx.memory.rivals || 0);
+      keep.rivals = base + ((output.fu.gains || {}).rivals || 0);
+      return keep;
+    }
+  });
+
+  /* ---------------------------------------------------------------------- */
+  /* 2.3 Job offers                                                         */
+  /* ---------------------------------------------------------------------- */
+
+  T.register({
+    id: 'job-offers',
+    step: 'world',
+    number: '2.3',
+    title: 'Determine job offers',
+    page: 83,
+    applies: trapped,
+    fields(ctx) {
+      return [{
+        key: 'offers', type: 'number', label: 'Job offers to generate', min: 0, max: 6,
+        value: ctx.facts.patronOffers || 0,
+        help: 'Pre-filled from this turn’s Patron search and Exploration. Add one if a Patron you know is offering a job.'
+      }];
+    },
+    resolve(input, ctx) {
+      if (!input.offers) {
+        return { output: { headline: 'No job offers', lines: [L.text('No Patron jobs this turn.')] } };
+      }
+      const steps = [];
+      for (let i = 1; i <= input.offers; i++) steps.push({ group: 'Job offer ' + i, steps: [{ table: 'Patron Table', label: 'Patron' }] });
+      steps.push({ text: 'Benefits are only paid if the mission succeeds. You may turn any job down after seeing the details.', tone: 'note' });
+      const run = F.start(steps, env(ctx, {}));
+      return runOutput(plural(input.offers, 'job offer', 'job offers'), run);
+    },
+    choose: chooseInRun,
+    facts(input) {
+      return { jobsOffered: input.offers || 0 };
+    }
+  });
+
+  /* ---------------------------------------------------------------------- */
+  /* 2.4 Assign equipment                                                   */
+  /* ---------------------------------------------------------------------- */
+
+  T.register({
+    id: 'assign-equipment',
+    step: 'world',
+    number: '2.4',
+    title: 'Assign equipment',
+    page: 85,
+    submitLabel: 'Done',
+    fields() {
+      return [{ key: 'note', type: 'info', text: 'Swap items between characters and the Stash now. What each character carries is what they take into battle. Without a ship, the Stash holds only 5 items (duplicate consumables count as one).' }];
+    },
+    resolve() {
+      return { output: { headline: 'Equipment assigned', lines: [] } };
+    }
+  });
+
+  /* ---------------------------------------------------------------------- */
+  /* 2.5 Resolve Rumors                                                     */
+  /* ---------------------------------------------------------------------- */
+
+  T.register({
+    id: 'rumors',
+    step: 'world',
+    number: '2.5',
+    title: 'Resolve any Rumors',
+    page: 85,
+    applies: trapped,
+    fields(ctx) {
+      return [
+        { key: 'onQuest', type: 'yesno', label: 'Are you on a Quest?', value: !!ctx.memory.onQuest },
+        {
+          key: 'rumors', type: 'number', label: 'Rumors you have', min: 0, max: 30,
+          value: (ctx.memory.rumors || 0) + (ctx.facts.rumorsGained || 0),
+          help: 'Includes ' + plural(ctx.facts.rumorsGained || 0, 'Rumor', 'Rumors') + ' gained this turn.',
+          showIf: (v) => !v.onQuest
+        }
+      ];
+    },
+    resolve(input) {
+      if (input.onQuest) {
+        return { output: { headline: 'On a Quest', lines: [L.text('While the Quest lasts, any Rumor you gain is a Quest Rumor instead (p.120).')], data: { quest: false } } };
+      }
+      if (!input.rumors) {
+        return { output: { headline: 'No Rumors', lines: [L.text('Nothing to follow up.')], data: { quest: false } } };
+      }
+      const roll = L.roll('1D6', { label: 'Rumors (a Quest on a roll of ' + input.rumors + ' or less)' });
+      const quest = roll.total <= input.rumors;
+      roll.success = quest;
+      roll.text = quest ? 'You have a Quest! Remove all Rumors; you may pursue it right away.' : 'The Rumors don’t lead anywhere yet.';
+      return {
+        output: { headline: quest ? 'New Quest!' : 'No Quest yet', tone: quest ? 'good' : undefined, lines: [roll], data: { quest } }
+      };
+    },
+    facts(input, output) {
+      return { onQuest: !!input.onQuest || !!output.data.quest };
+    },
+    remember(input, output, ctx) {
+      const quest = !!output.data.quest;
+      let rumors;
+      if (input.onQuest) rumors = ctx.memory.rumors || 0; // count not asked while on a Quest
+      else rumors = quest ? 0 : input.rumors || 0;
+      return { onQuest: !!input.onQuest || quest, rumors: rumors };
+    }
+  });
+
+  /* ---------------------------------------------------------------------- */
+  /* 2.6 Choose your battle                                                 */
+  /* ---------------------------------------------------------------------- */
+
+  const BATTLES = {
+    opportunity: 'Opportunity mission',
+    rival: 'Attack a Rival',
+    quest: 'Continue a Quest',
+    patron: 'Patron job'
+  };
+
+  T.register({
+    id: 'choose-battle',
+    step: 'world',
+    number: '2.6',
+    title: 'Choose your battle',
+    page: 85,
+    fields(ctx) {
+      if (ctx.facts.fleeFailed) {
+        return [{ key: 'note', type: 'info', text: 'You failed to flee the invasion: this turn’s battle is an Invasion Battle.' }];
+      }
+      return [
+        { key: 'rivals', type: 'number', label: 'Rivals you have', min: 0, max: 30, value: ctx.memory.rivals || 0 },
+        {
+          key: 'privateTransport', type: 'yesno', value: false,
+          label: 'Are you taking a Patron job with the Private Transport hazard?',
+          help: 'If so, Rivals can’t find you this turn.',
+          showIf: (v) => v.rivals > 0 && (ctx.facts.jobsOffered || 0) > 0
+        },
+        {
+          key: 'patronJob', type: 'yesno', value: (ctx.facts.jobsOffered || 0) > 0,
+          label: 'Do you have a Patron job you can take?'
+        }
+      ];
+    },
+    resolve(input, ctx) {
+      if (ctx.facts.fleeFailed) {
+        return {
+          output: {
+            headline: 'Invasion Battle', tone: 'bad',
+            lines: [L.text('Fight an Invasion Battle (p.92). If you survive, you escape and travel next turn.')],
+            data: { battle: 'invasion' }
+          }
+        };
+      }
+
+      const lines = [];
+      const rivals = input.rivals || 0;
+      const decoys = ctx.facts.decoys || 0;
+      if (rivals > 0 && input.privateTransport) {
+        lines.push(L.text('Private Transport: your Rivals can’t track you this turn.', 'good'));
+      } else if (rivals > 0) {
+        const check = L.roll('1D6', {
+          label: 'Do your Rivals find you? (found on ' + rivals + ' or less)',
+          modifiers: [{ label: 'Decoys', value: decoys }]
+        });
+        const found = check.total <= rivals;
+        check.success = !found;
+        check.text = found ? 'A Rival has tracked you down.' : 'You slip past your Rivals.';
+        lines.push(check);
+        if (found) {
+          const which = 1 + LP.rng.int(rivals);
+          lines.push(L.text('Rival ' + which + ' of ' + rivals + ' (in your list order) attacks. Patron jobs fail if their time runs out; Quests and Rumors wait.', 'bad'));
+          return { output: { headline: 'Rival attack!', tone: 'bad', lines, data: { battle: 'rival-attack' } } };
+        }
+      } else {
+        lines.push(L.text('No Rivals to worry about.'));
+      }
+
+      const options = [{ value: 'opportunity', label: BATTLES.opportunity }];
+      if (ctx.facts.tracked) options.push({ value: 'rival', label: BATTLES.rival });
+      if (ctx.facts.onQuest || ctx.memory.onQuest) options.push({ value: 'quest', label: BATTLES.quest });
+      if (input.patronJob) options.push({ value: 'patron', label: BATTLES.patron });
+      lines.push(L.text('If an Exploration result (Got yourself noticed) forces a Rival fight, take that instead.', 'note'));
+
+      if (options.length === 1) {
+        lines.push(L.text('Your only option is an Opportunity mission.'));
+        return { output: { headline: 'Battle: ' + BATTLES.opportunity, lines, data: { battle: 'opportunity' } } };
+      }
+      return {
+        output: { headline: 'Choose your battle', lines, data: { battle: null } },
+        pending: { prompt: 'Which battle will you fight?', options }
+      };
+    },
+    choose(record, value) {
+      const output = JSON.parse(JSON.stringify(record.output));
+      output.headline = 'Battle: ' + BATTLES[value];
+      output.data.battle = value;
+      return { output };
+    },
+    facts(input, output) {
+      return { battleType: output.data.battle };
+    },
+    remember(input) {
+      return input.rivals !== undefined ? { rivals: input.rivals } : {};
+    }
+  });
+})(window.LP);

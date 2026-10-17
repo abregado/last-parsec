@@ -5,48 +5,59 @@
   ],
   "columns": [
     "weight",
-    "rewards"
+    "reward",
+    "effect"
   ],
   "rows": [
     {
       "weight": 10,
-      "rewards": "Documents 1 Rumor"
+      "reward": "Documents",
+      "effect": "1 Rumor"
     },
     {
       "weight": 10,
-      "rewards": "Data Files 2 Rumors"
+      "reward": "Data Files",
+      "effect": "2 Rumors"
     },
     {
       "weight": 5,
-      "rewards": "Scrap 3 credits"
+      "reward": "Scrap",
+      "effect": "3 credits"
     },
     {
       "weight": 15,
-      "rewards": "Cargo Crate 1D6 credits"
+      "reward": "Cargo Crate",
+      "effect": "1D6 credits"
     },
     {
       "weight": 15,
-      "rewards": "Valuable Materials 1D6+2 credits"
+      "reward": "Valuable Materials",
+      "effect": "1D6+2 credits"
     },
     {
       "weight": 15,
-      "rewards": "Rare Substance Roll 2D6. Receive credits equal to highest roll."
+      "reward": "Rare Substance",
+      "effect": "Roll 2D6. Receive credits equal to highest roll."
     },
     {
       "weight": 15,
-      "rewards": "Ship Parts Discount your next ship component purchase by 1D6 credits. Establish value now."
+      "reward": "Ship Parts",
+      "effect": "Discount your next ship component purchase by 1D6 credits. Establish value now."
     },
     {
       "weight": 5,
-      "rewards": "Military Ship Part Discount your next ship component purchase by 1D6+2 credits. Establish the value now."
+      "reward": "Military Ship Part",
+      "effect": "Discount your next ship component purchase by 1D6+2 credits. Establish the value now."
     },
     {
       "weight": 5,
-      "rewards": "Mysterious Items 2 story points"
+      "reward": "Mysterious Items",
+      "effect": "2 story points"
     },
     {
       "weight": 5,
-      "rewards": "Personal Item 3 story points"
+      "reward": "Personal Item",
+      "effect": "3 story points"
     }
   ]
 }

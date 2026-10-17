@@ -157,7 +157,65 @@
     return rows.filter((row) => row[weightKey] > 0 && !skip(row)).length;
   }
 
+  /* ---------------------------------------------------------------------- */
+  /* Numbered table rolls                                                   */
+  /* ---------------------------------------------------------------------- */
+
+  const DIE_NOTATION = { D100: '1D100', D10: '1D10', D6: '1D6', '2D6': '2D6' };
+
+  /** "1-4" -> { min: 1, max: 4 }, "10" -> { min: 10, max: 10 }, null -> null. */
+  function parseRange(text) {
+    if (!text) return null;
+    const m = /^(\d+)(?:-(\d+))?$/.exec(String(text).trim());
+    if (!m) return null;
+    const min = parseInt(m[1], 10);
+    return { min: min, max: m[2] ? parseInt(m[2], 10) : min };
+  }
+
+  /**
+   * Roll the table's own die and look the result up by its printed ranges, so
+   * the output can show the number ("D100 -> 57").
+   *   weightKey  which range column to use (default 'weight')
+   *   modifier   added to the roll; totals past the ends count as the first/last row
+   *   exclude    as weightedPick; excluded results are rolled again
+   * Returns { row, natural, modifier, total, die } (natural/total null if the
+   * table has no printed ranges, in which case a weighted pick is used).
+   */
+  function rollOn(name, options) {
+    const opts = options || {};
+    const table = getTable(name);
+    const weightKey = opts.weightKey || 'weight';
+    const skip = toPredicate(opts.exclude);
+    const modifier = opts.modifier || 0;
+
+    const ranged = table.rows
+      .map((row) => ({ row, range: parseRange(row.ranges && row.ranges[weightKey]) }))
+      .filter((r) => r.range);
+
+    if (!table.die || !ranged.length) {
+      const row = weightedPick(table.rows, { weightKey, exclude: opts.exclude });
+      return { row, natural: null, modifier: 0, total: null, die: null };
+    }
+    if (!ranged.some((r) => !skip(r.row))) {
+      return { row: null, natural: null, modifier, total: null, die: table.die };
+    }
+
+    const low = Math.min(...ranged.map((r) => r.range.min));
+    const high = Math.max(...ranged.map((r) => r.range.max));
+    for (;;) {
+      const natural = roll(DIE_NOTATION[table.die]).total;
+      const total = natural + modifier;
+      const lookup = Math.max(low, Math.min(high, total));
+      const hit = ranged.find((r) => lookup >= r.range.min && lookup <= r.range.max);
+      if (hit && !skip(hit.row)) {
+        return { row: hit.row, natural, modifier, total, die: table.die };
+      }
+    }
+  }
+
   LP.rng = {
+    parseRange,
+    rollOn,
     setSource,
     seeded,
     int,

@@ -1,29 +1,29 @@
-weight,event
-3,"You’ve met a friendly doc who doesn’t ask too many questions. Select up to two crew members in Sick Bay and reduce their Recovery time by one campaign turn each. If they recover, they can act normally next campaign turn."
-5,"The life support system on the ship needs upgrading badly. Upgrading the life support system will cost 1D6 credits. The ship cannot be flown until this is paid. If your crew has an Engineer, modify the roll by -1."
-4,"A chance meeting turns into a new ally. Roll up a new character and add them to the crew, OR add +1 story point. You may decide after rolling up the new character."
-4,You’ve made friends among the locals. +1 story point.
-4,You managed to mouth off to the wrong people. Add a Rival.
-3,"An old nemesis has tracked you down. Select a prior Rival, or roll up a new one. They will follow you from planet to planet until resolved and receive +1 when rolling for the number of enemies in a battle."
-3,"A shady character offers you a deal. Give him any one item of equipment, then roll on the Trade Table (p.79)."
-4,You sell off some cargo you acquired on the last planet. Earn 1D6 credits.
-5,One of the crew overheard something interesting. Add 1 Rumor.
-3,"You’ve managed to settle some old “business”. If you have any, you may remove one Rival of your choice. If you have no Rivals, your captain earns +1 XP instead."
-3,"An admirer wants to come along. Gain a new crew member, if desired. They have only the base profile with no extra rolls, and bring no equipment. If your crew has any Feral members, the new member is also Feral."
-3,"An alien merchant offers you some strange device. If you want to buy it, pay 4 credits and then roll on the Loot Table."
-4,"Equipment malfunction. If there are any items in your Stash, a random item is damaged and must be Repaired."
-3,"You’ve earned a bit of a bad reputation. If you know any Patrons on the current world, randomly select one that will no longer work with you. If you have no Patrons, shrug and move on."
-5,The tax man is taking an interest in your business conduct. Roll 2D6 and pay the higher die in credits. If you have insufficient credits your ship is impounded until you can pay.
-3,"The crew has decided it’s time for a new person to be in charge. Select a crew member to be the new captain. They immediately receive 3 XP. Roll 1D6. On a 1, the old captain leaves the campaign permanently, taking any items carried with them. If your crew has any K’Erin, one of them must be selected, or they will leave."
-4,You’ve made some business contacts. Add a new Patron to the list of those known.
-3,Recent events made for a good learning opportunity. Every crew member receives +1 XP.
-4,"During routine maintenance, the gravitational adjuster got knocked out of alignment. Your ship suffers 1D6 points of Hull Point damage."
-4,"The crew spends a night drinking, watching movies, and playing cards. +1 story point."
-4,"You meet up with an old arms dealer contact who owes you a deal. Add your choice of 3 weapons from the following list: Hand Cannons, Military Rifles, Shotguns, or Machine Pistols."
-3,"You renegotiate some old debts. If you currently owe money, reduce your debt by 1D6+1 credits. If you owe nothing, earn 2 credits for being prudent with your money."
-3,"The sector news networks are awash with rumors of war. While you remain on this planet, any roll for Invasion is at +2."
-4,A bit of time on your hands The crew has a few days to do their own thing. Select two crew members at random and have each make a roll on the Exploration Table (p.80).
-3,"You got noticed by someone you’d rather avoid. Add a Rival. If you currently are on a Quest, the next campaign turn is automatically a battle against the new Rival, and they will add +1 to the number of enemies."
-3,"It’s time to go! Whatever you did, every campaign turn you stay on this planet, you must add an additional Rival."
-3,Unity government says no ships are authorized to leave. You cannot leave the planet during the next two campaign turns.
-3,"In hindsight, it’ll make a great story. Select a crew member who was a casualty last battle. They receive +1 Luck. If nobody got hurt, receive +1 story point instead."
+weight,title,effect
+3,You’ve met a friendly doc who doesn’t ask too many questions.,"Select up to two crew members in Sick Bay and reduce their Recovery time by one campaign turn each. If they recover, they can act normally next campaign turn."
+5,The life support system on the ship needs upgrading badly.,"Upgrading the life support system will cost 1D6 credits. The ship cannot be flown until this is paid. If your crew has an Engineer, modify the roll by -1."
+4,A chance meeting turns into a new ally.,"Roll up a new character and add them to the crew, OR add +1 story point. You may decide after rolling up the new character."
+4,You’ve made friends among the locals.,+1 story point.
+4,You managed to mouth off to the wrong people.,Add a Rival.
+3,An old nemesis has tracked you down.,"Select a prior Rival, or roll up a new one. They will follow you from planet to planet until resolved and receive +1 when rolling for the number of enemies in a battle."
+3,A shady character offers you a deal.,"Give him any one item of equipment, then roll on the Trade Table (p.79)."
+4,You sell off some cargo you acquired on the last planet.,Earn 1D6 credits.
+5,One of the crew overheard something interesting.,Add 1 Rumor.
+3,You’ve managed to settle some old “business”.,"If you have any, you may remove one Rival of your choice. If you have no Rivals, your captain earns +1 XP instead."
+3,An admirer wants to come along.,"Gain a new crew member, if desired. They have only the base profile with no extra rolls, and bring no equipment. If your crew has any Feral members, the new member is also Feral."
+3,An alien merchant offers you some strange device.,"If you want to buy it, pay 4 credits and then roll on the Loot Table."
+4,Equipment malfunction.,"If there are any items in your Stash, a random item is damaged and must be Repaired."
+3,You’ve earned a bit of a bad reputation.,"If you know any Patrons on the current world, randomly select one that will no longer work with you. If you have no Patrons, shrug and move on."
+5,The tax man is taking an interest in your business conduct.,Roll 2D6 and pay the higher die in credits. If you have insufficient credits your ship is impounded until you can pay.
+3,The crew has decided it’s time for a new person to be in charge.,"Select a crew member to be the new captain. They immediately receive 3 XP. Roll 1D6. On a 1, the old captain leaves the campaign permanently, taking any items carried with them. If your crew has any K’Erin, one of them must be selected, or they will leave."
+4,You’ve made some business contacts.,Add a new Patron to the list of those known.
+3,Recent events made for a good learning opportunity.,Every crew member receives +1 XP.
+4,"During routine maintenance, the gravitational adjuster got knocked out of alignment.",Your ship suffers 1D6 points of Hull Point damage.
+4,"The crew spends a night drinking, watching movies, and playing cards.",+1 story point.
+4,You meet up with an old arms dealer contact who owes you a deal.,"Add your choice of 3 weapons from the following list: Hand Cannons, Military Rifles, Shotguns, or Machine Pistols."
+3,You renegotiate some old debts.,"If you currently owe money, reduce your debt by 1D6+1 credits. If you owe nothing, earn 2 credits for being prudent with your money."
+3,The sector news networks are awash with rumors of war.,"While you remain on this planet, any roll for Invasion is at +2."
+4,A bit of time on your hands.,The crew has a few days to do their own thing. Select two crew members at random and have each make a roll on the Exploration Table (p.80).
+3,You got noticed by someone you’d rather avoid.,"Add a Rival. If you currently are on a Quest, the next campaign turn is automatically a battle against the new Rival, and they will add +1 to the number of enemies."
+3,It’s time to go!,"Whatever you did, every campaign turn you stay on this planet, you must add an additional Rival."
+3,Unity government says no ships are authorized to leave.,You cannot leave the planet during the next two campaign turns.
+3,"In hindsight, it’ll make a great story.","Select a crew member who was a casualty last battle. They receive +1 Luck. If nobody got hurt, receive +1 story point instead."

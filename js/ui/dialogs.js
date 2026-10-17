@@ -4,8 +4,11 @@
   const { el } = LP.dom;
 
   /**
-   * Open a modal dialog. Resolves to { value, text } where `value` is the
-   * clicked choice's value ('' when cancelled) and `text` the input contents.
+   * Open a modal dialog. Resolves to { value, text, fields } where `value` is
+   * the clicked choice's value ('' when cancelled), `text` the text input's
+   * contents, and `fields` the select values keyed by field key.
+   *
+   * options.fields: [{ key, label, value, options: [{ value, label }] }]
    *
    * The first choice is the default (pressing Enter picks it), so put the
    * safest/most likely choice first.
@@ -33,6 +36,14 @@
         input.value = options.input.value || '';
       }
 
+      const selects = (options.fields || []).map((field) => {
+        const select = el('select', { class: 'input select' },
+          field.options.map((o) => el('option', { value: String(o.value) }, o.label))
+        );
+        select.value = String(field.value);
+        return { field, select };
+      });
+
       const form = el('form', { class: 'dialog-form', method: 'dialog' },
         el('h2', { id: 'dialog-title', text: options.title }),
         options.message ? el('p', { class: 'dialog-message', text: options.message }) : null,
@@ -40,6 +51,10 @@
           el('span', { class: 'field-label', text: options.input.label }),
           input
         ) : null,
+        selects.map(({ field, select }) => el('label', { class: 'field' },
+          el('span', { class: 'field-label', text: field.label }),
+          select
+        )),
         el('div', { class: 'dialog-actions' },
           el('button', { type: 'button', class: 'btn', onclick: () => close('') }, 'Cancel'),
           choiceButtons
@@ -66,7 +81,9 @@
 
       dialog.addEventListener('close', () => {
         dialog.remove();
-        resolve({ value: result, text: input ? input.value.trim() : '' });
+        const fields = {};
+        for (const { field, select } of selects) fields[field.key] = select.value;
+        resolve({ value: result, text: input ? input.value.trim() : '', fields });
       });
 
       document.body.appendChild(dialog);
@@ -74,6 +91,8 @@
       if (input) {
         input.focus();
         input.select();
+      } else if (selects.length) {
+        selects[0].select.focus();
       }
     });
   }
@@ -104,5 +123,16 @@
     return result.value || null;
   }
 
-  Object.assign(LP.ui, { prompt, confirm, choose });
+  /** Form of dropdowns; resolves to { key: valueString } or null if cancelled. */
+  async function form({ title, message, fields, confirmLabel }) {
+    const result = await openDialog({
+      title,
+      message,
+      fields,
+      choices: [{ label: confirmLabel || 'Save', value: 'ok' }]
+    });
+    return result.value === 'ok' ? result.fields : null;
+  }
+
+  Object.assign(LP.ui, { prompt, confirm, choose, form });
 })(window.LP);
