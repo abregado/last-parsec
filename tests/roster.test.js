@@ -326,6 +326,85 @@
     assert.equal(xp[1][1], 'No XP (Bot)');
   });
 
+  test('finalize starts the resources; starting contacts go to the first planet', (assert) => {
+    rng.setSource(rng.seeded(21));
+    const c = generated(2);
+    R.finalize(c);
+    c.roster.start.rivals = 2;
+    c.roster.start.patrons = 1;
+    assert.equal(c.roster.resources.credits, c.roster.start.credits);
+    confirm(c, { firstTurn: true, startName: 'Firstfall', generateWorld: false });
+    const planet = P.current(c);
+    assert.equal(planet.rivals.length, 2);
+    assert.equal(planet.patrons.length, 1);
+    assert.equal(planet.rivals[0].notes, 'Starting Rival from crew creation.');
+    T.undo(c);
+    assert.equal(c.planets.length, 0, 'Undo removes the planet and its contacts');
+  });
+
+  test('Upkeep shows crew credits and the debt interest, and lists what to change', (assert) => {
+    const { c } = crewed();
+    c.roster.resources.credits = 10;
+    c.roster.ship = { name: '', rowId: null, type: 'Ship', hull: 20, hullMax: 20, debt: 32, traits: [] };
+    confirm(c);
+    confirm(c, { mode: 'stay' });
+    const info = T.currentFields(c).find((f) => f.key === 'credits');
+    assert.ok(/10 credits/.test(info.text) && /2 credits of interest/.test(info.text));
+    confirm(c, { sickBayIds: [], payment: 2 });
+    const rec = last(c);
+    assert.equal(rec.output.data.creditsAfter, 10 - rec.output.data.cost - 2);
+    assert.ok(rec.todo.some((t) => /^Credits: set to/.test(t)));
+    assert.ok(rec.todo.includes('Ship debt: set to 31.'), '32 − 2 paid + 1 interest');
+  });
+
+  test('crew tasks use the planet’s Patrons and Rivals', (assert) => {
+    const { c, planet, ava } = crewed();
+    P.newPatron(c, planet);
+    P.newPatron(c, planet);
+    confirm(c);
+    confirm(c, { mode: 'stay' });
+    confirm(c, { sickBayIds: [], hasShip: false });
+    assert.ok(!T.currentFields(c).some((f) => f.key === 'patrons' || f.key === 'rivals'));
+    confirm(c, { assign: { [ava.id]: 'patron' } });
+    const roll = last(c).output.fu.lines[0].children[0];
+    assert.ok(roll.modifiers.some((m) => m.label === 'known Patrons' && m.value === 2));
+  });
+
+  test('Galactic War is skipped when no other planet is invaded', (assert) => {
+    const { c } = crewed();
+    const stage = T.getStage('galactic-war');
+    const ctx = T.context(c, []);
+    ctx.facts.post = { type: 'opportunity' };
+    assert.ok(/No other planets/.test(stage.applies(ctx)));
+    const { planet: other } = P.createPlanet(c, { name: 'Elsewhere' });
+    P.startInvasion(other, null);
+    assert.equal(stage.applies(ctx), true);
+  });
+
+  test('contacts record where they came from', (assert) => {
+    const { c, planet } = crewed();
+    c.turnNumber = 5;
+    const r = P.newRival(c, planet, { notes: P.contactNote('a campaign event', c) });
+    assert.equal(r.notes, 'Met during a campaign event on turn 5.');
+    const pat = P.newPatron(c, planet, { notes: 'Old friend.' });
+    const turned = P.patronToRival(c, planet, pat.id, 'Turned on you.');
+    assert.equal(turned.notes, 'Old friend. Turned on you.');
+  });
+
+  test('follow-up gains become to-dos', (assert) => {
+    low();
+    const { c } = crewed();
+    let guard = 0;
+    while (current(c) !== 'get-paid' && guard++ < 40) {
+      const id = current(c);
+      if (id === 'travel') confirm(c, { mode: 'stay' });
+      else if (id === 'choose-battle') confirm(c, { privateTransport: false, patronJob: false });
+      else confirm(c, id === 'job-offers' ? { offers: 0 } : {});
+    }
+    confirm(c);
+    assert.ok(/^\+\d+ credits?\.$/.test(last(c).todo[0]));
+  });
+
   test('Start next turn moves the turn number on', (assert) => {
     const { c } = crewed();
     assert.equal(R.turnNumber(c), 1);

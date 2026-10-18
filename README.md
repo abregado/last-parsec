@@ -1,6 +1,6 @@
 # Last Parsec
 
-An unofficial companion web app for **Five Parsecs From Home** (Third Edition). It generates results: characters, crew equipment, ship, and later campaign turns and battles. It doesn't track your campaign. Record the results on your printed sheets.
+An unofficial companion web app for **Five Parsecs From Home** (Third Edition). It generates characters, crew, campaign turns and battles, and keeps track of your crew, their gear and the planets you visit.
 
 Not affiliated with or endorsed by Modiphius Entertainment. You need the rulebook to play.
 
@@ -11,13 +11,19 @@ Not affiliated with or endorsed by Modiphius Entertainment. You need the ruleboo
 
 Everything is saved in your browser's local storage. Use **Export** on the Campaigns screen to back up to a JSON file, and **Import** to restore it or move it to another browser.
 
-### Characters tab
+### Tabs
 
-- **+ Add character** adds an empty character. Every field starts as *Random*.
-- Pick a value in any dropdown to fix it. **Generate** rolls every field still set to Random. **Generate all** does this for every character.
-- After generating, each Random field gets a **↻ reroll** button. A reroll never gives the same result. Fixed fields can't be rerolled. Fields set by a species rule (e.g. De-converted → Revenge) are locked.
-- Results that cause extra rolls (credits dice, starting weapons and gear) appear as indented rows with their own dropdown and reroll button.
-- The **Crew** section covers the Leader, totals (credits, story points, Patrons, Rivals, Quest Rumors), the crew's starting equipment (Military rolls can switch to High-tech once per Savvy-increase character), the ship and debt, and the flavour tables.
+- **Crew:** your crew as it is now: each member's stats, XP, status, portrait and gear, plus the Stash, the ship and the crew's resources (credits, story points, Rumors and more).
+- **Planets:** the worlds you've visited, with their traits, named Patrons and Rivals, and invasions.
+- **Campaign Turn:** a step-by-step campaign turn. Each step shows a short summary and what to change by hand; a button shows the full dice working.
+- **Battle:** generates the battle for this turn.
+
+In **Edit mode** (the toggle at the right of the tab bar), the setup tabs also appear:
+- **Characters:** generate the starting crew or recruits, then press **Finalize**.
+- **Models:** which enemies you have models for.
+- **Species:** the species odds.
+- **Archetypes:** kinds of planet.
+- **Equipment:** the equipment tables.
 
 ## Development
 
@@ -35,11 +41,13 @@ css/styles.css
 js/lp.js                  global namespace
 js/data/tables.js         GENERATED roll tables (do not edit)
 js/data/species.js        the 26 crew species and their rules
+js/data/followups.js      follow-up rolls for table results
 js/core/                  rng (dice, weighted tables), effects parser, storage, router
-js/rules/                 character and crew rules (no DOM)
+js/rules/                 game rules and the campaign turn (no DOM)
 js/ui/                    screens and components
 tests/                    test runner and tests
 tools/                    build-tables.py, bump-version.py
+docs/                     developer docs (start with CLAUDE.md)
 roll_tables/json|csv      source table data
 ```
 

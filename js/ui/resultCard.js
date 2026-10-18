@@ -105,17 +105,80 @@
     }, '+ Stash');
   }
 
+  /* ---------------------------------------------------------------------- */
+  /* Summary view: results only, no dice or rule notes                      */
+  /* ---------------------------------------------------------------------- */
+
+  // Tables that only point to another table: their result is the next line.
+  const ROUTING = ['Loot Table', 'Weapon Category Subtable', 'Gear Subtable', 'Odd and Ends Table'];
+
+  function summaryOf(lines, opts) {
+    const out = [];
+    for (const line of lines || []) {
+      if (line.type === 'facts') {
+        out.push(factsLine(line));
+      } else if (line.type === 'table') {
+        if (ROUTING.includes(line.table)) {
+          out.push(...summaryOf(line.children, opts));
+          continue;
+        }
+        out.push(el('div', { class: 'sum-line' },
+          el('div', { class: 'line-head' },
+            line.label ? el('span', { class: 'line-label' }, line.label) : null,
+            el('strong', null, line.title),
+            itemBadge(line, opts)
+          ),
+          line.text ? el('p', { class: 'line-text' }, line.text) : null,
+          nested(line, opts)
+        ));
+      } else if (line.type === 'roll') {
+        const result = line.text || (line.success === undefined ? String(line.total) : line.success ? 'Passed.' : 'Failed.');
+        out.push(el('div', { class: 'sum-line' + (line.tone ? ' tone-' + line.tone : '') },
+          el('p', null, line.label ? el('span', { class: 'line-label' }, line.label + ' ') : null, verdict(line), ' ', result),
+          nested(line, opts)
+        ));
+      } else if (line.children && line.children.length) {
+        out.push(el('div', { class: 'sum-line' }, el('p', { class: 'sum-group' }, line.text), nested(line, opts)));
+      } else if (line.tone !== 'note') {
+        out.push(el('p', { class: 'sum-line' + (line.tone ? ' tone-' + line.tone : '') }, line.text));
+      }
+    }
+    return out;
+  }
+
+  function nested(line, opts) {
+    const kids = summaryOf(line.children, opts);
+    return kids.length ? el('div', { class: 'line-children' }, kids) : null;
+  }
+
   /**
-   * A stage's output. options.onChoose(value) is called when a pending
-   * choice button is pressed. With options.crew, item lines show whether
-   * they went into the Stash; conditional ones get a button calling
-   * options.onAddItem(line) (options.isAdded(line) says if it was pressed).
+   * A stage's output. options:
+   *   onChoose(value)        a pending choice button was pressed
+   *   todo: [text]           changes to make by hand (shown in the summary)
+   *   full, onToggle()       show the full working out; the toggle button swaps views
+   *   crew, onAddItem(line), isAdded(line)   Stash badges (see itemBadge)
    */
   function resultCard(output, pending, options) {
     const opts = options || {};
+    const lines = (output.lines || []).concat(output.fu ? output.fu.lines : []);
+    const full = opts.full || !opts.onToggle;
+    const todo = opts.todo || [];
     return el('div', { class: 'result-card' + (output.tone ? ' tone-' + output.tone : '') },
-      output.headline ? el('p', { class: 'result-headline' }, output.headline) : null,
-      el('div', { class: 'result-lines' }, (output.lines || []).concat(output.fu ? output.fu.lines : []).map((line) => renderLine(line, opts))),
+      el('div', { class: 'result-top' },
+        output.headline ? el('p', { class: 'result-headline' }, output.headline) : el('span'),
+        opts.onToggle ? el('button', {
+          type: 'button', class: 'btn btn-sm btn-ghost result-toggle', 'aria-pressed': full ? 'true' : 'false',
+          onclick: () => opts.onToggle()
+        }, full ? 'Summary' : 'Show working') : null
+      ),
+      full
+        ? el('div', { class: 'result-lines' }, lines.map((line) => renderLine(line, opts)))
+        : el('div', { class: 'result-lines result-summary' }, summaryOf(lines, opts)),
+      todo.length && !full
+        ? el('div', { class: 'todo' },
+          el('p', { class: 'todo-title' }, 'Change by hand'),
+          el('ul', null, todo.map((t) => el('li', null, t))))
+        : null,
       pending
         ? el('div', { class: 'choice', role: 'group', 'aria-label': pending.prompt },
           el('p', { class: 'choice-prompt' }, pending.prompt),

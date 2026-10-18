@@ -83,10 +83,7 @@
     return { min: spec.count + spec.modifier, max: spec.count * spec.sides + spec.modifier };
   }
 
-  /**
-   * Roll again until the total differs from `currentTotal`, keeping the real
-   * dice odds. Returns null if no other total is possible.
-   */
+  /** Reroll to a different total with the real dice odds; null if none is possible. */
   function rerollDice(notation, currentTotal) {
     const range = diceRange(notation);
     if (range.min === range.max) return null;

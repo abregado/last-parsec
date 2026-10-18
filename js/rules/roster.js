@@ -13,12 +13,15 @@
    *     leaderId: string | null,
    *     metThrough, characterizedAs: string | null,   // labels from crew creation
    *     start: { credits, storyPoints, patrons, rivals, questRumors } | null,
+   *     resources: { credits, storyPoints, rumors, questRumors, invasionRumors, fuel, shipParts },
+   *     counters: [{ id, name, amount }],   // anything else the player tracks
    *     notes: string
    *   }
    *   Member = {
    *     id, name, speciesId, origins: [{ label, value }],
    *     profile: { reactions, speed, combat, toughness, savvy, luck },
-   *     xp, status: 'active' | 'sick-bay', sickBayTurns, joinedTurn, notes
+   *     xp, status: 'active' | 'sick-bay', sickBayTurns, joinedTurn, notes,
+   *     portrait: data URL (1:2 JPEG) | null
    *   }
    *   Ship = { name, rowId, type, hull, hullMax, debt, traits: [string] }
    *
@@ -26,6 +29,16 @@
    */
 
   const STATS = ['reactions', 'speed', 'combat', 'toughness', 'savvy', 'luck'];
+  const RESOURCES = [
+    { key: 'credits', label: 'Credits' },
+    { key: 'storyPoints', label: 'Story points' },
+    { key: 'rumors', label: 'Rumors' },
+    { key: 'questRumors', label: 'Quest Rumors' },
+    { key: 'invasionRumors', label: 'Invasion rumors' },
+    { key: 'fuel', label: 'Fuel (credits)' },
+    { key: 'shipParts', label: 'Ship parts (credits)' }
+  ];
+
   const STATUSES = [
     { id: 'active', label: 'Active' },
     { id: 'sick-bay', label: 'In Sick Bay' }
@@ -62,6 +75,7 @@
       status: STATUSES.some((s) => s.id === raw.status) ? raw.status : 'active',
       sickBayTurns: Math.max(0, int(raw.sickBayTurns, 0)),
       joinedTurn: int(raw.joinedTurn, 0),
+      portrait: typeof raw.portrait === 'string' && raw.portrait.startsWith('data:image/') ? raw.portrait : null,
       notes: text(raw.notes)
     };
   }
@@ -78,6 +92,12 @@
       debt: Math.max(0, int(raw.debt, 0)),
       traits: Array.isArray(raw.traits) ? raw.traits.map(String) : []
     };
+  }
+
+  function normalizeResources(raw) {
+    const out = {};
+    for (const r of RESOURCES) out[r.key] = int(raw && raw[r.key], 0);
+    return out;
   }
 
   /** Fill in or repair campaign.roster (and campaign.turnNumber). Returns the roster. */
@@ -99,6 +119,10 @@
         credits: int(start.credits, 0), storyPoints: int(start.storyPoints, 0), patrons: int(start.patrons, 0),
         rivals: int(start.rivals, 0), questRumors: int(start.questRumors, 0)
       } : null,
+      resources: normalizeResources(raw.resources),
+      counters: (Array.isArray(raw.counters) ? raw.counters : []).filter((c) => c && typeof c === 'object').map((c) => ({
+        id: typeof c.id === 'string' && c.id ? c.id : newId(), name: text(c.name), amount: int(c.amount, 0)
+      })),
       notes: text(raw.notes)
     };
     campaign.turnNumber = Math.max(1, int(campaign.turnNumber, 1));
@@ -180,7 +204,7 @@
     return { name: nameOf(member), savvy: member.profile.savvy, engineer: isEngineer(member) };
   }
 
-  /** Add a crew member by hand (fields as Member). Returns the member. */
+  /** fields: as Member. */
   function addMember(campaign, fields) {
     const member = normalizeMember(Object.assign({ joinedTurn: turnNumber(campaign) }, fields));
     roster(campaign).members.push(member);
@@ -244,10 +268,8 @@
   }
 
   /**
-   * Put a stage's gained items in the Stash (only when there is a crew).
-   * The same roll (same key and row) keeps its item, so moves and edits
-   * survive a choice being made or undone. Marks each line with
-   * line.item = 'stash' (added) or 'manual' (the player adds it if it applies).
+   * Put a stage's gained items in the Stash and mark each line 'stash' or 'manual'.
+   * An item from the same line and row is kept, so moves and edits survive re-resolving.
    */
   function syncStageItems(campaign, tag, output, what) {
     const found = LP.items.linesIn(output);
@@ -316,10 +338,8 @@
   }
 
   /**
-   * Move the Characters tab into the crew. The first time, the crew's
-   * starting equipment goes to the Stash and the ship is set up; later
-   * finalizes add recruits. The generator is emptied afterwards.
-   * Returns { added, error }.
+   * Move the Characters tab into the crew and empty it. The first time also brings
+   * the crew equipment, ship and resources; later ones add recruits. Returns { added, error }.
    */
   function finalize(campaign) {
     const problem = finalizeProblem(campaign);
@@ -366,6 +386,7 @@
         credits: summary.credits.total, storyPoints: summary.storyPoints, patrons: summary.patrons,
         rivals: summary.rivals, questRumors: summary.questRumors
       };
+      Object.assign(r.resources, { credits: r.start.credits, storyPoints: r.start.storyPoints, questRumors: r.start.questRumors });
     }
 
     // Empty the generator, ready for recruits.
@@ -378,6 +399,7 @@
   LP.roster = {
     STATS,
     STATUSES,
+    RESOURCES,
     ensure,
     hasCrew,
     turnNumber,

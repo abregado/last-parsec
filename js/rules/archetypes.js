@@ -187,7 +187,7 @@
     };
   }
 
-  /** Make sure the campaign has archetypes (adds the default one if none). */
+  /** Adds the default archetype when there are none. */
   function ensure(campaign) {
     const list = Array.isArray(campaign.archetypes) ? campaign.archetypes.map(normalize) : [];
     campaign.archetypes = list.length ? list : [defaultArchetype()];

@@ -215,10 +215,7 @@
     return true;
   }
 
-  /**
-   * Switch one of the three Military rolls to the High-tech table or back.
-   * Only allowed while there are Savvy-increase characters to cover it.
-   */
+  /** Switch a Military roll to High-tech or back; each needs a character with a Savvy increase. */
   function setHighTech(campaign, index, on) {
     const crew = campaign.crew;
     const slot = crew.equipment[index];

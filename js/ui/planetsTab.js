@@ -161,6 +161,22 @@
     ));
   }
 
+  /** Where a Rival or Patron came from, plus the player's own notes. Saved as typed. */
+  const HAND_NOTE = (campaign) => 'Added on the Planets tab on turn ' + LP.roster.turnNumber(campaign) + '.';
+
+  function contactNotes(state, contact, kind) {
+    const area = el('textarea', {
+      class: 'input contact-notes', rows: '2', placeholder: 'Where they came from, encounters…',
+      'aria-label': 'Notes on ' + contact.name, 'data-focus': kind + '-notes:' + contact.id
+    });
+    area.value = contact.notes || '';
+    area.addEventListener('input', () => {
+      contact.notes = area.value;
+      LP.storage.touchCampaign(state.campaign);
+    });
+    return area;
+  }
+
   function patronsBlock(state, planet) {
     const { campaign } = state;
     const archetype = P.archetypeOf(campaign, planet);
@@ -178,7 +194,8 @@
           checkbox('Persistent (follows you)', !!p.persistent, (v) => { p.persistent = v; commit(state); }, 'pp:' + p.id),
           checkbox('One-time Contract', !!p.oneTimeContract, (v) => { p.oneTimeContract = v; commit(state); }, 'po:' + p.id),
           p.benefit ? el('span', { class: 'field-detail' }, 'Benefit: ' + p.benefit) : null
-        )
+        ),
+        contactNotes(state, p, 'patron')
       );
     });
     const addFrom = el('select', { class: 'input select', 'aria-label': 'Add a Patron from the archetype', 'data-focus': 'patron-add-from' },
@@ -186,13 +203,13 @@
       (archetype ? archetype.patrons : []).map((e) => el('option', { value: e.id }, e.name)));
     addFrom.addEventListener('change', () => {
       if (!addFrom.value) return;
-      P.newPatron(campaign, planet, { entryId: addFrom.value });
+      P.newPatron(campaign, planet, { entryId: addFrom.value, notes: HAND_NOTE(campaign) });
       commit(state);
     });
     return block('Patrons (' + planet.patrons.length + ')', el('div', { class: 'arch-body' },
       rows.length ? el('ul', { class: 'entry-list' }, rows) : el('p', { class: 'muted' }, 'No Patrons known here.'),
       el('div', { class: 'toolbar' },
-        el('button', { type: 'button', class: 'btn btn-sm', 'data-focus': 'patron-gen', onclick: () => { P.newPatron(campaign, planet); commit(state); } }, '+ Generate Patron'),
+        el('button', { type: 'button', class: 'btn btn-sm', 'data-focus': 'patron-gen', onclick: () => { P.newPatron(campaign, planet, { notes: HAND_NOTE(campaign) }); commit(state); } }, '+ Generate Patron'),
         addFrom
       )
     ));
@@ -214,7 +231,8 @@
         el('div', { class: 'battle-options' },
           checkbox('They hate you (+1 to their numbers)', !!r.hates, (v) => { r.hates = v; commit(state); }, 'rh:' + r.id),
           el('span', { class: 'field-detail' }, r.uniques.length ? r.uniques.length + ' possible Unique Individuals' : 'Any Unique Individual')
-        )
+        ),
+        contactNotes(state, r, 'rival')
       );
     });
     const addFrom = el('select', { class: 'input select', 'aria-label': 'Add a Rival from the archetype', 'data-focus': 'rival-add-from' },
@@ -222,13 +240,13 @@
       (archetype ? archetype.rivals : []).map((e) => el('option', { value: e.id }, e.name)));
     addFrom.addEventListener('change', () => {
       if (!addFrom.value) return;
-      P.newRival(campaign, planet, { entryId: addFrom.value });
+      P.newRival(campaign, planet, { entryId: addFrom.value, notes: HAND_NOTE(campaign) });
       commit(state);
     });
     return block('Rivals (' + planet.rivals.length + ')', el('div', { class: 'arch-body' },
       rows.length ? el('ul', { class: 'entry-list' }, rows) : el('p', { class: 'muted' }, 'No Rivals here.'),
       el('div', { class: 'toolbar' },
-        el('button', { type: 'button', class: 'btn btn-sm', 'data-focus': 'rival-gen', onclick: () => { P.newRival(campaign, planet); commit(state); } }, '+ Generate Rival'),
+        el('button', { type: 'button', class: 'btn btn-sm', 'data-focus': 'rival-gen', onclick: () => { P.newRival(campaign, planet, { notes: HAND_NOTE(campaign) }); commit(state); } }, '+ Generate Rival'),
         addFrom
       )
     ));

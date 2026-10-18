@@ -97,10 +97,7 @@
     campaign.models.invasion = {};
   }
 
-  /**
-   * Entries that can form an invasion force: ticked for invasions and enabled.
-   * Returns [{ table, row }].
-   */
+  /** Entries ticked for invasions and enabled: [{ table, row }]. */
   function invasionCandidates(campaign) {
     const out = [];
     for (const tableName of ENEMY_TABLES) {

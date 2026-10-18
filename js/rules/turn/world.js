@@ -52,10 +52,11 @@
   }
 
   /** Named Rivals and Patrons gained from follow-ups (Pick a fight, events...). */
-  function addGained(ctx, gains) {
+  function addGained(ctx, gains, what) {
     if (!ctx.planet || !gains) return;
-    for (let i = 0; i < (gains.rivals || 0); i++) LP.planets.newRival(ctx.campaign, ctx.planet);
-    for (let i = 0; i < (gains.patrons || 0); i++) LP.planets.newPatron(ctx.campaign, ctx.planet);
+    const notes = LP.planets.contactNote(what, ctx.campaign);
+    for (let i = 0; i < (gains.rivals || 0); i++) LP.planets.newRival(ctx.campaign, ctx.planet, { notes });
+    for (let i = 0; i < (gains.patrons || 0); i++) LP.planets.newPatron(ctx.campaign, ctx.planet, { notes });
   }
 
   function newId() {
@@ -80,6 +81,11 @@
   /* 2.1 Upkeep and ship repairs                                            */
   /* ---------------------------------------------------------------------- */
 
+  /** Debt interest: 1 credit, or 2 once the debt is 31 or more (p.76). */
+  function interestOn(debt) {
+    return debt >= 31 ? 2 : 1;
+  }
+
   /** 1 credit for up to 6 crew, +1 per crew member past 6 (p.76). */
   function upkeepCost(crew) {
     if (crew <= 0) return 0;
@@ -88,6 +94,20 @@
 
   T.register({
     id: 'upkeep',
+    todo(input, output, ctx) {
+      const d = output.data;
+      const list = [];
+      if (d.creditsAfter !== undefined) list.push('Credits: set to ' + d.creditsAfter + ' (Upkeep ' + d.cost + (input.payment ? ', debt payment ' + input.payment : '') + ').');
+      else list.push('Pay ' + plural(d.cost, 'credit', 'credits') + ' Upkeep' + (input.payment ? ' and ' + input.payment + ' towards the debt' : '') + '.');
+      if (d.seized) list.push('Remove the ship: it was seized.');
+      else if (input.hasShip) {
+        if (input.debt > 0) list.push('Ship debt: set to ' + d.debt + '.');
+        if (input.hullDamage > 0) list.push('Ship: repair 1 Hull Point (free).');
+      }
+      if (input.sickBayIds && input.sickBayIds.length) list.push('Sick Bay: one turn off for ' + R.listText(R.namesOf(ctx.campaign, input.sickBayIds)) + '.');
+      else if (input.sickBay) list.push('Sick Bay: one turn off for each character there.');
+      return list;
+    },
     step: 'world',
     number: '2.1',
     title: 'Upkeep and ship repairs',
@@ -96,8 +116,13 @@
     fields(ctx) {
       const ship = hasCrew(ctx) ? ctx.campaign.roster.ship : null;
       const hasShip = ctx.facts.hasShip !== undefined ? ctx.facts.hasShip : ctx.memory.hasShip !== undefined ? ctx.memory.hasShip !== false : !hasCrew(ctx) || !!ship;
-      const debt = ctx.memory.debt !== undefined ? ctx.memory.debt : ship ? ship.debt : 0;
-      const hull = ctx.memory.hullDamage !== undefined ? ctx.memory.hullDamage : ship ? Math.max(0, ship.hullMax - ship.hull) : 0;
+      // With a crew, the Crew tab's ship is the current state.
+      const debt = ship ? ship.debt : ctx.memory.debt || 0;
+      const hull = ship ? Math.max(0, ship.hullMax - ship.hull) : ctx.memory.hullDamage || 0;
+      const info = [];
+      if (hasCrew(ctx)) {
+        info.push({ key: 'credits', type: 'info', text: 'The crew has ' + plural(ctx.campaign.roster.resources.credits, 'credit', 'credits') + ' (Crew tab).' + (debt > 0 ? ' Unpaid, the ship debt grows by ' + plural(interestOn(debt), 'credit', 'credits') + ' of interest this turn.' : '') });
+      }
       const crewFields = hasCrew(ctx)
         ? [{
           key: 'sickBayIds', type: 'multiselect', label: 'In Sick Bay (including Bots under repair)',
@@ -109,7 +134,7 @@
           { key: 'crewCount', type: 'number', label: 'Crew members', min: 1, max: 30, value: crewDefault(ctx) },
           { key: 'sickBay', type: 'number', label: 'In Sick Bay (including Bots under repair)', min: 0, max: 30, value: 0, help: 'They don’t count for Upkeep and can’t take tasks.' }
         ];
-      return crewFields.concat([
+      return info.concat(crewFields, [
         { key: 'hasShip', type: 'yesno', label: 'Do you have a ship?', value: hasShip },
         { key: 'debt', type: 'number', label: 'Ship debt (credits)', min: 0, max: 999, value: debt || 0, showIf: (v) => v.hasShip },
         { key: 'payment', type: 'number', label: 'Paying off the debt this turn (credits)', min: 0, max: 999, value: 0, showIf: (v) => v.hasShip && v.debt > 0 },
@@ -125,24 +150,31 @@
       const lines = [];
       const data = { seized: false, debt: input.hasShip ? input.debt || 0 : 0, hullDamage: input.hasShip ? input.hullDamage || 0 : 0 };
 
-      // Upkeep
       const paying = R.crewCount(ctx, input.crewCount) - sickCount(input);
       const highCost = hasTrait(ctx, 'high-cost');
       const cost = upkeepCost(paying + (highCost ? 2 : 0));
-      lines.push(L.facts([
+      const upkeepFacts = [
         ['Upkeep', plural(cost, 'credit', 'credits')],
         ['Counted crew', paying + (highCost ? ' (+2 for High cost)' : '')]
-      ]));
+      ];
+      data.cost = cost;
+      if (hasCrew(ctx)) {
+        const credits = ctx.campaign.roster.resources.credits;
+        const after = credits - cost - (input.hasShip ? input.payment || 0 : 0);
+        upkeepFacts.push(['Crew credits', credits + ' → ' + after + (after < 0 ? ' (short!)' : '')]);
+        data.creditsAfter = after;
+      }
+      lines.push(L.facts(upkeepFacts));
       lines.push(L.text('For each credit you are short, one crew member refuses to do a task this turn. You may sell items for 1 credit of Upkeep each. Basic supplies (Trade) skip Upkeep once. You may also kick out a crew member now.', 'note'));
 
-      // Debt
       if (input.hasShip && input.debt > 0) {
         const remaining = input.debt - (input.payment || 0);
         if (remaining <= 0) {
           lines.push(L.text('Ship debt paid off!', 'good'));
           data.debt = 0;
         } else {
-          const interest = remaining >= 31 ? 2 : 1;
+          const interest = interestOn(remaining);
+          data.interest = interest;
           data.debt = remaining + interest;
           lines.push(L.facts([
             ['Ship debt', input.debt + (input.payment ? ' − ' + input.payment + ' paid' : '') + ' + ' + interest + ' interest = ' + data.debt + ' credits']
@@ -160,14 +192,12 @@
         }
       }
 
-      // Hull
       if (input.hasShip && !data.seized && input.hullDamage > 0) {
         data.hullDamage = input.hullDamage - 1;
         lines.push(L.text('1 Hull Point repaired for free: ' + plural(data.hullDamage, 'point', 'points') + ' of damage left. Each credit spent repairs 1 more point' +
           (hasTrait(ctx, 'lacks-starship-facilities') ? ' (no more than 3 credits per turn on this world).' : '.')));
       }
 
-      // Medical care
       if (sickCount(input) > 0) {
         const price = hasTrait(ctx, 'medical-science') ? 3 : 4;
         if (input.sickBayIds) lines.push(L.facts([['In Sick Bay', R.listText(R.namesOf(ctx.campaign, input.sickBayIds))]]));
@@ -238,6 +268,12 @@
 
   T.register({
     id: 'crew-tasks',
+    todo(input, output, ctx) {
+      const t = tasksOf(input);
+      if (!t.train) return [];
+      const names = onTask(input, ctx, 'train').map(R.nameOf);
+      return ['+1 XP for ' + (names.length ? R.listText(names) : plural(t.train, 'trainee', 'trainees')) + '.'];
+    },
     step: 'world',
     number: '2.2',
     title: 'Assign and resolve crew tasks',
@@ -260,10 +296,10 @@
             help: 'Up to two crew per task. Crew can also sit this turn out.' + restricted,
             tasks: TASKS, value: {}
           },
-        { key: 'patrons', type: 'number', label: 'Patrons you already know', min: 0, max: 20, value: ctx.memory.patrons || 0, showIf: n('patron'), help: 'Each adds +1 to the Patron search.' },
+        ctx.planet ? null : { key: 'patrons', type: 'number', label: 'Patrons you already know', min: 0, max: 20, value: ctx.memory.patrons || 0, showIf: n('patron'), help: 'Each adds +1 to the Patron search.' },
         { key: 'patronCredits', type: 'number', label: 'Credits spent on the Patron search', min: 0, max: 50, value: 0, showIf: n('patron'), help: '+1 per credit.' },
         { key: 'extraTrades', type: 'number', label: 'Extra Trade rolls bought (3 credits each)', min: 0, max: 10, value: 0, showIf: n('trade') },
-        { key: 'rivals', type: 'number', label: 'Rivals you have', min: 0, max: 30, value: ctx.memory.rivals || 0, showIf: (v) => n('track')(v) || n('explore')(v) },
+        ctx.planet ? null : { key: 'rivals', type: 'number', label: 'Rivals you have', min: 0, max: 30, value: ctx.memory.rivals || 0, showIf: (v) => n('track')(v) || n('explore')(v) },
         { key: 'trackCredits', type: 'number', label: 'Credits spent on Tracking', min: 0, max: 50, value: 0, showIf: n('track'), help: '+1 per credit.' },
         { key: 'repairCredits', type: 'number', label: 'Credits on spare parts, per Repair attempt', min: 0, max: 20, value: 0, showIf: n('repair'), help: '+1 per credit.' }
       ];
@@ -281,7 +317,8 @@
     resolve(input, ctx) {
       const t = tasksOf(input);
       const crewCount = ctx.facts.crewCount || crewDefault(ctx);
-      const rivals = input.rivals !== undefined ? input.rivals : (ctx.memory.rivals || 0);
+      const rivals = ctx.planet ? ctx.planet.rivals.length : input.rivals !== undefined ? input.rivals : (ctx.memory.rivals || 0);
+      const knownPatrons = ctx.planet ? ctx.planet.patrons.length : input.patrons || 0;
       const steps = [];
       const who = (key) => onTask(input, ctx, key);
       const names = (key) => R.listText(who(key).map(R.nameOf));
@@ -293,7 +330,7 @@
             roll: '1D6', label: 'Patron search',
             add: [
               { label: 'searchers', value: t.patron },
-              { label: 'known Patrons', value: input.patrons || 0 },
+              { label: 'known Patrons', value: knownPatrons },
               { label: 'credits', value: input.patronCredits || 0 },
               { label: 'Opportunities', value: hasTrait(ctx, 'opportunities') ? 1 : 0 },
               { label: 'Corporate state', value: hasTrait(ctx, 'corporate-state') ? 2 : 0 }
@@ -429,7 +466,7 @@
       return keep;
     },
     apply(input, output, ctx) {
-      addGained(ctx, { rivals: (output.fu.gains || {}).rivals || 0 });
+      addGained(ctx, { rivals: (output.fu.gains || {}).rivals || 0 }, 'crew tasks');
     }
   });
 
@@ -489,11 +526,7 @@
     }
   });
 
-  /**
-   * Job offers from named Patrons: new ones are created from the archetype,
-   * a known one keeps its Patron type. Each offer rolls Danger Pay, Time Frame
-   * and Benefits/Hazards/Conditions for that type.
-   */
+  /** Offers from named Patrons (new ones from the archetype); each rolls its type's job script. */
   function namedOffers(input, ctx) {
     const P = LP.planets;
     const scratch = JSON.parse(JSON.stringify(ctx.planet));
@@ -504,7 +537,7 @@
     }
     const newPatrons = [];
     for (let i = 0; i < (input.offers || 0); i++) {
-      const p = P.newPatron(ctx.campaign, scratch);
+      const p = P.newPatron(ctx.campaign, scratch, { notes: P.contactNote('job offers', ctx.campaign).replace('Met during', 'Offered you a job during') });
       newPatrons.push(p);
       offers.push(p);
     }

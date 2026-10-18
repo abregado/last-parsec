@@ -171,9 +171,10 @@
       const np = output.data && output.data.newPlanet;
       if (!np || !planetsOn(ctx)) return;
       const planet = LP.planets.normalizePlanet({ id: np.id, name: np.name, archetypeId: np.archetypeId, worldTraits: np.worldTraits });
-      for (let i = 1; i <= (np.importRivals || 0); i++) planet.rivals.push({ id: np.id + '-r' + i, entryId: null, name: 'Rival ' + i, enemy: null, uniques: [], hates: false });
-      for (let i = 1; i <= (np.importPatrons || 0); i++) planet.patrons.push({ id: np.id + '-p' + i, entryId: null, name: 'Patron ' + i, patronType: null, persistent: false, oneTimeContract: false, benefit: null, forces: [], uniques: [] });
+      for (let i = 1; i <= (np.importRivals || 0); i++) planet.rivals.push({ id: np.id + '-r' + i, entryId: null, name: 'Rival ' + i, enemy: null, uniques: [], hates: false, notes: 'Remembered from before planets were tracked.' });
+      for (let i = 1; i <= (np.importPatrons || 0); i++) planet.patrons.push({ id: np.id + '-p' + i, entryId: null, name: 'Patron ' + i, patronType: null, persistent: false, oneTimeContract: false, benefit: null, forces: [], uniques: [], notes: 'Remembered from before planets were tracked.' });
       if (np.invaded) LP.planets.startInvasion(planet, null);
+      if (input.firstTurn) LP.planets.addStartingContacts(ctx.campaign, planet);
       ctx.campaign.planets.push(planet);
       ctx.campaign.currentPlanetId = planet.id;
     }
@@ -268,6 +269,10 @@
 
   T.register({
     id: 'travel',
+    todo(input, output) {
+      const d = output.data;
+      return d.traveling ? ['Pay ' + plural(d.cost + (d.bribe || 0), 'credit', 'credits') + ' for travel' + (d.bribe ? ' (including the bribe)' : '') + '.'] : [];
+    },
     step: 'travel',
     number: '1.2',
     title: 'Decide whether to travel',
@@ -662,13 +667,17 @@
       const d = output.data;
       if (!planetsOn(ctx) || !d.destinationId) return;
       const P = LP.planets;
-      if (d.newPlanet && !P.get(ctx.campaign, d.newPlanet.id)) ctx.campaign.planets.push(P.normalizePlanet(d.newPlanet));
+      if (d.newPlanet && !P.get(ctx.campaign, d.newPlanet.id)) {
+        const planet = P.normalizePlanet(d.newPlanet);
+        ctx.campaign.planets.push(planet);
+        if (ctx.facts.firstTurn) P.addStartingContacts(ctx.campaign, planet);
+      }
       const dest = P.get(ctx.campaign, d.destinationId);
       const from = d.fromId ? P.get(ctx.campaign, d.fromId) : null;
       if (from && dest && from !== dest) P.moveContacts(from, dest, d.followIds || [], d.persistentIds || []);
       if (dest) {
         P.setCurrent(ctx.campaign, dest.id);
-        if (d.forgeRival) P.newRival(ctx.campaign, dest);
+        if (d.forgeRival) P.newRival(ctx.campaign, dest, { notes: 'Came after you for using a forged Freelancer License, on turn ' + LP.roster.turnNumber(ctx.campaign) + '.' });
       }
     },
     remember(input, output) {

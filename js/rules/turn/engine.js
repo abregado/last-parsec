@@ -12,7 +12,7 @@
    *     startedAt,
    *     memoryAtStart,                // turnMemory when the turn began (for Restart)
    *     draft: { id, input } | null,  // input to pre-fill after an Undo
-   *     records: [{ id, input, output, pending, facts, history, memoryBefore }]
+   *     records: [{ id, input, output, pending, facts, todo, history, memoryBefore, geoBefore }]
    *   }
    *   campaign.turnMemory = { ... }   // values remembered between turns (pre-fills)
    *
@@ -25,6 +25,7 @@
    *   choose(record, value, ctx) -> { output, pending? }             (if it can be pending)
    *   facts(input, output, ctx)  -> values later stages read         (optional)
    *   remember(input, output, ctx) -> values kept for the next turn  (optional)
+   *   todo(input, output, ctx)  -> [text] changes the player makes by hand (Crew tab) (optional)
    *   itemSource                 -> what gained items are credited to ("a trade roll"), text or
    *                                 (input, output, ctx) -> text                     (optional)
    *   apply(input, output, ctx)  -> changes planets (campaign.planets / currentPlanetId).
@@ -35,8 +36,8 @@
    * Undo and Restart restore planets as well as turnMemory. Items a stage
    * gains go into the Crew tab's Stash (tagged, so Undo and Restart take them back).
    *
-   * ctx = { settings, memory, facts, campaign }, where facts merges the facts
-   * of every earlier confirmed stage in order.
+   * ctx = { settings, memory, facts, campaign, planet }; facts merges every
+   * earlier confirmed stage's facts in order.
    *
    * Output is plain data: { headline, tone, lines: [line] } (see lines below).
    * A pending output carries { prompt, options: [{ value, label }] } and must
@@ -79,7 +80,7 @@
     };
   }
 
-  /** Make sure campaign.turn and campaign.turnMemory exist and are sane. */
+  /** Create or repair campaign.turn and campaign.turnMemory. */
   function ensure(campaign) {
     if (!campaign.turnMemory || typeof campaign.turnMemory !== 'object' || Array.isArray(campaign.turnMemory)) {
       campaign.turnMemory = {};
@@ -96,10 +97,7 @@
     return campaign.turn;
   }
 
-  /**
-   * ctx.memory is turnMemory, with Rivals, Patrons, world traits and the
-   * invasion taken from the current planet when there is one.
-   */
+  /** ctx.memory is turnMemory, with contacts, traits and invasion taken from the current planet. */
   function context(campaign, records) {
     const facts = {};
     for (const record of records) Object.assign(facts, record.facts || {});
@@ -169,11 +167,7 @@
     return campaign.turn.startedAt + '/' + record.id;
   }
 
-  /**
-   * Put the items a stage gained into the Crew tab's Stash, credited with
-   * where they came from. def.itemSource: text or (input, output, ctx) -> text,
-   * used for items not under a group with its own source.
-   */
+  /** Put a stage's gained items in the Stash; def.itemSource credits those outside a sourced group. */
   function syncItems(campaign, def, record, ctx) {
     if (!LP.roster) return;
     const source = typeof def.itemSource === 'function' ? def.itemSource(record.input, record.output, ctx) : def.itemSource;
@@ -182,6 +176,27 @@
       planet: ctx.planet ? ctx.planet.name : null,
       turn: LP.roster.turnNumber(campaign)
     });
+  }
+
+  function plural(n, one, many) {
+    return n + ' ' + (n === 1 ? one : many);
+  }
+
+  /** Changes the player makes by hand: the stage's todo() plus follow-up gains. */
+  function todoFor(def, record, ctx) {
+    const list = def.todo ? (def.todo(record.input, record.output, ctx) || []).filter(Boolean) : [];
+    const g = (record.output && record.output.fu && record.output.fu.gains) || {};
+    if (g.storyPoints) list.push('+' + plural(g.storyPoints, 'story point', 'story points') + '.');
+    if (g.rumors) list.push('+' + plural(g.rumors, 'Rumor', 'Rumors') + '.');
+    if (!ctx.planet && g.rivals) list.push('Add ' + plural(g.rivals, 'Rival', 'Rivals') + '.');
+    if (!ctx.planet && g.patrons) list.push('Add ' + plural(g.patrons, 'Patron', 'Patrons') + '.');
+    return list;
+  }
+
+  /** After a stage's output changes: items into the Stash, and the to-do list. */
+  function finish(campaign, def, record, ctx) {
+    syncItems(campaign, def, record, ctx);
+    record.todo = todoFor(def, record, ctx);
   }
 
   function applyResult(campaign, def, record, result, ctx) {
@@ -193,7 +208,7 @@
       setGeo(campaign, record.geoBefore);
       def.apply(record.input, record.output, context(campaign, campaign.turn.records.filter((r) => r !== record)));
     }
-    syncItems(campaign, def, record, ctx);
+    finish(campaign, def, record, ctx);
   }
 
   /** Confirm the current stage. Returns { ok: true } or { error }. */
@@ -245,10 +260,7 @@
     return ensure(campaign).records.length > 0;
   }
 
-  /**
-   * Step back once: undo the last choice if the last stage has one, otherwise
-   * remove the last stage and show its input again with the same values.
-   */
+  /** Undo the last choice, or else remove the last stage and refill its form. */
   function undo(campaign) {
     const turn = ensure(campaign);
     const record = turn.records[turn.records.length - 1];
@@ -260,7 +272,7 @@
       record.facts = previous.facts;
       campaign.turnMemory = previous.memory;
       setGeo(campaign, previous.geo);
-      syncItems(campaign, getStage(record.id), record, context(campaign, turn.records.slice(0, -1)));
+      finish(campaign, getStage(record.id), record, context(campaign, turn.records.slice(0, -1)));
       return true;
     }
     turn.records.pop();

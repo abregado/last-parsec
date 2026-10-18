@@ -94,10 +94,7 @@
     return item;
   }
 
-  /**
-   * "Gained on Ruhr during a trade roll by Ava on turn 11."
-   * what: "a trade roll by Ava"; planet: name or null; turn: number or null.
-   */
+  /** "Gained on Ruhr during a trade roll by Ava on turn 11." */
   function sourceText(what, planet, turn) {
     let text = 'Gained';
     if (planet) text += ' on ' + planet;
@@ -107,13 +104,9 @@
   }
 
   /**
-   * Item lines in a turn stage's output (and its follow-up run), in order:
-   *   [{ line, key, what, manual, damaged }]
-   * key is the line's position, so the same roll keeps the same item.
-   * what is the nearest group's source text, if any.
-   * manual is true under a "when" condition or on a conditional step:
-   * those are only gained if the condition holds, so the player adds them.
-   * damaged comes from the line or any line above it (Damaged gear: 2 rolls).
+   * Item lines in a stage's output: [{ line, key, what, manual, damaged }].
+   * key: line position. what: nearest group's source. manual: under a condition,
+   * so the player confirms it. damaged: set on the line or any line above it.
    */
   function linesIn(output) {
     const out = [];

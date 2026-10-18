@@ -221,10 +221,8 @@
   }
 
   /**
-   * Bring the character's fields in line with its species: add/remove fields,
-   * apply forced results, drop values that are no longer allowed, rebuild
-   * children. Once the character has been generated, any empty Random slot
-   * is rolled straight away.
+   * Match the fields to the species (forced results, allowed values, child slots).
+   * Once generated, empty Random slots are rolled straight away.
    */
   function sync(character) {
     if (!character.fields) character.fields = {};
@@ -304,7 +302,7 @@
     return sync(character);
   }
 
-  /** The slot can be rerolled: Random, has a value, and another result exists. */
+  /** Random, rolled, and another result exists. */
   function canReroll(character, path) {
     const slot = getSlot(character, path);
     if (!slot || slot.mode !== 'random' || slot.value === null) return false;
@@ -510,7 +508,6 @@
     const bonus = s.bonus || {};
     storyPoints += bonus.storyPoints || 0;
 
-    // Abilities.
     const base = species ? species.profile : speciesData.byId['baseline-human'].profile;
     const caps = Object.assign({}, DEFAULT_MAX, s.caps || {});
     const profile = {};

@@ -26,7 +26,6 @@
   }
 
   /**
-   * Builds the Crew section.
    *   ctx.commit(flashKey)  save + redraw, highlighting the row with that key
    *   ctx.flashKey          row key to highlight in this draw
    */

@@ -74,10 +74,11 @@
   }
 
   /** Named Rivals and Patrons gained from events. */
-  function addGained(ctx, gains) {
+  function addGained(ctx, gains, what) {
     if (!ctx.planet || !gains) return;
-    for (let i = 0; i < (gains.rivals || 0); i++) LP.planets.newRival(ctx.campaign, ctx.planet);
-    for (let i = 0; i < (gains.patrons || 0); i++) LP.planets.newPatron(ctx.campaign, ctx.planet);
+    const notes = LP.planets.contactNote(what, ctx.campaign);
+    for (let i = 0; i < (gains.rivals || 0); i++) LP.planets.newRival(ctx.campaign, ctx.planet, { notes });
+    for (let i = 0; i < (gains.patrons || 0); i++) LP.planets.newPatron(ctx.campaign, ctx.planet, { notes });
   }
 
   function clone(value) {
@@ -309,7 +310,7 @@
       }
       if (data.gained && ctx.planet) {
         const scratch = clone(ctx.planet);
-        data.newRival = LP.planets.newRival(ctx.campaign, scratch, { enemy: p.enemy, hates: data.hate });
+        data.newRival = LP.planets.newRival(ctx.campaign, scratch, { enemy: p.enemy, hates: data.hate, notes: 'Enemies you fought on turn ' + LP.roster.turnNumber(ctx.campaign) + ' (' + BATTLE_TYPES.find((t) => t.value === p.type).label + ') who held a grudge.' });
         lines.push(L.text(data.newRival.name + ' are now your Rivals on ' + ctx.planet.name + '.', 'bad'));
       }
       return { output: { headline: data.gained ? 'New Rival' + (data.newRival ? ': ' + data.newRival.name : '!') : 'No new Rival', tone: data.gained ? 'bad' : 'good', lines, data } };
@@ -369,7 +370,7 @@
       const d = output.data;
       if (!ctx.planet) return;
       if (d.removeId) LP.planets.removePatron(ctx.planet, d.removeId);
-      if (d.vengefulId) LP.planets.patronToRival(ctx.campaign, ctx.planet, d.vengefulId);
+      if (d.vengefulId) LP.planets.patronToRival(ctx.campaign, ctx.planet, d.vengefulId, 'Turned on you after a job on turn ' + LP.roster.turnNumber(ctx.campaign) + '.');
     }
   });
 
@@ -444,6 +445,7 @@
 
   T.register({
     id: 'get-paid',
+    todo: (input, output) => ['+' + plural(output.data.credits, 'credit', 'credits') + '.'],
     itemSource: 'the mission pay-out',
     step: 'post',
     number: '4.4',
@@ -492,7 +494,7 @@
       const lines = [line];
       if (p.type === 'patron') lines.push(L.text('Danger Pay is paid even if the mission failed (unless the job was Demanding). Benefits only pay out on success.', 'note'));
       lines.push(L.text('Credits from Notable Sights picked up during the battle are on top of this.', 'note'));
-      return { output: { headline: plural(total, 'credit', 'credits'), tone: 'good', lines } };
+      return { output: { headline: plural(total, 'credit', 'credits'), tone: 'good', lines, data: { credits: total } } };
     }
   });
 
@@ -504,6 +506,7 @@
 
   T.register({
     id: 'battlefield-finds',
+    todo: (input, output) => (output.fu.data && output.fu.data.evidence ? ['+' + plural(output.fu.data.evidence, 'credit', 'credits') + ' (Invasion Evidence).'] : []),
     itemSource: 'battlefield finds',
     step: 'post',
     number: '4.5',
@@ -630,6 +633,7 @@
 
   T.register({
     id: 'injuries',
+    todo: () => ['Set each injured character’s recovery time (In Sick Bay) on the Crew tab; remove anyone killed.'],
     step: 'post',
     number: '4.8',
     title: 'Determine injuries and recovery',
@@ -668,6 +672,10 @@
 
   T.register({
     id: 'experience',
+    todo(input, output) {
+      const xp = output.data && output.data.xp.length ? output.data.xp : null;
+      return [xp ? 'Add XP: ' + xp.filter((x) => /^\+/.test(x[1])).map((x) => x[0] + ' ' + x[1].split(' (')[0]).join(', ') + '.' : 'Award XP to everyone who took part.'];
+    },
     step: 'post',
     number: '4.9',
     title: 'Experience and character upgrades',
@@ -706,6 +714,7 @@
       return {
         output: {
           headline: 'XP awarded',
+          data: { xp: perCharacter },
           lines: [
             L.facts(items),
             perCharacter.length ? L.facts(perCharacter) : null,
@@ -722,6 +731,7 @@
 
   T.register({
     id: 'advanced-training',
+    todo: (input, output) => (output.headline === 'Approved' ? ['Pay the course cost in XP or credits.'] : []),
     step: 'post',
     number: '4.10',
     title: 'Invest in Advanced Training',
@@ -756,6 +766,10 @@
 
   T.register({
     id: 'purchase',
+    todo: (input) => {
+      const n = (input.military || 0) + (input.gear || 0) + (input.gadget || 0);
+      return n ? ['Pay ' + plural(3 * n, 'credit', 'credits') + ' for purchases.'] : [];
+    },
     itemSource: 'a purchase',
     step: 'post',
     number: '4.11',
@@ -819,7 +833,7 @@
       return keep;
     },
     apply(input, output, ctx) {
-      addGained(ctx, output.fu.gains);
+      addGained(ctx, output.fu.gains, 'a campaign event');
     }
   });
 
@@ -876,7 +890,7 @@
       return keep;
     },
     apply(input, output, ctx) {
-      addGained(ctx, output.fu.gains);
+      addGained(ctx, output.fu.gains, 'a character event');
     }
   });
 
@@ -890,7 +904,11 @@
     number: '4.14',
     title: 'Check for Galactic War progress',
     page: 126,
-    applies: needs,
+    applies(ctx) {
+      if (!pb(ctx)) return needs(ctx);
+      if (planetsOn(ctx) && !LP.planets.invadedPlanets(ctx.campaign, ctx.campaign.currentPlanetId).length) return 'No other planets are being Invaded.';
+      return true;
+    },
     fields(ctx) {
       if (planetsOn(ctx)) {
         const tracked = LP.planets.invadedPlanets(ctx.campaign, ctx.campaign.currentPlanetId);

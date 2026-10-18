@@ -204,7 +204,8 @@
 
   test('Specialists and Lieutenant follow the total', (assert) => {
     const c = ctx();
-    const b = battle(c, 'opportunity', { category: 'hired-muscle', enemy: 'Hired Muscle|enforcers' }); // Numbers +0
+    const plain = { deployment: 'no-condition', category: 'hired-muscle', enemy: 'Hired Muscle|enforcers' }; // Numbers +0
+    const b = battle(c, 'opportunity', plain);
     const at = (n) => { B.setFixed(b, c, 'numbers', n); return B.force(b, c); };
     let f = at(2);
     assert.deepEqual([f.total, f.specialists, f.lieutenant], [2, 0, false]);
@@ -212,14 +213,14 @@
     assert.deepEqual([f.specialists, f.lieutenant, f.regulars], [1, true, 2]);
     f = at(6);
     assert.equal(f.specialists, 1);
-    const q = battle(c, 'quest', { category: 'hired-muscle', enemy: 'Hired Muscle|enforcers' });
+    const q = battle(c, 'quest', plain);
     assert.ok(B.setFixed(q, c, 'objective', 'defend'), 'Defend is a Quest objective');
     assert.equal(B.setFixed(b, c, 'objective', 'defend'), false, 'not an Opportunity objective');
     B.setFixed(q, c, 'numbers', 6);
     f = B.force(q, c); // 6 + 1 Defend = 7
     assert.deepEqual([f.total, f.specialists], [7, 2]);
     const insane = ctx({ difficulty: 'insanity' });
-    const bi = battle(insane, 'opportunity', { category: 'hired-muscle', enemy: 'Hired Muscle|enforcers' });
+    const bi = battle(insane, 'opportunity', plain);
     B.setFixed(bi, insane, 'numbers', 3);
     const fi = B.force(bi, insane); // 3 + 1 Insanity = 4
     assert.deepEqual([fi.total, fi.specialists], [4, 2]);

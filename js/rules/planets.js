@@ -8,8 +8,8 @@
    *   id, name, archetypeId, createdAt,
    *   worldTraits: [traitId],
    *   licence: { required, cost, owned },
-   *   patrons: [{ id, entryId, name, patronType, persistent, oneTimeContract, benefit, forces, uniques }],
-   *   rivals:  [{ id, entryId, name, enemy: 'Table|rowId' | null, uniques: [uniqueId], hates }],
+   *   patrons: [{ id, entryId, name, patronType, persistent, oneTimeContract, benefit, forces, uniques, notes }],
+   *   rivals:  [{ id, entryId, name, enemy: 'Table|rowId' | null, uniques: [uniqueId], hates, notes }],
    *   invasion: null | { status: 'invaded' | 'lost' | 'liberated', enemy: 'Table|rowId' | null, makingGround },
    *   notes
    * }]
@@ -57,6 +57,10 @@
   /* Campaign helpers                                                       */
   /* ---------------------------------------------------------------------- */
 
+  function withNotes(contact) {
+    return Object.assign(contact, { notes: typeof contact.notes === 'string' ? contact.notes : '' });
+  }
+
   function normalizePlanet(raw) {
     const p = raw && typeof raw === 'object' ? raw : {};
     const inv = p.invasion && typeof p.invasion === 'object' ? p.invasion : null;
@@ -67,8 +71,8 @@
       createdAt: p.createdAt || new Date().toISOString(),
       worldTraits: Array.isArray(p.worldTraits) ? p.worldTraits.filter((t) => typeof t === 'string') : [],
       licence: Object.assign({ required: false, cost: 0, owned: false }, p.licence || {}),
-      patrons: Array.isArray(p.patrons) ? p.patrons.filter((x) => x && typeof x === 'object') : [],
-      rivals: Array.isArray(p.rivals) ? p.rivals.filter((x) => x && typeof x === 'object') : [],
+      patrons: Array.isArray(p.patrons) ? p.patrons.filter((x) => x && typeof x === 'object').map(withNotes) : [],
+      rivals: Array.isArray(p.rivals) ? p.rivals.filter((x) => x && typeof x === 'object').map(withNotes) : [],
       invasion: inv && ['invaded', 'lost', 'liberated'].includes(inv.status)
         ? { status: inv.status, enemy: inv.enemy || null, makingGround: inv.makingGround || 0 } : null,
       notes: typeof p.notes === 'string' ? p.notes : ''
@@ -183,10 +187,7 @@
     return row ? row.patron_is : id;
   }
 
-  /**
-   * Add a new named Patron to a planet from its archetype. The Patron type
-   * comes from the entry, or is rolled on the Patron Table.
-   */
+  /** New named Patron from the planet's archetype; the type comes from the entry or the Patron Table. */
   function newPatron(campaign, planet, options) {
     const opts = options || {};
     const archetype = archetypeOf(campaign, planet);
@@ -208,17 +209,14 @@
       oneTimeContract: false,
       benefit: null,
       forces: entry ? entry.forces.slice() : A.allForces(),
-      uniques: entry ? entry.uniques.slice() : []
+      uniques: entry ? entry.uniques.slice() : [],
+      notes: opts.notes || ''
     };
     planet.patrons.push(patron);
     return patron;
   }
 
-  /**
-   * Add a new named Rival. With options.enemy ('Table|rowId'), the Rival is
-   * someone you just fought: an archetype entry listing that enemy is used
-   * if there is one, otherwise a plain Rival named after the enemy.
-   */
+  /** New named Rival; with options.enemy (someone you just fought) an entry listing that enemy is preferred. */
   function newRival(campaign, planet, options) {
     const opts = options || {};
     const archetype = archetypeOf(campaign, planet);
@@ -243,14 +241,15 @@
       name: uniqueName(baseName, planet.rivals.map((r) => r.name)),
       enemy: enemy,
       uniques: entry ? entry.uniques.slice() : [],
-      hates: !!opts.hates
+      hates: !!opts.hates,
+      notes: opts.notes || ''
     };
     planet.rivals.push(rival);
     return rival;
   }
 
   /** A Vengeful Patron turns on you: they become a Rival using their own forces. */
-  function patronToRival(campaign, planet, patronId) {
+  function patronToRival(campaign, planet, patronId, notes) {
     const patron = planet.patrons.find((p) => p.id === patronId);
     if (!patron) return null;
     planet.patrons = planet.patrons.filter((p) => p.id !== patronId);
@@ -260,7 +259,8 @@
       name: uniqueName(patron.name, planet.rivals.map((r) => r.name)),
       enemy: pickForce(campaign, patron.forces),
       uniques: patron.uniques.slice(),
-      hates: false
+      hates: false,
+      notes: [patron.notes, notes].filter(Boolean).join(' ')
     };
     planet.rivals.push(rival);
     return rival;
@@ -315,10 +315,23 @@
   /* Migration from the old remembered counts                               */
   /* ---------------------------------------------------------------------- */
 
-  /**
-   * Turn the remembered world (traits, Rival and Patron counts) into a
-   * planet, with placeholder names. Makes it current.
-   */
+  /** Save the pre-planets remembered world as the current planet, with placeholder contacts. */
+  const NOTE_REMEMBERED = 'Remembered from before planets were tracked.';
+
+  /** Where a contact came from: "Met during a campaign event on turn 4." */
+  function contactNote(what, campaign) {
+    const turn = LP.roster && campaign ? LP.roster.turnNumber(campaign) : null;
+    return 'Met during ' + what + (turn ? ' on turn ' + turn : '') + '.';
+  }
+
+  /** Starting Rivals and Patrons from crew creation, on the first planet. */
+  function addStartingContacts(campaign, planet) {
+    const start = campaign.roster && campaign.roster.start;
+    if (!start) return;
+    for (let i = 0; i < start.rivals; i++) newRival(campaign, planet, { notes: 'Starting Rival from crew creation.' });
+    for (let i = 0; i < start.patrons; i++) newPatron(campaign, planet, { notes: 'Starting Patron from crew creation.' });
+  }
+
   function fromMemory(campaign, name) {
     ensure(campaign);
     const m = campaign.turnMemory || {};
@@ -328,8 +341,8 @@
       archetypeId: campaign.archetypes[0].id,
       worldTraits: m.worldTraits || []
     });
-    for (let i = 1; i <= (m.rivals || 0); i++) planet.rivals.push({ id: newId(), entryId: null, name: 'Rival ' + i, enemy: null, uniques: [], hates: false });
-    for (let i = 1; i <= (m.patrons || 0); i++) planet.patrons.push({ id: newId(), entryId: null, name: 'Patron ' + i, patronType: null, persistent: false, oneTimeContract: false, benefit: null, forces: [], uniques: [] });
+    for (let i = 1; i <= (m.rivals || 0); i++) planet.rivals.push({ id: newId(), entryId: null, name: 'Rival ' + i, enemy: null, uniques: [], hates: false, notes: NOTE_REMEMBERED });
+    for (let i = 1; i <= (m.patrons || 0); i++) planet.patrons.push({ id: newId(), entryId: null, name: 'Patron ' + i, patronType: null, persistent: false, oneTimeContract: false, benefit: null, forces: [], uniques: [], notes: NOTE_REMEMBERED });
     if (m.invadedNext) startInvasion(planet, null);
     campaign.planets.push(planet);
     campaign.currentPlanetId = planet.id;
@@ -340,6 +353,6 @@
     randomName, uniqueName, normalizePlanet, ensure, get, current, archetypeOf, setCurrent, remove, canVisit,
     pickArchetype, rollWorld, createPlanet, pickForce, patronTypeName,
     newPatron, newRival, patronToRival, removeRival, removePatron, moveContacts,
-    startInvasion, applyWarResult, invadedPlanets, fromMemory
+    startInvasion, applyWarResult, invadedPlanets, fromMemory, contactNote, addStartingContacts
   };
 })(window.LP);

@@ -8,7 +8,7 @@
    *   {
    *     generated, createdAt,
    *     mission: 'opportunity' | 'patron' | 'quest' | 'quest-finale' | 'rival' | 'rival-attack' | 'invasion',
-   *     options: { crewFielded, dangerousJob, securityTeam, lowPriority, varied },
+   *     options: { crewFielded, deployedIds?, rivalId?, dangerousJob, securityTeam, lowPriority, varied },
    *     slots: { key: { mode: 'random' | 'fixed' | 'forced', value, dice? } },
    *     events: [{ round, rowId, natural }],
    *     seize: { savvy, outnumbered, feral, gadget, result? }
@@ -625,11 +625,7 @@
     return true;
   }
 
-  /**
-   * Deploy named crew members (from the Crew tab). Sets the crew in the
-   * field, and the Seize the Initiative inputs it decides: the highest
-   * Savvy and whether a Feral is fighting.
-   */
+  /** Deploy named crew; also sets Seize the Initiative's highest Savvy and Feral. */
   function setDeployed(battle, ctx, ids) {
     const members = (ids || []).map((id) => LP.roster.getMember(ctx.campaign, id)).filter(Boolean);
     battle.options.deployedIds = members.map((m) => m.id);

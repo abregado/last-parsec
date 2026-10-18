@@ -14,8 +14,11 @@
     ['luck', 'Luck', 'Lk']
   ];
 
-  // The table picked in the Add item form, per campaign (page visit only).
+  // Page-visit UI state: the Add item form's table, and items opened for editing.
   const addTableByCampaign = {};
+  const openItems = new Set();
+
+  const PORTRAIT_WIDTH = 240;   // stored at 240 × 480 to keep localStorage small
 
   /* ---------------------------------------------------------------------- */
   /* Helpers                                                                */
@@ -31,8 +34,9 @@
     draw(state);
   }
 
+  /** Plain text box for a whole number (no spinner). */
   function numberInput(value, focus, onChange, attrs) {
-    const input = el('input', Object.assign({ class: 'input input-number', type: 'number', inputmode: 'numeric', 'data-focus': focus }, attrs || {}));
+    const input = el('input', Object.assign({ class: 'input input-number', type: 'text', inputmode: 'numeric', autocomplete: 'off', 'data-focus': focus }, attrs || {}));
     input.value = String(value);
     input.addEventListener('change', () => {
       const n = parseInt(input.value, 10);
@@ -71,7 +75,29 @@
     commit(state);
   }
 
+  /** Name, type pip and Edit; Edit opens the full row. */
   function itemRow(state, item) {
+    const open = openItems.has(item.id);
+    const category = I.categoryOf(item.table);
+    const toggle = el('button', {
+      type: 'button', class: 'btn btn-sm btn-ghost', 'data-focus': 'item-edit:' + item.id,
+      'aria-expanded': open ? 'true' : 'false',
+      onclick: () => {
+        if (open) openItems.delete(item.id);
+        else openItems.add(item.id);
+        draw(state);
+      }
+    }, open ? 'Done' : 'Edit');
+    const head = el('div', { class: 'item-head' },
+      el('span', { class: 'item-name' + (item.damaged ? ' damaged' : ''), title: item.damaged ? 'Damaged: needs Repair' : item.source || null }, item.name),
+      category ? el('span', { class: 'badge item-cat' }, I.categoryLabel(category)) : null,
+      toggle
+    );
+    if (!open) return el('li', { class: 'item-row compact' }, head);
+    return el('li', { class: 'item-row' + (item.damaged ? ' damaged' : '') }, head, itemEditor(state, item));
+  }
+
+  function itemEditor(state, item) {
     const campaign = state.campaign;
     const where = el('select', { class: 'input select item-move', 'aria-label': 'Where ' + item.name + ' is', 'data-focus': 'item-move:' + item.id },
       el('option', { value: '' }, 'Stash'),
@@ -89,17 +115,14 @@
       commit(state);
     });
 
-    const category = I.categoryOf(item.table);
-    return el('li', { class: 'item-row' + (item.damaged ? ' damaged' : '') },
+    return el('div', { class: 'item-editor' },
       el('div', { class: 'item-head' },
-        el('strong', { class: 'item-name' }, item.name),
-        category ? el('span', { class: 'badge item-cat' }, I.categoryLabel(category)) : null,
+        el('label', { class: 'field inline-field' }, el('span', { class: 'field-label' }, 'With'), where),
         el('label', { class: 'check item-damaged' }, damaged, ' Damaged'),
-        where,
         el('button', {
-          type: 'button', class: 'btn btn-sm btn-ghost', 'aria-label': 'Remove ' + item.name, title: 'Remove',
+          type: 'button', class: 'btn btn-sm btn-danger',
           'data-focus': 'item-remove:' + item.id, onclick: () => removeItem(state, item)
-        }, '✕')
+        }, 'Delete')
       ),
       textInput(item.source, 'item-source:' + item.id, (v) => {
         item.source = v;
@@ -159,6 +182,72 @@
   /* Members                                                                */
   /* ---------------------------------------------------------------------- */
 
+  /* ---------------------------------------------------------------------- */
+  /* Portraits                                                              */
+  /* ---------------------------------------------------------------------- */
+
+  /** Crop and shrink an image file to a 1:2 JPEG data URL. */
+  function portraitData(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Could not read the file.'));
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('That file isn’t an image the browser can open.'));
+        img.onload = () => {
+          const w = PORTRAIT_WIDTH;
+          const h = w * 2;
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const scale = Math.max(w / img.width, h / img.height);
+          const sw = w / scale;
+          const sh = h / scale;
+          canvas.getContext('2d').drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.85));
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /** Drop an image on it (or click to pick one); a new image replaces the old. */
+  function portrait(state, member) {
+    const picker = el('input', { type: 'file', accept: 'image/*', hidden: true });
+    const use = async (file) => {
+      if (!file || !/^image\//.test(file.type)) {
+        LP.ui.notify('Drop an image file.', 'error');
+        return;
+      }
+      try {
+        member.portrait = await portraitData(file);
+        commit(state);
+      } catch (e) {
+        LP.ui.notify(e.message, 'error');
+      }
+    };
+    picker.addEventListener('change', () => use(picker.files[0]));
+    const box = el('button', {
+      type: 'button', class: 'portrait' + (member.portrait ? ' has-image' : ''),
+      'aria-label': (member.portrait ? 'Replace' : 'Add') + ' portrait of ' + R.nameOf(member),
+      title: 'Drop an image here, or click to choose one',
+      'data-focus': 'portrait:' + member.id,
+      onclick: () => picker.click()
+    }, member.portrait ? el('img', { src: member.portrait, alt: '' }) : el('span', null, 'Drop portrait'));
+    box.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      box.classList.add('drag');
+    });
+    box.addEventListener('dragleave', () => box.classList.remove('drag'));
+    box.addEventListener('drop', (e) => {
+      e.preventDefault();
+      box.classList.remove('drag');
+      use(e.dataTransfer.files[0]);
+    });
+    return el('div', { class: 'portrait-wrap' }, box, picker);
+  }
+
   async function removeMember(state, member) {
     const ok = await LP.ui.confirm({
       title: 'Remove ' + R.nameOf(member) + '?',
@@ -203,6 +292,9 @@
 
     const carried = R.itemsOf(campaign, member.id);
     return el('li', { class: 'panel member-card' + (member.status === 'sick-bay' ? ' sick' : '') },
+      el('div', { class: 'member-top' },
+      portrait(state, member),
+      el('div', { class: 'member-top-body' },
       el('div', { class: 'member-head' },
         textInput(member.name, 'member-name:' + member.id, (v) => {
           member.name = v;
@@ -236,7 +328,7 @@
               commit(state);
             }, { min: '0', max: '20', 'aria-label': 'Turns left in Sick Bay' }))
           : null
-      ),
+      ))),
       el('div', { class: 'stat-grid crew-stats' }, stats),
       species && species.rules && species.rules.length
         ? el('details', { class: 'member-rules' }, el('summary', null, 'Species rules'), el('ul', null, species.rules.map((r) => el('li', null, r))))
@@ -299,6 +391,46 @@
     );
   }
 
+  function resourcesPanel(state) {
+    const roster = state.campaign.roster;
+    const fixed = R.RESOURCES.map((r) => el('label', { class: 'field resource' },
+      el('span', { class: 'field-label' }, r.label),
+      numberInput(roster.resources[r.key], 'res:' + r.key, (n) => {
+        roster.resources[r.key] = n;
+        commit(state);
+      }, { 'aria-label': r.label })
+    ));
+    const counters = roster.counters.map((c) => el('div', { class: 'counter-row' },
+      textInput(c.name, 'counter-name:' + c.id, (v) => {
+        c.name = v;
+        save(state);
+      }, { maxlength: '40', placeholder: 'What (e.g. Med-patches)', 'aria-label': 'Counter name' }),
+      numberInput(c.amount, 'counter-amount:' + c.id, (n) => {
+        c.amount = n;
+        commit(state);
+      }, { 'aria-label': 'Amount of ' + (c.name || 'counter') }),
+      el('button', {
+        type: 'button', class: 'btn btn-sm btn-ghost', 'aria-label': 'Remove ' + (c.name || 'counter'),
+        onclick: () => {
+          roster.counters = roster.counters.filter((x) => x !== c);
+          commit(state);
+        }
+      }, '✕')
+    ));
+    return el('section', { class: 'panel crew-resources' },
+      el('h3', null, 'Resources'),
+      el('div', { class: 'resource-grid' }, fixed),
+      counters.length ? el('div', { class: 'counter-list' }, counters) : null,
+      el('button', {
+        type: 'button', class: 'btn btn-sm', 'data-focus': 'counter-add',
+        onclick: () => {
+          roster.counters.push({ id: LP.storage.newId(), name: '', amount: 0 });
+          commit(state);
+        }
+      }, '+ Track something else')
+    );
+  }
+
   function infoPanel(state) {
     const roster = state.campaign.roster;
     const start = roster.start;
@@ -318,7 +450,7 @@
       textArea(roster.notes, 'crew-notes', (v) => {
         roster.notes = v;
         save(state);
-      }, { rows: '3', placeholder: 'Crew notes (credits, story points, Rumors…)', 'aria-label': 'Crew notes' })
+      }, { rows: '3', placeholder: 'Crew notes', 'aria-label': 'Crew notes' })
     );
   }
 
@@ -353,6 +485,7 @@
       )
     ));
 
+    container.appendChild(resourcesPanel(state));
     container.appendChild(el('ul', { class: 'member-grid' }, roster.members.map((m) => memberCard(state, m))));
 
     container.appendChild(el('section', { class: 'panel crew-stash' },

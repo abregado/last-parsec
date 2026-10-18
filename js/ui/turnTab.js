@@ -20,6 +20,13 @@
     );
   }
 
+  // Result cards showing their full working out (page visit only).
+  const showWorking = new Set();
+
+  function workingKey(state, record) {
+    return state.campaign.turn.startedAt + '/' + record.id;
+  }
+
   function commit(state, after) {
     LP.storage.touchCampaign(state.campaign);
     draw(state, after);
@@ -38,6 +45,14 @@
       return el('li', { class: 'stage ' + status, 'data-stage': def.id },
         stageHeader(def),
         LP.ui.resultCard(item.record.output, item.record.pending, {
+          todo: item.record.todo,
+          full: showWorking.has(workingKey(state, item.record)),
+          onToggle: () => {
+            const key = workingKey(state, item.record);
+            if (showWorking.has(key)) showWorking.delete(key);
+            else showWorking.add(key);
+            draw(state);
+          },
           crew: LP.roster.hasCrew(state.campaign),
           isAdded: (line) => LP.roster.hasManual(state.campaign, T.itemTag(state.campaign, item.record), line),
           onAddItem: (line) => {
@@ -54,7 +69,6 @@
       );
     }
 
-    // Current stage: input form.
     const fields = T.currentFields(state.campaign);
     return el('li', { class: 'stage current', 'data-stage': def.id },
       stageHeader(def),
