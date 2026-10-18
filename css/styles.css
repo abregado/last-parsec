@@ -473,15 +473,45 @@ main:focus {
   color: var(--accent);
 }
 
+.tab-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 24px;
+  border-bottom: 1px solid var(--border);
+}
+
 .tabs {
   display: flex;
+  flex: 1;
+  min-width: 0;
   gap: 4px;
-  margin: 0 0 24px;
+  margin: 0;
   padding: 0;
   overflow-x: auto;
-  border-bottom: 1px solid var(--border);
   list-style: none;
   scrollbar-width: thin;
+}
+
+/* Setup tabs (Edit mode only) sit after a divider. */
+.tab-config-first {
+  margin-left: 6px;
+  padding-left: 10px;
+  border-left: 1px solid var(--border);
+}
+
+.tab-config {
+  font-weight: 500;
+}
+
+.mode-toggle {
+  flex: none;
+  white-space: nowrap;
+}
+
+.mode-toggle[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .tab {
@@ -1933,4 +1963,269 @@ main:focus {
 
 .planet-notes {
   resize: vertical;
+}
+
+
+/* ==========================================================================
+   Crew tab
+   ========================================================================== */
+
+.member-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
+  gap: 14px;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.member-card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.member-card.sick {
+  border-style: dashed;
+}
+
+.member-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.member-head .leader-badge {
+  margin-left: 0;
+}
+
+.member-name {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.member-meta {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.member-meta strong {
+  color: var(--text);
+}
+
+.member-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.crew-stats {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.crew-stat {
+  display: grid;
+  gap: 2px;
+  padding: 4px;
+}
+
+.crew-stat-name {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.crew-stat .input-number {
+  width: 100%;
+  min-width: 0;
+  padding: 4px 2px;
+  font-family: var(--font-mono);
+  text-align: center;
+}
+
+.member-rules ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  font-size: 0.9rem;
+}
+
+.member-sub {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.crew-notes {
+  width: 100%;
+  resize: vertical;
+}
+
+.item-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item-row {
+  display: grid;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-sunken);
+}
+
+.item-row.damaged {
+  border-color: var(--danger);
+}
+
+.item-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.item-name {
+  margin-right: auto;
+}
+
+.item-move {
+  width: auto;
+  max-width: 12em;
+}
+
+.item-source {
+  width: 100%;
+  font-size: 0.85rem;
+}
+
+.crew-stash {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.add-item {
+  display: grid;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.add-item-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.add-item-row .input {
+  flex: 1 1 12em;
+  min-width: 0;
+}
+
+.crew-bottom {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 14px;
+}
+
+.crew-ship,
+.crew-info {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.ship-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.hull-pair .input-number {
+  width: 4.5em;
+}
+
+.crew-facts {
+  margin: 0;
+}
+
+.recruit-note {
+  margin: -8px 0 16px;
+}
+
+/* Result cards: items that went into the Stash. */
+.item-badge {
+  padding: 0 6px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.item-add {
+  padding: 0 8px;
+  font-size: 0.75rem;
+}
+
+/* Battle tab: deployed crew. */
+.battle-deploy {
+  margin: 10px 0 0;
+}
+
+.deploy-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 4px 14px;
+}
+
+/* ==========================================================================
+   Equipment tab
+   ========================================================================== */
+
+.equipment-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 8px;
+}
+
+.equipment-section {
+  margin: 24px 0 4px;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+}
+
+.equipment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.equipment-table {
+  scroll-margin-top: 16px;
+}
+
+@media (max-width: 600px) {
+  .crew-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .mode-toggle {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+  }
 }

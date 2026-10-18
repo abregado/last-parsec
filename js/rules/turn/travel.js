@@ -110,8 +110,13 @@
       const data = { newPlanet: null, traits: input.worldTraits || [], invaded: !first && !!input.invaded };
       const items = [
         ['Difficulty', LP.settings.difficultyLabel(ctx.settings.difficulty)],
-        ['Campaign crew size', String(ctx.settings.crewSize)]
+        ['Campaign crew size', String(ctx.settings.crewSize)],
+        ['Campaign turn', String(LP.roster.turnNumber(ctx.campaign))]
       ];
+      if (LP.roster.hasCrew(ctx.campaign)) {
+        const crew = LP.roster.members(ctx.campaign);
+        items.push(['Crew', plural(crew.length, 'member', 'members') + ' (from the Crew tab)']);
+      }
 
       if (planetsOn(ctx)) {
         if (first) {
@@ -284,7 +289,7 @@
           key: 'mode', type: 'select', label: fled ? 'How are you leaving?' : 'Travel to a new world?',
           options, value: fled ? (hasShip ? 'ship' : 'commercial') : 'stay'
         },
-        {
+        LP.roster.hasCrew(ctx.campaign) ? null : {
           key: 'crewCount', type: 'number', label: 'Crew members', min: 1, max: 30,
           value: ctx.memory.crewCount || ctx.settings.crewSize,
           help: 'Commercial passage costs 1 credit per crew member.',
@@ -331,7 +336,7 @@
         lines.push(L.facts([['Travel cost', cost + ' credits'], ['Breakdown', costNotes.join(', ')]]));
         lines.push(L.text('If your ship has Hull damage, taking off is dangerous: see p.59.', 'note'));
       } else {
-        cost = input.crewCount;
+        cost = LP.roster.crewCount(ctx, input.crewCount);
         lines.push(L.facts([['Travel cost', plural(cost, 'credit', 'credits') + ' (1 per crew member)']]));
         lines.push(L.text('No packages or other cargo can be carried, and there is no Starship Travel Event.', 'note'));
       }
@@ -369,7 +374,7 @@
       };
     },
     remember(input) {
-      return input.mode === 'commercial' ? { crewCount: input.crewCount } : {};
+      return input.mode === 'commercial' && input.crewCount ? { crewCount: input.crewCount } : {};
     }
   });
 
@@ -388,7 +393,11 @@
       if (ctx.facts.travelMode !== 'ship') return 'Commercial passage: no Starship Travel Event.';
       return true;
     },
+    itemSource: 'a starship travel event',
     fields(ctx) {
+      if (LP.roster.hasCrew(ctx.campaign)) {
+        return [{ key: 'note', type: 'info', text: 'Roll on the Starship Travel Events Table. Events that pick crew members pick from your ' + plural(LP.roster.members(ctx.campaign).length, 'crew member', 'crew') + '; items found go into the Stash.' }];
+      }
       return [{
         key: 'crewCount', type: 'number', label: 'Crew members', min: 1, max: 30,
         value: ctx.memory.crewCount || ctx.settings.crewSize,
@@ -397,12 +406,11 @@
     },
     resolve(input, ctx) {
       const archetype = ctx.planet ? LP.planets.archetypeOf(ctx.campaign, ctx.planet) : null;
-      const run = LP.followup.start([{ table: 'Starship Travel Events Table' }], {
-        crewCount: input.crewCount,
+      const run = LP.followup.start([{ table: 'Starship Travel Events Table' }], Object.assign(LP.roster.crewEnv(ctx, input.crewCount), {
         crewSize: ctx.settings.crewSize,
         disabled: LP.archetypes ? LP.archetypes.disabledMap(ctx.campaign, archetype) : (ctx.campaign.models ? ctx.campaign.models.disabled : {}),
         speciesWeights: LP.archetypes ? LP.archetypes.speciesWeights(archetype) : null
-      });
+      }));
       return {
         output: { headline: run.lines[0].title, lines: [], fu: run },
         pending: LP.followup.pendingChoice(run)
@@ -420,7 +428,7 @@
       return { travelEvent: output.fu.lines[0].rowId, travelGains: output.fu.gains };
     },
     remember(input) {
-      return { crewCount: input.crewCount };
+      return input.crewCount ? { crewCount: input.crewCount } : {};
     }
   });
 

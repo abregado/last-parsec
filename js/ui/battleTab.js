@@ -119,10 +119,10 @@
   /* Panels                                                                 */
   /* ---------------------------------------------------------------------- */
 
-  function checkbox(label, checked, onChange, focus) {
+  function checkbox(label, checked, onChange, focus, detail) {
     const input = el('input', { type: 'checkbox', checked: checked, 'data-focus': focus });
     input.addEventListener('change', () => onChange(input.checked));
-    return el('label', { class: 'check' }, input, ' ' + label);
+    return el('label', { class: 'check' }, input, ' ' + label, detail ? el('span', { class: 'field-detail' }, ' · ' + detail) : null);
   }
 
   function missionPanel(state) {
@@ -145,6 +145,25 @@
         commit(state);
       }
     });
+
+    const R = LP.roster;
+    let deployPanel = null;
+    if (R.hasCrew(campaign)) {
+      const deployed = new Set(battle.options.deployedIds || []);
+      deployPanel = el('fieldset', { class: 'field battle-deploy' },
+        el('legend', { class: 'field-label' }, 'Crew in the field (' + deployed.size + ' of ' + ctx.settings.crewSize + ')'),
+        el('div', { class: 'deploy-list' }, R.members(campaign).map((m) => {
+          const carried = R.itemsOf(campaign, m.id).map((i) => i.name + (i.damaged ? ' (damaged)' : ''));
+          return checkbox(R.nameOf(m) + (m.status === 'sick-bay' ? ' (Sick Bay)' : ''), deployed.has(m.id), (v) => {
+            if (v) deployed.add(m.id);
+            else deployed.delete(m.id);
+            B.setDeployed(battle, ctx, R.members(campaign).map((x) => x.id).filter((id) => deployed.has(id)));
+            commit(state);
+          }, 'battle.deploy.' + m.id, carried.length ? 'Carrying ' + carried.join(', ') : 'Carrying nothing');
+        })),
+        deployed.size > ctx.settings.crewSize ? el('span', { class: 'warning' }, 'More than your campaign crew size of ' + ctx.settings.crewSize + '.') : null
+      );
+    }
 
     const fromTurn = turnMission(campaign);
     const planet = B.planetOf(ctx);
@@ -170,8 +189,9 @@
       el('div', { class: 'battle-mission-row' },
         el('label', { class: 'field' }, el('span', { class: 'field-label' }, 'Mission'), select),
         rivalPicker ? el('label', { class: 'field' }, el('span', { class: 'field-label' }, 'Rival'), rivalPicker) : null,
-        el('label', { class: 'field' }, el('span', { class: 'field-label' }, 'Crew in the field'), crew)
+        deployPanel ? null : el('label', { class: 'field' }, el('span', { class: 'field-label' }, 'Crew in the field'), crew)
       ),
+      deployPanel,
       rival && !rival.enemy ? el('p', { class: 'field-detail' }, rival.name + ' has no enemy type yet: roll it, then set it on the Planets tab.') : null,
       fromTurn && fromTurn !== battle.mission
         ? el('p', { class: 'turn-link' },
@@ -415,6 +435,10 @@
       useTurn(battle, ctx, campaign);
     } else if (!battle.generated) {
       useTurn(battle, ctx, campaign);
+    }
+    // With a crew, start with everyone fit to fight in the field.
+    if (LP.roster.hasCrew(campaign) && !battle.generated && !Array.isArray(battle.options.deployedIds)) {
+      B.setDeployed(battle, ctx, B.defaultDeployed(ctx));
     }
     campaign.battle = battle;
     draw({ container, campaign, battle, ctx });

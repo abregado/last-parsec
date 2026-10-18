@@ -25,12 +25,15 @@
    *   choose(record, value, ctx) -> { output, pending? }             (if it can be pending)
    *   facts(input, output, ctx)  -> values later stages read         (optional)
    *   remember(input, output, ctx) -> values kept for the next turn  (optional)
+   *   itemSource                 -> what gained items are credited to ("a trade roll"), text or
+   *                                 (input, output, ctx) -> text                     (optional)
    *   apply(input, output, ctx)  -> changes planets (campaign.planets / currentPlanetId).
    *                                 Runs after resolve and again after each choice, always
    *                                 starting from the planets as they were before the stage,
    *                                 so it must only depend on input and output. (optional)
    *
-   * Undo and Restart restore planets as well as turnMemory.
+   * Undo and Restart restore planets as well as turnMemory. Items a stage
+   * gains go into the Crew tab's Stash (tagged, so Undo and Restart take them back).
    *
    * ctx = { settings, memory, facts, campaign }, where facts merges the facts
    * of every earlier confirmed stage in order.
@@ -161,6 +164,26 @@
     return fields;
   }
 
+  /** Tag on the items a record put in the Stash. */
+  function itemTag(campaign, record) {
+    return campaign.turn.startedAt + '/' + record.id;
+  }
+
+  /**
+   * Put the items a stage gained into the Crew tab's Stash, credited with
+   * where they came from. def.itemSource: text or (input, output, ctx) -> text,
+   * used for items not under a group with its own source.
+   */
+  function syncItems(campaign, def, record, ctx) {
+    if (!LP.roster) return;
+    const source = typeof def.itemSource === 'function' ? def.itemSource(record.input, record.output, ctx) : def.itemSource;
+    LP.roster.syncStageItems(campaign, itemTag(campaign, record), record.output, {
+      label: source || 'the ' + def.title.charAt(0).toLowerCase() + def.title.slice(1) + ' step',
+      planet: ctx.planet ? ctx.planet.name : null,
+      turn: LP.roster.turnNumber(campaign)
+    });
+  }
+
   function applyResult(campaign, def, record, result, ctx) {
     record.output = result.output;
     record.pending = result.pending || null;
@@ -170,6 +193,7 @@
       setGeo(campaign, record.geoBefore);
       def.apply(record.input, record.output, context(campaign, campaign.turn.records.filter((r) => r !== record)));
     }
+    syncItems(campaign, def, record, ctx);
   }
 
   /** Confirm the current stage. Returns { ok: true } or { error }. */
@@ -236,11 +260,13 @@
       record.facts = previous.facts;
       campaign.turnMemory = previous.memory;
       setGeo(campaign, previous.geo);
+      syncItems(campaign, getStage(record.id), record, context(campaign, turn.records.slice(0, -1)));
       return true;
     }
     turn.records.pop();
     campaign.turnMemory = record.memoryBefore || {};
     setGeo(campaign, record.geoBefore);
+    if (LP.roster) LP.roster.removeTagged(campaign, itemTag(campaign, record), true);
     turn.draft = { id: record.id, input: record.input };
     return true;
   }
@@ -250,12 +276,14 @@
     ensure(campaign);
     campaign.turnMemory = clone(campaign.turn.memoryAtStart) || {};
     setGeo(campaign, campaign.turn.geoAtStart);
+    if (LP.roster) LP.roster.removeTagged(campaign, campaign.turn.startedAt + '/', true);
     campaign.turn = newTurn(campaign);
   }
 
   /** Begin the next turn, keeping what this turn remembered. */
   function nextTurn(campaign) {
     ensure(campaign);
+    campaign.turnNumber = (LP.roster ? LP.roster.turnNumber(campaign) : campaign.turnNumber || 1) + 1;
     campaign.turn = newTurn(campaign);
   }
 
@@ -354,6 +382,7 @@
     register,
     getStage,
     ensure,
+    itemTag,
     walk,
     currentFields,
     context,

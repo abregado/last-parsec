@@ -1,6 +1,6 @@
 # Last Parsec — Five Parsecs From Home companion app
 
-Phase 1 (campaigns + Characters tab, build steps 1–6 below) is **done**. Phase 2 is planned at the end of this file: campaign settings and the Models tab (2A) are **done**; the Campaign Turn tab's engine, UI (Restart/Undo, pending choices) and the Start + Travel stages (0, 1.1-1.4) are **done**. The follow-up executor and scripts (Starship Travel Events, Trade, Exploration, Loot chain, Rewards) are **done**, and the travel event stage uses them. The World stages (2.1-2.6) are **done**. Phase 3 (Battle tab) and the Post-Battle stages (2C, pre-filled from the battle) are **done**: a campaign turn now runs from Start to Turn complete. Phase 4 (Species, Archetypes and Planets tabs, and planets throughout the turn and battle) is **done**.
+Phase 1 (campaigns + Characters tab, build steps 1–6 below) is **done**. Phase 2 is planned at the end of this file: campaign settings and the Models tab (2A) are **done**; the Campaign Turn tab's engine, UI (Restart/Undo, pending choices) and the Start + Travel stages (0, 1.1-1.4) are **done**. The follow-up executor and scripts (Starship Travel Events, Trade, Exploration, Loot chain, Rewards) are **done**, and the travel event stage uses them. The World stages (2.1-2.6) are **done**. Phase 3 (Battle tab) and the Post-Battle stages (2C, pre-filled from the battle) are **done**: a campaign turn now runs from Start to Turn complete. Phase 4 (Species, Archetypes and Planets tabs, and planets throughout the turn and battle) is **done**. Phase 5 (Crew tab, itemized Stash, Equipment tab, Edit/Play mode) is **done**.
 
 ## Goals and constraints
 
@@ -612,3 +612,25 @@ One combined table of all 26 species, replacing the book's two-step roll (Crew T
 1. **Fleeing an invasion deletes** that planet's Patrons and Rivals, as the book says. The planet itself stays, tracked for the Galactic War.
 2. **Running out of names:** entries are reused with a number ("Pirates (2)").
 3. **Species weights:** one combined table, shown on the Species tab. Archetypes hold a weight per species, with All to 0 and Reset to default buttons.
+
+
+## Phase 5: Crew tab, Stash, Equipment tab, Edit/Play mode
+
+- **Finalize** (Characters tab) turns generated characters into crew members on `campaign.roster` (`js/rules/roster.js`). The first time, the 8 starting equipment rolls go to the Stash, origin items go to their character, and the ship, flavour and starting resources are recorded. Afterwards the generator is emptied, and later finalizes add recruits (`joinedTurn`).
+- **Items** (`js/rules/items.js`): `{ id, table, rowId, name, damaged, source, turn, carrierId, tag, key }`. `carrierId` null = Stash. `source` is editable text such as "Gained on Ruhr during a trade roll by Ava on turn 11."
+- **Crew tab** (`js/ui/crewTab.js`): member cards (name, leader, status and Sick Bay turns, editable stats and XP, origins, species rules, carried items, notes); Stash with an Add item form; Ship (name, Hull, debt); crew notes.
+- **Turn integration**:
+  - The engine collects item lines from every stage's output (`LP.items.linesIn`) and puts them in the Stash, tagged per record. Undo and Restart take them back. Items under a "when" condition, or on a `conditional` step, get a "+ Stash" button instead.
+  - Stages credit items with `itemSource`, and follow-up groups with `source`.
+  - `campaign.turnNumber` goes up on Start next turn.
+- **Named crew in stages**, when there is a crew:
+  - **Upkeep:** Sick Bay is picked by name.
+  - **Crew tasks:** a new `assign` field type picks each character's task. Groups are named after the character, and Savvy rolls use their Savvy (`who`).
+  - **Travel events and Character Events:** pick a named crew member.
+  - **Battle result:** participants and casualties are picked by name.
+  - **Injuries:** rolled per character (Bots and Soulless use the Bot Injury Table).
+  - **Experience:** XP is listed per character.
+  - **Battle tab:** deploy named crew. The Seize the Initiative Savvy and Feral inputs follow from who is deployed.
+  - XP, injuries, credits and story points are still applied by hand on the Crew tab.
+- **Equipment tab**: read-only view of the starting, purchase and Loot tables.
+- **Edit / Play mode**: a toggle at the right of the tab bar. Play mode hides the setup tabs (Characters, Models, Species, Archetypes, Equipment). It is stored per browser in `localStorage` (`lastParsec.mode`).

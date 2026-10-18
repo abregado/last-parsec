@@ -19,8 +19,25 @@
     return ctx.facts.fleeFailed ? 'Trapped by the invasion: you can only Assign Equipment this turn.' : true;
   }
 
+  const R = LP.roster;
+
   function crewDefault(ctx) {
-    return ctx.memory.crewCount || ctx.settings.crewSize;
+    return R.crewCount(ctx);
+  }
+
+  function hasCrew(ctx) {
+    return R.hasCrew(ctx.campaign);
+  }
+
+  /** Crew members free for tasks this turn (from Upkeep), when there is a crew. */
+  function availableMembers(ctx) {
+    const ids = ctx.facts.availableIds;
+    return ids ? ids.map((id) => R.getMember(ctx.campaign, id)).filter(Boolean) : R.available(ctx.campaign);
+  }
+
+  /** Number of crew in Sick Bay from the Upkeep input. */
+  function sickCount(input) {
+    return input.sickBayIds ? input.sickBayIds.length : input.sickBay || 0;
   }
 
   /** Env for follow-up runs: Models and archetype restrictions, species weights, Rival names. */
@@ -77,18 +94,30 @@
     page: 76,
     applies: trapped,
     fields(ctx) {
-      const hasShip = ctx.facts.hasShip !== undefined ? ctx.facts.hasShip : ctx.memory.hasShip !== false;
-      return [
-        { key: 'crewCount', type: 'number', label: 'Crew members', min: 1, max: 30, value: crewDefault(ctx) },
-        { key: 'sickBay', type: 'number', label: 'In Sick Bay (including Bots under repair)', min: 0, max: 30, value: 0, help: 'They don’t count for Upkeep and can’t take tasks.' },
+      const ship = hasCrew(ctx) ? ctx.campaign.roster.ship : null;
+      const hasShip = ctx.facts.hasShip !== undefined ? ctx.facts.hasShip : ctx.memory.hasShip !== undefined ? ctx.memory.hasShip !== false : !hasCrew(ctx) || !!ship;
+      const debt = ctx.memory.debt !== undefined ? ctx.memory.debt : ship ? ship.debt : 0;
+      const hull = ctx.memory.hullDamage !== undefined ? ctx.memory.hullDamage : ship ? Math.max(0, ship.hullMax - ship.hull) : 0;
+      const crewFields = hasCrew(ctx)
+        ? [{
+          key: 'sickBayIds', type: 'multiselect', label: 'In Sick Bay (including Bots under repair)',
+          options: R.memberOptions(R.members(ctx.campaign)),
+          value: R.members(ctx.campaign).filter((m) => m.status === 'sick-bay').map((m) => m.id),
+          help: 'They don’t count for Upkeep and can’t take tasks. Pre-filled from the Crew tab.'
+        }]
+        : [
+          { key: 'crewCount', type: 'number', label: 'Crew members', min: 1, max: 30, value: crewDefault(ctx) },
+          { key: 'sickBay', type: 'number', label: 'In Sick Bay (including Bots under repair)', min: 0, max: 30, value: 0, help: 'They don’t count for Upkeep and can’t take tasks.' }
+        ];
+      return crewFields.concat([
         { key: 'hasShip', type: 'yesno', label: 'Do you have a ship?', value: hasShip },
-        { key: 'debt', type: 'number', label: 'Ship debt (credits)', min: 0, max: 999, value: ctx.memory.debt || 0, showIf: (v) => v.hasShip },
+        { key: 'debt', type: 'number', label: 'Ship debt (credits)', min: 0, max: 999, value: debt || 0, showIf: (v) => v.hasShip },
         { key: 'payment', type: 'number', label: 'Paying off the debt this turn (credits)', min: 0, max: 999, value: 0, showIf: (v) => v.hasShip && v.debt > 0 },
-        { key: 'hullDamage', type: 'number', label: 'Hull damage (points)', min: 0, max: 99, value: ctx.memory.hullDamage || 0, showIf: (v) => v.hasShip }
-      ];
+        { key: 'hullDamage', type: 'number', label: 'Hull damage (points)', min: 0, max: 99, value: hull || 0, showIf: (v) => v.hasShip }
+      ]);
     },
-    validate(input) {
-      if (input.sickBay > input.crewCount) return 'More crew in Sick Bay than in the crew.';
+    validate(input, ctx) {
+      if (sickCount(input) > R.crewCount(ctx, input.crewCount)) return 'More crew in Sick Bay than in the crew.';
       if (input.payment > input.debt) return 'You can’t pay more than you owe.';
       return null;
     },
@@ -97,7 +126,7 @@
       const data = { seized: false, debt: input.hasShip ? input.debt || 0 : 0, hullDamage: input.hasShip ? input.hullDamage || 0 : 0 };
 
       // Upkeep
-      const paying = input.crewCount - (input.sickBay || 0);
+      const paying = R.crewCount(ctx, input.crewCount) - sickCount(input);
       const highCost = hasTrait(ctx, 'high-cost');
       const cost = upkeepCost(paying + (highCost ? 2 : 0));
       lines.push(L.facts([
@@ -139,8 +168,9 @@
       }
 
       // Medical care
-      if (input.sickBay > 0) {
+      if (sickCount(input) > 0) {
         const price = hasTrait(ctx, 'medical-science') ? 3 : 4;
+        if (input.sickBayIds) lines.push(L.facts([['In Sick Bay', R.listText(R.namesOf(ctx.campaign, input.sickBayIds))]]));
         lines.push(L.text('Medical care: pay ' + price + ' credits to take 1 campaign turn off one character’s recovery, as often as you can afford. Everyone in Sick Bay now marks off one turn; those who finish can fight this turn but take no task.'));
       }
 
@@ -153,20 +183,23 @@
         }
       };
     },
-    facts(input, output) {
-      return {
-        crewCount: input.crewCount,
-        available: input.crewCount - (input.sickBay || 0),
+    facts(input, output, ctx) {
+      const count = R.crewCount(ctx, input.crewCount);
+      const facts = {
+        crewCount: count,
+        available: count - sickCount(input),
         hasShip: input.hasShip && !output.data.seized
       };
+      if (input.sickBayIds) facts.availableIds = R.members(ctx.campaign).filter((m) => !input.sickBayIds.includes(m.id)).map((m) => m.id);
+      return facts;
     },
     remember(input, output) {
-      return {
-        crewCount: input.crewCount,
+      const keep = input.crewCount ? { crewCount: input.crewCount } : {};
+      return Object.assign(keep, {
         hasShip: !!input.hasShip && !output.data.seized,
         debt: output.data.seized ? 0 : output.data.debt,
         hullDamage: output.data.seized ? 0 : output.data.hullDamage
-      };
+      });
     }
   });
 
@@ -187,8 +220,20 @@
 
   const RECRUIT_NOTE = 'Basic profile for their type, armed with a Handgun. No Background, Motivation or Class rolls.';
 
+  /** Crew per task: { taskKey: count }, from named assignments or plain counts. */
   function tasksOf(input) {
+    if (input.assign) {
+      const counts = {};
+      for (const task of Object.values(input.assign)) if (task) counts[task] = (counts[task] || 0) + 1;
+      return counts;
+    }
     return input.tasks || {};
+  }
+
+  /** The named crew members on a task (empty without a crew). */
+  function onTask(input, ctx, key) {
+    if (!input.assign) return [];
+    return Object.keys(input.assign).filter((id) => input.assign[id] === key).map((id) => R.getMember(ctx.campaign, id)).filter(Boolean);
   }
 
   T.register({
@@ -197,16 +242,24 @@
     number: '2.2',
     title: 'Assign and resolve crew tasks',
     page: 76,
+    itemSource: 'crew tasks',
     applies: trapped,
     fields(ctx) {
       const available = ctx.facts.available !== undefined ? ctx.facts.available : crewDefault(ctx);
-      const n = (key) => (v) => v.tasks && v.tasks[key] > 0;
+      const n = (key) => (v) => tasksOf(v)[key] > 0;
+      const restricted = hasTrait(ctx, 'travel-restricted') ? ' Travel restricted: only one crew member may Explore.' : '';
       return [
-        {
-          key: 'tasks', type: 'tasks', label: 'How many crew on each task?', perTask: 2, total: available,
-          help: 'Up to two crew per task. Crew can also sit this turn out.' + (hasTrait(ctx, 'travel-restricted') ? ' Travel restricted: only one crew member may Explore.' : ''),
-          tasks: TASKS, value: {}
-        },
+        hasCrew(ctx)
+          ? {
+            key: 'assign', type: 'assign', label: 'Who does what?', perTask: 2,
+            members: R.memberOptions(availableMembers(ctx)), tasks: TASKS, value: {},
+            help: 'Up to two crew per task. Crew in Sick Bay aren’t listed.' + restricted
+          }
+          : {
+            key: 'tasks', type: 'tasks', label: 'How many crew on each task?', perTask: 2, total: available,
+            help: 'Up to two crew per task. Crew can also sit this turn out.' + restricted,
+            tasks: TASKS, value: {}
+          },
         { key: 'patrons', type: 'number', label: 'Patrons you already know', min: 0, max: 20, value: ctx.memory.patrons || 0, showIf: n('patron'), help: 'Each adds +1 to the Patron search.' },
         { key: 'patronCredits', type: 'number', label: 'Credits spent on the Patron search', min: 0, max: 50, value: 0, showIf: n('patron'), help: '+1 per credit.' },
         { key: 'extraTrades', type: 'number', label: 'Extra Trade rolls bought (3 credits each)', min: 0, max: 10, value: 0, showIf: n('trade') },
@@ -221,7 +274,7 @@
       const used = TASKS.reduce((sum, task) => sum + (t[task.key] || 0), 0);
       const over = TASKS.find((task) => (t[task.key] || 0) > 2);
       if (over) return over.label + ': at most 2 crew per task.';
-      if (used > available) return 'Only ' + available + ' crew are available for tasks.';
+      if (!input.assign && used > available) return 'Only ' + available + ' crew are available for tasks.';
       if (hasTrait(ctx, 'travel-restricted') && (t.explore || 0) > 1) return 'Travel restricted: only one crew member may Explore on this world.';
       return null;
     },
@@ -230,10 +283,12 @@
       const crewCount = ctx.facts.crewCount || crewDefault(ctx);
       const rivals = input.rivals !== undefined ? input.rivals : (ctx.memory.rivals || 0);
       const steps = [];
+      const who = (key) => onTask(input, ctx, key);
+      const names = (key) => R.listText(who(key).map(R.nameOf));
 
       if (t.patron) {
         steps.push({
-          group: 'Find a Patron (' + plural(t.patron, 'crew member', 'crew') + ')',
+          group: 'Find a Patron (' + (input.assign ? names('patron') : plural(t.patron, 'crew member', 'crew')) + ')',
           steps: [{
             roll: '1D6', label: 'Patron search',
             add: [
@@ -253,12 +308,20 @@
       }
 
       if (t.train) {
-        steps.push({ group: 'Train', steps: [{ text: '+1 XP for each of the ' + plural(t.train, 'crew member', 'crew') + ' training. If that allows a Character Upgrade (p.123), resolve it now.' }] });
+        const trainees = input.assign ? names('train') : 'the ' + plural(t.train, 'crew member', 'crew') + ' training';
+        steps.push({ group: 'Train', steps: [{ text: '+1 XP for ' + (input.assign ? trainees : 'each of ' + trainees) + '. If that allows a Character Upgrade (p.123), resolve it now.' }] });
       }
 
       const trades = (t.trade || 0) + (t.trade ? input.extraTrades || 0 : 0);
+      const traders = who('trade');
       for (let i = 1; i <= trades; i++) {
-        steps.push({ group: i <= t.trade ? 'Trader ' + i : 'Bought Trade roll ' + (i - t.trade), steps: [{ table: 'Trade Table' }] });
+        const trader = i <= t.trade ? traders[i - 1] : null;
+        steps.push({
+          group: trader ? 'Trade: ' + R.nameOf(trader) : i <= t.trade ? 'Trader ' + i : 'Bought Trade roll ' + (i - t.trade),
+          source: trader ? 'a trade roll by ' + R.nameOf(trader) : i <= t.trade ? 'a trade roll' : 'a bought trade roll',
+          who: trader ? R.who(trader) : undefined,
+          steps: [{ table: 'Trade Table' }]
+        });
       }
       if (t.trade && hasTrait(ctx, 'free-trade-zone')) {
         steps.push({ when: 'Free trade zone: one trader may roll twice and keep either result', steps: [{ table: 'Trade Table', label: 'Second roll' }] });
@@ -289,16 +352,23 @@
         recruitSteps.push({ text: RECRUIT_NOTE, tone: 'note' });
         if (hasTrait(ctx, 'adventurous-population')) recruitSteps.push({ text: 'Adventurous population: roll up one extra character and choose who to hire.', tone: 'note' });
         if (hasTrait(ctx, 'alien-species-restricted')) recruitSteps.push({ text: 'Alien species restricted: a recruit of the restricted species counts as a Baseline Human instead.', tone: 'note' });
-        steps.push({ group: 'Recruit', steps: recruitSteps });
+        steps.push({ group: 'Recruit' + (input.assign ? ' (' + names('recruit') + ')' : ''), steps: recruitSteps });
       }
 
+      const explorers = who('explore');
       for (let i = 1; i <= (t.explore || 0); i++) {
-        steps.push({ group: 'Explorer ' + i, steps: [{ table: 'Exploration Table' }] });
+        const explorer = explorers[i - 1];
+        steps.push({
+          group: explorer ? 'Explore: ' + R.nameOf(explorer) : 'Explorer ' + i,
+          source: explorer ? 'exploration by ' + R.nameOf(explorer) : 'exploration',
+          who: explorer ? R.who(explorer) : undefined,
+          steps: [{ table: 'Exploration Table' }]
+        });
       }
 
       if (t.track) {
         steps.push({
-          group: 'Track',
+          group: 'Track' + (input.assign ? ' (' + names('track') + ')' : ''),
           steps: rivals > 0
             ? [{
               roll: '1D6', label: 'Tracking', target: 6,
@@ -312,27 +382,30 @@
         });
       }
 
+      const repairers = who('repair');
       for (let i = 1; i <= (t.repair || 0); i++) {
+        const repairer = repairers[i - 1];
         steps.push({
-          group: 'Repair ' + i,
+          group: repairer ? 'Repair: ' + R.nameOf(repairer) : 'Repair ' + i,
           steps: [{
             roll: '1D6', label: 'Repair (1D6 + Savvy, needs 6+)', savvy: true, engineer: true, target: 6,
+            who: repairer ? R.who(repairer) : undefined,
             add: [
               { label: 'spare parts', value: input.repairCredits || 0 },
               { label: 'Technical knowledge', value: hasTrait(ctx, 'technical-knowledge') ? 1 : 0 }
             ],
-            outcomes: [{ natural: 1, final: true, text: 'Natural 1: the item is beyond fixing.', tone: 'bad' }]
+            outcomes: [{ natural: 1, final: true, fail: true, text: 'Natural 1: the item is beyond fixing.', tone: 'bad' }]
           }]
         });
       }
 
       if (t.decoy) {
-        steps.push({ group: 'Decoy', steps: [{ text: '+' + t.decoy + ' when checking whether your Rivals find you (stage 2.6).' }] });
+        steps.push({ group: 'Decoy' + (input.assign ? ' (' + names('decoy') + ')' : ''), steps: [{ text: '+' + t.decoy + ' when checking whether your Rivals find you (stage 2.6).' }] });
       }
 
       if (!steps.length) steps.push({ text: 'Nobody took a task this turn.' });
 
-      const run = F.start(steps, env(ctx, { crewCount: crewCount, rivals: rivals }));
+      const run = F.start(steps, env(ctx, Object.assign(R.crewEnv(ctx, crewCount), { rivals: rivals })));
       const busy = TASKS.filter((task) => t[task.key]).map((task) => task.label + ' ' + t[task.key]);
       return runOutput(busy.length ? busy.join(' · ') : 'No tasks', run);
     },
@@ -366,6 +439,7 @@
 
   T.register({
     id: 'job-offers',
+    itemSource: 'a job offer',
     step: 'world',
     number: '2.3',
     title: 'Determine job offers',
@@ -462,11 +536,16 @@
     title: 'Assign equipment',
     page: 85,
     submitLabel: 'Done',
-    fields() {
-      return [{ key: 'note', type: 'info', text: 'Swap items between characters and the Stash now. What each character carries is what they take into battle. Without a ship, the Stash holds only 5 items (duplicate consumables count as one).' }];
+    fields(ctx) {
+      const where = hasCrew(ctx) ? 'Swap items between characters and the Stash on the Crew tab now.' : 'Swap items between characters and the Stash now.';
+      return [{ key: 'note', type: 'info', text: where + ' What each character carries is what they take into battle. Without a ship, the Stash holds only 5 items (duplicate consumables count as one).' }];
     },
-    resolve() {
-      return { output: { headline: 'Equipment assigned', lines: [] } };
+    resolve(input, ctx) {
+      if (!hasCrew(ctx)) return { output: { headline: 'Equipment assigned', lines: [] } };
+      const names = (list) => list.length ? list.map((i) => i.name + (i.damaged ? ' (damaged)' : '')).join(', ') : 'Nothing';
+      const items = R.members(ctx.campaign).map((m) => [R.nameOf(m), names(R.itemsOf(ctx.campaign, m.id))]);
+      items.push(['Stash', names(R.itemsOf(ctx.campaign, null))]);
+      return { output: { headline: 'Equipment assigned', lines: [L.facts(items)] } };
     }
   });
 

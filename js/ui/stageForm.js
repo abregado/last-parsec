@@ -15,6 +15,8 @@
    *   type 'text'        free text; placeholder
    *   type 'tasks'       tasks: [{ key, label, hint? }], perTask (max per task),
    *                      total (crew available), value: { taskKey: count }
+   *   type 'assign'      members: [{ value, label, hint? }], tasks: [{ key, label }],
+   *                      perTask, value: { memberId: taskKey }   (named crew tasks)
    *
    * onSubmit(values) receives only the visible fields' values and returns an
    * error message (shown under the form) or nothing.
@@ -163,6 +165,45 @@
           );
         }
 
+        case 'assign': {
+          const chosen = Object.assign({}, field.value || {});
+          values[field.key] = chosen;
+          const status = el('span', { class: 'field-detail task-total' });
+          const updateStatus = () => {
+            const counts = {};
+            for (const task of Object.values(chosen)) if (task) counts[task] = (counts[task] || 0) + 1;
+            const over = field.tasks.find((t) => (counts[t.key] || 0) > field.perTask);
+            const busy = Object.values(chosen).filter(Boolean).length;
+            status.textContent = over ? over.label + ': at most ' + field.perTask + ' crew!' : busy + ' of ' + field.members.length + ' crew on a task';
+            status.classList.toggle('over', !!over);
+          };
+          const rows = field.members.map((m) => {
+            const selectId = id + '-' + m.value;
+            const select = el('select', { id: selectId, class: 'input select', 'data-focus': 'field:' + field.key + ':' + m.value },
+              el('option', { value: '' }, 'No task'),
+              field.tasks.map((t) => el('option', { value: t.key }, t.label))
+            );
+            select.value = chosen[m.value] || '';
+            select.addEventListener('change', () => {
+              if (select.value) chosen[m.value] = select.value;
+              else delete chosen[m.value];
+              updateStatus();
+              refreshVisibility();
+            });
+            return el('div', { class: 'task-row' },
+              el('label', { for: selectId, class: 'task-label' }, el('strong', null, m.label), m.hint ? el('span', { class: 'field-detail' }, m.hint) : null),
+              select
+            );
+          });
+          updateStatus();
+          return el('fieldset', { class: 'field stage-field' },
+            el('legend', { class: 'field-label' }, field.label),
+            field.help ? el('span', { class: 'field-detail' }, field.help) : null,
+            rows.length ? el('div', { class: 'task-grid assign-grid' }, rows) : el('p', { class: 'muted' }, 'Nobody is free for tasks.'),
+            status
+          );
+        }
+
         default:
           return el('p', { class: 'form-error' }, 'Unknown field type: ' + field.type);
       }
@@ -204,6 +245,12 @@
           const over = field.tasks.find((t) => (v[t.key] || 0) > field.perTask);
           if (over) return showError(over.label + ': at most ' + field.perTask + ' crew per task.');
           if (used > field.total) return showError('Only ' + field.total + ' crew are available for tasks.');
+        }
+        if (field.type === 'assign') {
+          const counts = {};
+          for (const task of Object.values(v)) if (task) counts[task] = (counts[task] || 0) + 1;
+          const over = field.tasks.find((t) => (counts[t.key] || 0) > field.perTask);
+          if (over) return showError(over.label + ': at most ' + field.perTask + ' crew per task.');
         }
         visible[field.key] = v;
       }

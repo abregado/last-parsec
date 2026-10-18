@@ -3,15 +3,48 @@
 
   const { el } = LP.dom;
 
+  // State tabs show the campaign as it is now; config tabs set it up and
+  // only show in Edit mode.
   const TABS = [
-    { id: 'characters', label: 'Characters' },
-    { id: 'models', label: 'Models' },
-    { id: 'species', label: 'Species' },
-    { id: 'archetypes', label: 'Archetypes' },
+    { id: 'crew', label: 'Crew' },
     { id: 'planets', label: 'Planets' },
     { id: 'turn', label: 'Campaign Turn' },
-    { id: 'battle', label: 'Battle' }
+    { id: 'battle', label: 'Battle' },
+    { id: 'characters', label: 'Characters', config: true },
+    { id: 'models', label: 'Models', config: true },
+    { id: 'species', label: 'Species', config: true },
+    { id: 'archetypes', label: 'Archetypes', config: true },
+    { id: 'equipment', label: 'Equipment', config: true }
   ];
+
+  const MODE_KEY = 'lastParsec.mode';
+
+  /** 'edit' (every tab) or 'play' (state tabs only); kept per browser. */
+  function getMode() {
+    try {
+      return localStorage.getItem(MODE_KEY) === 'play' ? 'play' : 'edit';
+    } catch (e) {
+      return 'edit';
+    }
+  }
+
+  function setMode(mode) {
+    try {
+      localStorage.setItem(MODE_KEY, mode);
+    } catch (e) { /* the toggle still works for this page */ }
+    fallbackMode = mode;
+  }
+
+  let fallbackMode = null;
+
+  function mode() {
+    return fallbackMode || getMode();
+  }
+
+  /** Where a campaign opens: the generator until there is a crew. */
+  function defaultTab(campaign) {
+    return LP.roster && LP.roster.hasCrew(campaign) || mode() === 'play' ? 'crew' : 'characters';
+  }
 
   function renderNotFound(container) {
     container.appendChild(el('div', { class: 'empty-state' },
@@ -60,9 +93,11 @@
 
     const tab = TABS.find((t) => t.id === route.tab);
     if (!tab) {
-      LP.router.redirect(LP.router.campaignPath(campaign.id, TABS[0].id));
+      LP.router.redirect(LP.router.campaignPath(campaign.id, defaultTab(campaign)));
       return;
     }
+    const playing = mode() === 'play';
+    const shown = TABS.filter((t) => !playing || !t.config || t.id === tab.id);
 
     document.title = campaign.name + ' · ' + tab.label + ' · Last Parsec';
 
@@ -79,16 +114,34 @@
       )
     ));
 
-    container.appendChild(el('nav', { 'aria-label': 'Campaign tools' },
+    const toggle = el('button', {
+      type: 'button',
+      class: 'btn btn-sm mode-toggle',
+      'aria-pressed': playing ? 'true' : 'false',
+      title: playing ? 'Show the setup tabs (Characters, Models, Species, Archetypes, Equipment)' : 'Hide the setup tabs while you play',
+      onclick: () => {
+        setMode(playing ? 'edit' : 'play');
+        // Leaving Edit mode on a setup tab: go to the crew.
+        if (!playing && tab.config) {
+          LP.router.go(LP.router.campaignPath(campaign.id, 'crew'));
+          return;
+        }
+        LP.dom.clear(container);
+        render(container, route);
+      }
+    }, playing ? '▶ Play mode' : '✎ Edit mode');
+
+    container.appendChild(el('nav', { class: 'tab-bar', 'aria-label': 'Campaign tools' },
       el('ul', { class: 'tabs' },
-        TABS.map((t) => el('li', null,
+        shown.map((t, i) => el('li', { class: t.config && (i === 0 || !shown[i - 1].config) ? 'tab-config-first' : null },
           el('a', {
-            class: 'tab',
+            class: 'tab' + (t.config ? ' tab-config' : ''),
             href: LP.router.campaignPath(campaign.id, t.id),
             'aria-current': t.id === tab.id ? 'page' : null
           }, t.label)
         ))
-      )
+      ),
+      toggle
     ));
 
     // On narrow screens the tab bar scrolls: bring the active tab into view.
@@ -104,5 +157,5 @@
     else panel.appendChild(el('p', { class: 'muted' }, 'Coming soon.'));
   }
 
-  LP.views.campaign = { render };
+  LP.views.campaign = { render, TABS, mode };
 })(window.LP);

@@ -55,11 +55,18 @@
     return !!(ctx.facts.fled || ctx.facts.fleeFailed);
   }
 
+  const R = LP.roster;
+
+  function hasCrew(ctx) {
+    return R.hasCrew(ctx.campaign);
+  }
+
   function env(ctx, extra) {
     const archetype = ctx.planet && LP.planets ? LP.planets.archetypeOf(ctx.campaign, ctx.planet) : null;
     return Object.assign({
       crewSize: ctx.settings.crewSize,
-      crewCount: ctx.facts.crewCount || ctx.memory.crewCount || ctx.settings.crewSize,
+      crewCount: ctx.facts.crewCount || R.crewCount(ctx),
+      crewNames: hasCrew(ctx) ? R.members(ctx.campaign).map(R.nameOf) : null,
       disabled: LP.archetypes ? LP.archetypes.disabledMap(ctx.campaign, archetype) : (ctx.campaign && ctx.campaign.models ? ctx.campaign.models.disabled : {}),
       speciesWeights: LP.archetypes ? LP.archetypes.speciesWeights(archetype) : null,
       rivalNames: ctx.planet ? ctx.planet.rivals.map((r) => r.name) : null
@@ -118,6 +125,25 @@
       const type = fromTurn || (s && s.mission) || 'opportunity';
       const isType = (...types) => (v) => types.includes(v.type);
       const fielded = ctx.campaign && ctx.campaign.battle && ctx.campaign.battle.options ? ctx.campaign.battle.options.crewFielded : ctx.settings.crewSize;
+      const deployed = ctx.campaign && ctx.campaign.battle && ctx.campaign.battle.options ? ctx.campaign.battle.options.deployedIds : null;
+      const crew = hasCrew(ctx) ? R.members(ctx.campaign) : null;
+      const crewFields = crew
+        ? [
+          {
+            key: 'participantIds', type: 'multiselect', label: 'Crew who took part', options: R.memberOptions(crew),
+            value: deployed && deployed.length ? deployed.filter((id) => R.getMember(ctx.campaign, id)) : R.available(ctx.campaign).map((m) => m.id),
+            help: deployed && deployed.length ? 'Pre-filled from the Battle tab.' : null
+          },
+          {
+            key: 'casualtyIds', type: 'multiselect', label: 'Casualties', options: R.memberOptions(crew), value: [],
+            help: 'Knocked out (3 Stuns at once) doesn’t count. Bots and Soulless roll on the Bot Injury Table.'
+          }
+        ]
+        : [
+          { key: 'participants', type: 'number', label: 'Crew who took part', min: 1, max: 12, value: fielded || ctx.settings.crewSize },
+          { key: 'casualties', type: 'number', label: 'Casualties (not Bots or Soulless)', min: 0, max: 12, value: 0, help: 'Knocked out (3 Stuns at once) doesn’t count.' },
+          { key: 'botCasualties', type: 'number', label: 'Bot and Soulless casualties', min: 0, max: 12, value: 0 }
+        ];
       return [
         {
           key: 'note', type: 'info',
@@ -129,9 +155,7 @@
         { key: 'won', type: 'yesno', label: 'Did you Win (complete the objective)?', value: true, showIf: (v) => hasObjective(v.type) },
         { key: 'invasionThreat', type: 'yesno', label: 'Was the enemy an Invasion Threat?', value: !!(s && s.invasionThreat), showIf: (v) => v.type !== 'invasion' },
         { key: 'uniqueKilled', type: 'yesno', label: 'Did you kill a Unique Individual?', value: false },
-        { key: 'participants', type: 'number', label: 'Crew who took part', min: 1, max: 12, value: fielded || ctx.settings.crewSize },
-        { key: 'casualties', type: 'number', label: 'Casualties (not Bots or Soulless)', min: 0, max: 12, value: 0, help: 'Knocked out (3 Stuns at once) doesn’t count.' },
-        { key: 'botCasualties', type: 'number', label: 'Bot and Soulless casualties', min: 0, max: 12, value: 0 },
+      ].concat(crewFields, [
         { key: 'firstBlood', type: 'yesno', label: 'Did one of your crew inflict the first casualty?', value: true },
         { key: 'dangerPay', type: 'number', label: 'Danger Pay (credits)', min: 0, max: 10, value: 0, showIf: isType('patron') },
         { key: 'payTwice', type: 'yesno', label: 'Danger Pay lets you roll twice for pay (10+ result)?', value: false, showIf: isType('patron') },
@@ -150,9 +174,14 @@
           showIf: isType('patron')
         } : null,
         { key: 'bounty', type: 'number', label: 'Criminal bounty (credits, if any)', min: 0, max: 3, value: s && s.bounty ? s.bounty : 0, showIf: (v) => v.category === 'criminal-elements' && v.type !== 'invasion' }
-      ];
+      ]);
     },
     validate(input) {
+      if (input.participantIds) {
+        if (!input.participantIds.length) return 'Pick the crew who took part.';
+        if ((input.casualtyIds || []).some((id) => !input.participantIds.includes(id))) return 'Casualties must be crew who took part.';
+        return null;
+      }
       if ((input.casualties || 0) + (input.botCasualties || 0) > input.participants) return 'More casualties than crew who took part.';
       return null;
     },
@@ -162,11 +191,24 @@
       if (input.type !== 'invasion') items.push(['Enemy', CATEGORIES.find((c) => c.value === input.category).label]);
       items.push(['Held the Field', input.heldField ? 'Yes' : 'No']);
       if (hasObjective(input.type)) items.push(['Won', input.won ? 'Yes' : 'No']);
-      items.push(['Casualties', String((input.casualties || 0) + (input.botCasualties || 0))]);
+      if (input.participantIds) {
+        items.push(['Took part', R.listText(R.namesOf(ctx.campaign, input.participantIds))]);
+        items.push(['Casualties', input.casualtyIds && input.casualtyIds.length ? R.listText(R.namesOf(ctx.campaign, input.casualtyIds)) : 'None']);
+      } else {
+        items.push(['Casualties', String((input.casualties || 0) + (input.botCasualties || 0))]);
+      }
       return { output: { headline: type + (input.heldField ? ': held the field' : ': driven off'), lines: [L.facts(items)] } };
     },
     facts(input, output, ctx) {
       const s = battleSummary(ctx) || {};
+      if (input.participantIds) {
+        const hurt = (input.casualtyIds || []).map((id) => R.getMember(ctx.campaign, id)).filter(Boolean);
+        input = Object.assign({}, input, {
+          participants: input.participantIds.length,
+          casualties: hurt.filter((m) => !R.isMachine(m)).length,
+          botCasualties: hurt.filter((m) => R.isMachine(m)).length
+        });
+      }
       return {
         post: {
           type: input.type,
@@ -188,7 +230,9 @@
           extraFinds: !!s.extraFinds,
           enemy: input.type === 'invasion' ? null : s.enemy || null,
           rivalId: input.rivalId || null,
-          patronId: input.patronId || null
+          patronId: input.patronId || null,
+          participantIds: input.participantIds || null,
+          casualtyIds: input.participantIds ? input.casualtyIds || [] : null
         }
       };
     }
@@ -335,6 +379,7 @@
 
   T.register({
     id: 'quest-progress',
+    itemSource: 'quest progress',
     step: 'post',
     number: '4.3',
     title: 'Determine Quest progress',
@@ -399,6 +444,7 @@
 
   T.register({
     id: 'get-paid',
+    itemSource: 'the mission pay-out',
     step: 'post',
     number: '4.4',
     title: 'Get paid',
@@ -458,6 +504,7 @@
 
   T.register({
     id: 'battlefield-finds',
+    itemSource: 'battlefield finds',
     step: 'post',
     number: '4.5',
     title: 'Battlefield finds',
@@ -548,6 +595,7 @@
 
   T.register({
     id: 'loot',
+    itemSource: 'post-battle loot',
     step: 'post',
     number: '4.7',
     title: 'Gather the loot',
@@ -593,13 +641,20 @@
     },
     fields(ctx) {
       const p = pb(ctx);
+      if (p.casualtyIds) return [{ key: 'note', type: 'info', text: 'Rolling for ' + R.listText(R.namesOf(ctx.campaign, p.casualtyIds)) + '.' }];
       return [{ key: 'note', type: 'info', text: 'Rolling for ' + plural(p.casualties, 'casualty', 'casualties') + (p.botCasualties ? ' and ' + plural(p.botCasualties, 'Bot or Soulless casualty', 'Bot or Soulless casualties') : '') + '.' }];
     },
     resolve(input, ctx) {
       const p = pb(ctx);
       const steps = [];
-      for (let i = 1; i <= p.casualties; i++) steps.push({ group: 'Casualty ' + i, steps: [{ table: 'Injury Table' }] });
-      for (let i = 1; i <= p.botCasualties; i++) steps.push({ group: 'Bot/Soulless casualty ' + i, steps: [{ table: 'Bot Injury Table' }] });
+      const hurt = (p.casualtyIds || []).map((id) => R.getMember(ctx.campaign, id)).filter(Boolean);
+      if (hurt.length) {
+        for (const m of hurt) steps.push({ group: R.nameOf(m) + (R.isMachine(m) ? ' (Bot Injury Table)' : ''), steps: [{ table: R.isMachine(m) ? 'Bot Injury Table' : 'Injury Table' }] });
+        steps.push({ text: 'Set recovery times on the Crew tab (status In Sick Bay).', tone: 'note' });
+      } else {
+        for (let i = 1; i <= p.casualties; i++) steps.push({ group: 'Casualty ' + i, steps: [{ table: 'Injury Table' }] });
+        for (let i = 1; i <= p.botCasualties; i++) steps.push({ group: 'Bot/Soulless casualty ' + i, steps: [{ table: 'Bot Injury Table' }] });
+      }
       steps.push({ text: 'A character with Luck who would die survives instead, but loses ALL Luck. Otherwise spent Luck comes back now. Medical school lets one casualty roll twice and keep the better.', tone: 'note' });
       const run = F.start(steps, env(ctx));
       return runOutput(plural(p.casualties + p.botCasualties, 'injury roll', 'injury rolls'), run);
@@ -633,13 +688,29 @@
       if (p.uniqueKilled) items.push(['Killed the Unique Individual', '+1 XP']);
       if (ctx.settings.difficulty === 'easy') items.push(['Easy mode', '+1 XP each']);
       if (ctx.facts.questDone) items.push(['Completed the Quest', '+1 XP each']);
+      const perCharacter = [];
+      if (p.participantIds) {
+        const bonus = (ctx.settings.difficulty === 'easy' ? 1 : 0) + (ctx.facts.questDone ? 1 : 0);
+        for (const id of p.participantIds) {
+          const m = R.getMember(ctx.campaign, id);
+          if (!m) continue;
+          if (R.isBot(m)) {
+            perCharacter.push([R.nameOf(m), 'No XP (Bot)']);
+            continue;
+          }
+          const hurt = p.casualtyIds.includes(id);
+          const xp = (hurt ? 1 : won ? 3 : 2) + bonus;
+          perCharacter.push([R.nameOf(m), '+' + xp + ' XP (' + (hurt ? 'casualty' : 'survived') + (bonus ? ', +' + bonus + ' bonus' : '') + ')']);
+        }
+      }
       return {
         output: {
           headline: 'XP awarded',
           lines: [
             L.facts(items),
+            perCharacter.length ? L.facts(perCharacter) : null,
             L.text('Characters who fled in the first 2 rounds get no XP. Upgrade costs: Reactions 7, Combat Skill 7, Speed 5, Savvy 5, Toughness 6, Luck 10 (max 1, or 3 for Humans). Engineers can’t raise Toughness above 4.', 'note')
-          ]
+          ].filter(Boolean)
         }
       };
     }
@@ -685,6 +756,7 @@
 
   T.register({
     id: 'purchase',
+    itemSource: 'a purchase',
     step: 'post',
     number: '4.11',
     title: 'Purchase items',
@@ -721,6 +793,7 @@
 
   T.register({
     id: 'campaign-event',
+    itemSource: 'a campaign event',
     step: 'post',
     number: '4.12',
     title: 'Roll for a Campaign Event',
@@ -761,7 +834,14 @@
     title: 'Roll for a Character Event',
     page: 126,
     applies: needs,
+    itemSource(input, output) {
+      return output.data && output.data.target ? 'a character event for ' + output.data.target : 'a character event';
+    },
     fields(ctx) {
+      if (hasCrew(ctx)) {
+        const eligible = R.members(ctx.campaign).filter((m) => !R.isMachine(m));
+        return [{ key: 'note', type: 'info', text: eligible.length ? 'The event happens to one of ' + R.listText(eligible.map(R.nameOf)) + ', at random (Bots and Soulless don’t have Character Events).' : 'Nobody in the crew can have a Character Event (Bots and Soulless don’t).' }];
+      }
       return [{
         key: 'eligible', type: 'number', label: 'Crew members who aren’t Bots or Soulless', min: 1, max: 30,
         value: ctx.memory.crewCount || ctx.settings.crewSize,
@@ -769,14 +849,22 @@
       }];
     },
     resolve(input, ctx) {
+      let target = null;
+      if (hasCrew(ctx)) {
+        const eligible = R.members(ctx.campaign).filter((m) => !R.isMachine(m));
+        if (!eligible.length) return runOutput('No Character Event', F.start([{ text: 'Nobody in the crew can have a Character Event.' }], env(ctx)));
+        target = R.nameOf(eligible[LP.rng.int(eligible.length)]);
+      }
       const steps = [
-        { randomCrew: true, label: 'The event happens to' },
+        target ? { text: 'The event happens to ' + target + '.' } : { randomCrew: true, label: 'The event happens to' },
         { table: 'Character Events Table' },
         { when: 'If the character is a Precursor, you may roll a second event and choose either', steps: [{ table: 'Character Events Table', label: 'Alternative' }] }
       ];
-      const run = F.start(steps, env(ctx, { crewCount: input.eligible }));
+      const run = F.start(steps, env(ctx, { crewCount: input.eligible, crewNames: null }));
       const first = run.lines.find((l) => l.type === 'table');
-      return runOutput(first ? first.title : 'Character Event', run, [L.text('If an event is impossible, the character gets +1 XP instead.', 'note')]);
+      const result = runOutput(first ? first.title : 'Character Event', run, [L.text('If an event is impossible, the character gets +1 XP instead.', 'note')]);
+      result.output.data = { target: target };
+      return result;
     },
     choose: chooseInRun,
     remember(input, output, ctx) {

@@ -391,7 +391,7 @@
   for (const id of Object.keys(BHC_COLUMN)) followups['Patron Table'][id] = jobScript(id);
 
   followups['Benefits Subtable'] = {
-    'fringe-benefit': [{ table: 'Loot Table', note: 'Only paid out if the mission succeeds.' }],
+    'fringe-benefit': [{ table: 'Loot Table', conditional: true, note: 'Only paid out if the mission succeeds.' }],
     'connections': [{ gain: { rumors: 1 } }],
     'company-store': [{ table: 'Trade Table', note: 'Only paid out if the mission succeeds.' }],
     'negotiable': [{ table: 'Danger Pay Table', label: 'Second Danger Pay roll (keep the better)', note: 'Corporation jobs add +1 to this roll too.' }]

@@ -353,6 +353,35 @@
     commit(state);
   }
 
+  async function finalize(state) {
+    const campaign = state.campaign;
+    const problem = LP.roster.finalizeProblem(campaign);
+    if (problem) {
+      LP.ui.notify(problem, 'error');
+      return;
+    }
+    const first = !LP.roster.hasCrew(campaign);
+    const n = campaign.characters.length;
+    const who = n === 1 ? '1 character' : n + ' characters';
+    const ok = await LP.ui.confirm({
+      title: first ? 'Finalize the crew?' : 'Add the recruits to the crew?',
+      message: first
+        ? who + ', their starting items, the crew’s starting equipment and the ship move to the Crew tab, and this tab is emptied. Turns and battles then use the Crew tab.'
+        : who + ' join the crew on the Crew tab (turn ' + LP.roster.turnNumber(campaign) + '), with any items they rolled. This tab is emptied.',
+      confirmLabel: first ? 'Finalize crew' : 'Add to crew'
+    });
+    if (!ok) return;
+    const result = LP.roster.finalize(campaign);
+    if (result.error) {
+      LP.ui.notify(result.error, 'error');
+      return;
+    }
+    selectedByCampaign[campaign.id] = null;
+    LP.storage.touchCampaign(campaign);
+    LP.ui.notify((result.added.length === 1 ? '1 character' : result.added.length + ' characters') + ' added to the crew.', 'success');
+    LP.router.go(LP.router.campaignPath(campaign.id, 'crew'));
+  }
+
   function commit(state) {
     LP.crew.sync(state.campaign);
     LP.storage.touchCampaign(state.campaign);
@@ -369,6 +398,7 @@
 
     const { container, campaign } = state;
     const characters = campaign.characters;
+    const recruiting = LP.roster.hasCrew(campaign);
     clear(container);
 
     let selected = characters.find((c) => c.id === selectedByCampaign[campaign.id]);
@@ -381,9 +411,20 @@
       el('p', { class: 'muted' }, characters.length === 1 ? '1 character' : characters.length + ' characters'),
       el('div', { class: 'toolbar' },
         el('button', { type: 'button', class: 'btn btn-primary', 'data-focus': 'add', onclick: () => addCharacter(state) }, '+ Add character'),
-        el('button', { type: 'button', class: 'btn', 'data-focus': 'generate-all', disabled: !characters.length, onclick: () => generateAll(state) }, 'Generate all')
+        el('button', { type: 'button', class: 'btn', 'data-focus': 'generate-all', disabled: !characters.length, onclick: () => generateAll(state) }, 'Generate all'),
+        el('button', {
+          type: 'button', class: 'btn btn-primary', 'data-focus': 'finalize', disabled: !characters.length,
+          title: LP.roster.finalizeProblem(campaign) || null,
+          onclick: () => finalize(state)
+        }, recruiting ? 'Add to crew' : 'Finalize crew')
       )
     ));
+
+    if (recruiting) {
+      container.appendChild(el('p', { class: 'muted recruit-note' },
+        'Your crew is on the ', el('a', { href: LP.router.campaignPath(campaign.id, 'crew') }, 'Crew tab'),
+        '. Characters made here join it as recruits when you press Add to crew.'));
+    }
 
     if (!characters.length) {
       container.appendChild(el('div', { class: 'empty-state' },
@@ -398,7 +439,7 @@
         ),
         editor(state, selected)
       ));
-      container.appendChild(LP.ui.crewSection(campaign, {
+      if (!recruiting) container.appendChild(LP.ui.crewSection(campaign, {
         flashKey: flash,
         commit: (key) => {
           flash = key;

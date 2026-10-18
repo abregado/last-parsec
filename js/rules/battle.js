@@ -625,6 +625,29 @@
     return true;
   }
 
+  /**
+   * Deploy named crew members (from the Crew tab). Sets the crew in the
+   * field, and the Seize the Initiative inputs it decides: the highest
+   * Savvy and whether a Feral is fighting.
+   */
+  function setDeployed(battle, ctx, ids) {
+    const members = (ids || []).map((id) => LP.roster.getMember(ctx.campaign, id)).filter(Boolean);
+    battle.options.deployedIds = members.map((m) => m.id);
+    battle.options.crewFielded = Math.max(1, members.length);
+    if (members.length) {
+      battle.seize.savvy = Math.max(...members.map((m) => m.profile.savvy));
+      battle.seize.feral = members.some((m) => m.speciesId === 'feral');
+      battle.seize.result = null;
+    }
+    sync(battle, ctx);
+    return true;
+  }
+
+  /** Crew deployed by default: everyone not in Sick Bay, up to the campaign crew size. */
+  function defaultDeployed(ctx) {
+    return LP.roster.available(ctx.campaign).slice(0, crewSize(ctx)).map((m) => m.id);
+  }
+
   /* ---------------------------------------------------------------------- */
   /* Resolution                                                             */
   /* ---------------------------------------------------------------------- */
@@ -789,7 +812,7 @@
 
   LP.battle = {
     MISSIONS, FROM_TURN, OBJECTIVE_TEXT, RIVAL_ATTACK_TEXT, EDGES,
-    missionLabel, newBattle, normalize, sync, fields, generate, canReroll, reroll, namedRival, planetOf,
+    missionLabel, newBattle, normalize, sync, fields, generate, canReroll, reroll, namedRival, planetOf, setDeployed, defaultDeployed,
     setFixed, setRandom, setMission, setOption, force, uniqueStatus, resolve, summary,
     seizeModifiers, rollSeize, rollEvent, rollNumbers
   };

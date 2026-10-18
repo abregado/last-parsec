@@ -53,7 +53,7 @@
     if (!raw || typeof raw !== 'object') throw new Error('Campaign entry is not an object.');
     if (typeof raw.name !== 'string' || !raw.name.trim()) throw new Error('Campaign is missing a name.');
     const created = typeof raw.createdAt === 'string' ? raw.createdAt : now();
-    return {
+    const campaign = {
       id: typeof raw.id === 'string' && raw.id ? raw.id : newId(),
       name: raw.name.trim(),
       createdAt: created,
@@ -65,8 +65,12 @@
       turn: raw.turn && typeof raw.turn === 'object' && !Array.isArray(raw.turn) ? raw.turn : null,
       turnMemory: raw.turnMemory && typeof raw.turnMemory === 'object' && !Array.isArray(raw.turnMemory) ? raw.turnMemory : {},
       battle: raw.battle && typeof raw.battle === 'object' && !Array.isArray(raw.battle) ? raw.battle : null,
-      ...geography(raw)
+      ...geography(raw),
+      roster: raw.roster,
+      turnNumber: raw.turnNumber
     };
+    if (LP.roster) LP.roster.ensure(campaign);
+    return campaign;
   }
 
   /** Validate a stored or imported document and upgrade it to VERSION. */

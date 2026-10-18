@@ -38,6 +38,13 @@
       return el('li', { class: 'stage ' + status, 'data-stage': def.id },
         stageHeader(def),
         LP.ui.resultCard(item.record.output, item.record.pending, {
+          crew: LP.roster.hasCrew(state.campaign),
+          isAdded: (line) => LP.roster.hasManual(state.campaign, T.itemTag(state.campaign, item.record), line),
+          onAddItem: (line) => {
+            const added = LP.roster.addFromLine(state.campaign, T.itemTag(state.campaign, item.record), line);
+            if (added) LP.ui.notify(added.name + ' added to the Stash.', 'success');
+            commit(state);
+          },
           onChoose: (value) => {
             const result = T.choose(state.campaign, value);
             if (result.error) LP.ui.notify(result.error, 'error');
@@ -89,7 +96,7 @@
     clear(container);
 
     container.appendChild(el('div', { class: 'tab-toolbar' },
-      el('p', { class: 'muted' }, 'Turn started ' + LP.dom.formatDate(turn.startedAt)),
+      el('p', { class: 'muted' }, el('strong', null, 'Turn ' + LP.roster.turnNumber(campaign)), ' · started ' + LP.dom.formatDate(turn.startedAt)),
       el('div', { class: 'toolbar' },
         el('button', {
           type: 'button',
@@ -123,7 +130,7 @@
     if (w.finished) {
       container.appendChild(el('section', { class: 'panel turn-end' },
         el('h3', null, 'Turn complete'),
-        el('p', { class: 'muted' }, 'Copy anything you still need onto your sheets. Starting the next turn keeps what this turn remembered (world traits, Rivals, Patrons, Rumors, debt and so on).'),
+        el('p', { class: 'muted' }, 'Copy anything you still need onto your sheets' + (LP.roster.hasCrew(campaign) ? ' and the Crew tab (XP, injuries, credits)' : '') + '. Starting the next turn keeps what this turn remembered (world traits, Rivals, Patrons, Rumors, debt and so on).'),
         el('div', { class: 'toolbar' },
           el('button', {
             type: 'button',
@@ -132,7 +139,7 @@
               T.nextTurn(campaign);
               commit(state, 'current');
             }
-          }, 'Start next turn')
+          }, 'Start turn ' + (LP.roster.turnNumber(campaign) + 1))
         )
       ));
     }

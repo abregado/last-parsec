@@ -29,20 +29,29 @@
    *       savvy: a "1D6 + Savvy" check. The verdict is left open and a note
    *       says what Savvy is needed; ifFail steps are shown as "If it fails".
    *       outcomes are checked in order; `natural` matches the first die alone;
-   *       `final: true` on an outcome replaces the Savvy note (e.g. natural 1 always fails).
+   *       `final: true` on an outcome replaces the Savvy note (e.g. natural 1 always fails);
+   *       `fail: true` marks the roll failed whatever the total.
    *   { text, tone? }
    *   { gain: { storyPoints: 1, ... }, text? }
    *   { when: 'If your ship has Hull damage', steps: [...] }
    *       Something the app can't know: rolled anyway and shown under the condition.
-   *   { group: 'World 1', steps: [...] }
+   *   { group: 'World 1', source?, who?, steps: [...] }
+   *       source: what gained items are credited to ("a trade roll by Ava")
+   *       who: Savvy rolls inside are for this crew member (see below)
    *   { choice: { prompt, options: [{ value, label, then? }] } }   pauses the run
-   *   { randomCrew: true, label?, count? }       "Crew member 3 of 6" from env.crewCount
+   *   { randomCrew: true, label?, count? }       a name from env.crewNames, or "Crew member 3 of 6" from env.crewCount
    *   { randomRival: true }                      a name from env.rivalNames, or "n of N" from env.rivals
    *   { enemyNumbers: true, plus? }              highest of (crew size - 3) D6
    *   { species: true, label? }                  a species from the combined table, using
    *                                              env.speciesWeights (or the book defaults)
    *
-   * env: { crewCount, rivals, crewSize, disabled (campaign.models.disabled), table, depth }
+   * Table steps may also carry damaged: true (or a note starting "Damaged") and
+   * conditional: true (only gained if something else happens); both mark the
+   * items rolled under them for the Stash (LP.items.linesIn).
+   * Savvy rolls may carry who: { name, savvy, engineer } to roll for a known
+   * crew member: their Savvy (and Engineer +1) is added and the roll passes or fails.
+   *
+   * env: { crewCount, crewNames, rivals, crewSize, disabled (campaign.models.disabled), table, depth }
    */
 
   const MAX_DEPTH = 6;
@@ -140,6 +149,9 @@
     const row = line.rowId ? table.rows.find((r) => r.id === line.rowId) : null;
     // Only show rule text for "event" style tables; item tables have none.
     if (row && column && step.showText !== false) line.text = row[column];
+    // Item flags for the Crew tab's Stash (see LP.items.linesIn).
+    if (step.damaged || (step.note && /^Damaged/.test(step.note))) line.damaged = true;
+    if (step.conditional) line.conditional = true;
     const path = append(state, frame.target, line);
 
     // The row's own follow-ups first, so a note ("Damaged…") ends up after the final item.
@@ -152,20 +164,22 @@
 
   function runRoll(state, step, frame) {
     const r = LP.rng.roll(step.roll);
-    const modifiers = (step.add || []).filter((m) => m.value);
+    const who = step.savvy ? step.who || frame.env.who || null : null;
+    const own = who ? [{ label: who.name + '’s Savvy', value: who.savvy || 0 }, { label: 'Engineer', value: step.engineer && who.engineer ? 1 : 0 }] : [];
+    const modifiers = (step.add || []).concat(own).filter((m) => m.value);
     const added = modifiers.reduce((sum, m) => sum + m.value, 0);
     const line = { type: 'roll', label: step.label || '', notation: r.notation, dice: r.dice, base: r.total, modifiers: modifiers, total: r.total + added };
     if (step.keep === 'highest') {
       line.keep = 'highest';
       line.total = Math.max(...r.dice);
     }
-    if (step.target !== undefined && !step.savvy) {
+    if (step.target !== undefined && (!step.savvy || who)) {
       line.target = step.target;
       line.success = line.total >= step.target;
       if (step.invert) line.invert = true;
     }
     const texts = [];
-    if (step.savvy) texts.push(LP.turn.line.savvyNote(line.total, step.target, { engineer: step.engineer }));
+    if (step.savvy && !who) texts.push(LP.turn.line.savvyNote(line.total, step.target, { engineer: step.engineer }));
     if (step.text) texts.push(step.text);
 
     let then = [];
@@ -176,6 +190,7 @@
         if (outcome.final) texts.length = 0;
         if (outcome.text) texts.push(outcome.text);
         if (outcome.tone) line.tone = outcome.tone;
+        if (outcome.fail && line.success !== undefined) line.success = false;
         if (outcome.gain) gains = outcome.gain;
         then = outcome.then || [];
       }
@@ -189,7 +204,9 @@
     const path = append(state, frame.target, line);
 
     const next = then.slice();
-    if (step.ifFail) {
+    if (step.ifFail && who) {
+      if (line.success === false) next.push(...step.ifFail);
+    } else if (step.ifFail) {
       next.push({ when: step.savvy ? 'If it fails' : 'If it failed', steps: step.ifFail });
     }
     push(state, next, path, frame.env);
@@ -222,16 +239,23 @@
     }
 
     if (step.when || step.group) {
-      const path = append(state, frame.target, { type: 'text', text: (step.when || step.group) + ':', tone: step.when ? 'note' : undefined });
-      push(state, step.steps, path, env);
+      const head = { type: 'text', text: (step.when || step.group) + ':', tone: step.when ? 'note' : undefined };
+      if (step.when) head.when = true;
+      if (step.source) head.source = step.source;
+      const path = append(state, frame.target, head);
+      push(state, step.steps, path, step.who ? Object.assign({}, env, { who: step.who }) : env);
       return;
     }
 
     if (step.randomCrew) {
       const n = env.crewCount;
       const count = step.count || 1;
+      const names = env.crewNames;
       let text;
-      if (!n) {
+      if (names && names.length) {
+        const picks = pickDistinct(names.length, count).map((i) => names[i - 1]);
+        text = picks.join(', ') + '.';
+      } else if (!n) {
         text = 'Pick ' + (count === 1 ? 'a random crew member' : count + ' random crew members') + '.';
       } else {
         const picks = pickDistinct(n, count);
