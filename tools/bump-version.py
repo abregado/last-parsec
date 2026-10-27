@@ -14,7 +14,7 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-PAGES = ["index.html", "tests.html"]
+PAGES = ["index.html", "tests.html", "table.html"]
 
 # src="js/..." or href="css/..." (local paths only), with or without an existing ?v=
 PATTERN = re.compile(r'((?:src|href)="(?!https?:|data:|#)[^"?]+\.(?:js|css))(?:\?v=[^"]*)?"')

@@ -11,11 +11,13 @@
 | `js/data/tables.js` | GENERATED roll tables (`LP.data.tables`). Never edit by hand. |
 | `js/data/species.js` | The 26 species and their rules. |
 | `js/data/baseEvents.js`, `basePack.js` | The base event pack: events (GENERATED) and condition types. |
+| `js/data/gear.js` | GENERATED weapon stats, trait rules and item effects (`tools/build-gear.py`, needs the local rulebook PDF). Never edit by hand. |
 | `js/data/nameTables.js` | Starter name tables and each species' default tables. |
 | `js/data/followups.js` | Follow-up scripts per table row (see `campaign-turn.md`). |
 | `js/core/rng.js` | Dice, weighted picks, table rolls, rerolls that never repeat. |
 | `js/core/effects.js` | Parses origin-table effect text into stats and resources. |
 | `js/core/followup.js` | Runs follow-up scripts. |
+| `js/core/tableStore.js` | localStorage for the table view (see `battle.md`). |
 | `js/core/registry.js`, `predicate.js`, `snapshot.js` | Registries of definitions, event conditions, and snapshots for Undo. |
 | `js/core/storage.js` | localStorage, campaign normalizing, import and export. |
 | `js/core/router.js` | Hash routes: `#/` and `#/campaign/<id>/<tab>`. |
@@ -26,6 +28,7 @@
 | `js/ui/*.js` | Screens and components. |
 | `tools/build-tables.py` | `roll_tables/json` → `js/data/tables.js`. |
 | `tools/build-events.py` | `tools/events/*.py` + the roll tables → `js/data/baseEvents.js` (GENERATED, the base pack's events). |
+| `tools/build-gear.py` | rulebook PDF → `js/data/gear.js` (GENERATED). |
 | `tools/bump-version.py` | Stamps `?v=` on script and style links (cache busting). |
 
 ## Tables

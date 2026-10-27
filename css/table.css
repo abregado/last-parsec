@@ -1,0 +1,100 @@
+/* The table view (table.html). Colour tokens match css/styles.css; this page is standalone. */
+  :root {
+    --bg:#0d1117; --bg-raised:#151b24; --bg-sunken:#0a0d12; --surface:#1b2330; --surface-alt:#151c27;
+    --border:#2c3747; --border-strong:#3d4b60; --text:#e3e9f1; --text-muted:#93a1b5;
+    --accent:#4fd1c5; --accent-contrast:#062421; --danger:#f2706a; --warn:#ffcf5c;
+    --font-body:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    --font-display:"Bahnschrift","DIN Alternate","Arial Narrow",system-ui,sans-serif;
+    --radius:8px;
+  }
+  :root[data-theme="light"] {
+    --bg:#f3f5f8; --bg-raised:#fff; --bg-sunken:#e1e7ee; --surface:#fff; --surface-alt:#edf1f6;
+    --border:#d3dae3; --border-strong:#b5c0ce; --text:#17202b; --text-muted:#5a6778;
+    --accent:#0f8a80; --accent-contrast:#fff; --danger:#c23b33; --warn:#b7791f;
+  }
+  * { box-sizing:border-box; }
+  html { -webkit-text-size-adjust:100%; }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.4 var(--font-body); }
+  h1,h2,h3 { font-family:var(--font-display); margin:0; }
+  button { font:inherit; color:inherit; cursor:pointer; touch-action:manipulation; }
+
+  .btn { min-height:48px; min-width:48px; padding:0 16px; border-radius:var(--radius); border:1px solid var(--border-strong);
+         background:var(--surface); font-weight:600; display:inline-flex; align-items:center; justify-content:center; }
+  .btn:active { transform:scale(.97); }
+  .btn-primary { background:var(--accent); color:var(--accent-contrast); border-color:var(--accent); }
+  .btn-out { min-width:64px; }
+  .btn-out.on { background:var(--danger); color:#fff; border-color:var(--danger); }
+
+  .bar { position:sticky; top:0; z-index:10; background:var(--bg-raised); border-bottom:1px solid var(--border);
+         display:flex; align-items:center; gap:12px; padding:6px 12px; }
+  .bar .grow { flex:1; min-width:0; }
+  .bar h1 { font-size:18px; }
+  .bar .sub { color:var(--text-muted); font-size:13px; }
+
+  main { padding:10px 12px 40px; display:grid; grid-template-columns:minmax(0,1fr); gap:18px; }
+  section > h2 { font-size:15px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-muted); margin:0 0 6px; display:flex; justify-content:space-between; align-items:baseline; }
+  section > h2 small { font:600 14px var(--font-body); text-transform:none; letter-spacing:0; }
+
+  /* battle brief: at most 2 columns, one rule per line */
+  .brief { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 28px; margin:0; }
+  .brief > div { padding:6px 0; border-bottom:1px solid var(--border); }
+  .brief dt { font-size:12px; text-transform:uppercase; color:var(--accent); font-weight:700; }
+  .brief dd { margin:0; padding:1px 0; }
+
+  /* team rules sit above their table */
+  .team { margin:0 0 8px; }
+  .team .rule { padding:2px 0; }
+  .rule b { color:var(--accent); }
+
+  /* units: one grid row each. Left half = name, stats, character rules. Right half = weapons and their rules. */
+  .tablewrap { overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius); }
+  .grid { min-width:760px; --stats:6; }
+  .grid.foes { --stats:5; }
+  .row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 64px; align-items:stretch; }
+  .head { background:var(--bg-sunken); font:700 12px var(--font-body); text-transform:uppercase; color:var(--text-muted); text-align:center; }
+  .head > div { padding:6px 0; }
+  .unit:nth-child(odd) { background:var(--surface); }
+  .unit:nth-child(even) { background:var(--surface-alt); }
+  .unit + .unit { border-top:1px solid var(--border-strong); }
+  .left { display:grid; grid-template-columns:120px repeat(var(--stats), minmax(0,1fr)); padding:0 0 0 12px; align-content:start; }
+  .right { display:grid; grid-template-columns:minmax(0,1fr) 54px 54px 54px; align-content:start; border-left:1px solid var(--border-strong); padding:0 8px 0 12px; }
+  .head .left, .head .right { padding-top:0; padding-bottom:0; align-content:center; }
+  .head .right { border-left-color:transparent; }
+  .head .left > div, .head .right > div { padding:6px 0; }
+  .head .l { text-align:left; }
+  .name b { font:700 19px/1.1 var(--font-display); display:block; }
+  .name span { font-size:12px; color:var(--text-muted); font-weight:400; text-transform:none; }
+  .stat { font:700 26px/1.2 var(--font-display); text-align:center; align-self:center; padding:6px 0; }
+  .name { padding:6px 0; }
+  .wn { font:700 19px/1.2 var(--font-display); align-self:center; }
+  .wv { font:700 22px/1.2 var(--font-display); text-align:center; align-self:center; }
+  .wn, .wv { padding-top:6px; padding-bottom:6px; }
+  /* Out: a full-height cell attached to the right of the row */
+  .act { display:flex; }
+  .btn-out { flex:1; width:100%; min-height:48px; border:0; border-left:1px solid var(--border-strong); border-radius:0; padding:0;
+             background:#8f3732; color:#fff; }
+  .btn-out svg { width:26px; height:26px; fill:currentColor; }
+  .btn-out.on { background:#e0443c; box-shadow:inset 0 0 0 3px rgba(255,255,255,.55); }
+  /* ability areas are darker than the stat block */
+  .rules { background:var(--bg-sunken); padding:5px 8px; }
+  .left .rules { grid-column:1 / -1; margin-left:-12px; padding-left:24px; }
+  .right .rules { grid-column:1 / -1; margin:0 -8px 0 -12px; padding-left:12px; }
+  .rule { padding:1px 0; font-size:15px; }
+  .rule i { font-style:normal; }
+  .unit.out > :not(.act) { opacity:.28; }
+  .unit.out .name b { text-decoration:line-through; }
+
+  /* events */
+  .events { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:10px 24px; }
+  .event { display:flex; gap:14px; align-items:flex-start; }
+  .event .btn { flex:none; min-height:64px; }
+  .event h3 { font-size:17px; }
+  .event p { margin:2px 0 0; }
+  .event .dice { font:12px ui-monospace,Consolas,monospace; color:var(--text-muted); }
+  .muted { color:var(--text-muted); }
+
+
+  .small { font-size:13px; }
+  .empty { padding:40px 16px; text-align:center; }
+  .wn.muted { font-weight:400; font-size:15px; }
+ 

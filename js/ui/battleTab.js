@@ -6,6 +6,7 @@
   const rng = LP.rng;
 
   let flash = null;
+  let tableWindow = null;
 
   function signed(n) {
     return n >= 0 ? '+' + n : '−' + Math.abs(n);
@@ -377,9 +378,48 @@
   /* Render                                                                 */
   /* ---------------------------------------------------------------------- */
 
+  /** The table view's URL for the current battle, or null until one is generated. */
+  function tableUrl(state) {
+    const model = LP.tableModel.build(state.campaign, state.battle, state.ctx);
+    return model ? 'table.html' + LP.tableStore.encode(model) : null;
+  }
+
+  /** Open (or refresh) the table view window, a reference and Out tracker for use at the table. */
+  function openTable(state) {
+    const url = tableUrl(state);
+    if (!url) return;
+    tableWindow = window.open(url, 'lp-table');
+    if (!tableWindow) LP.ui.notify('The table view was blocked. Allow pop-ups for this page and try again.', 'error');
+  }
+
+  /** Copy a link to the table view, for other players' phones. The battle travels in the link. */
+  function copyTableLink(state) {
+    const url = tableUrl(state);
+    if (!url) return;
+    const link = new URL(url, location.href).href;
+    const done = () => LP.ui.notify('Link copied. Anyone who opens it sees this battle.', 'success');
+    const fallback = () => {
+      const box = el('textarea', { style: 'position:fixed;opacity:0' });
+      box.value = link;
+      document.body.appendChild(box);
+      box.select();
+      const ok = document.execCommand && document.execCommand('copy');
+      box.remove();
+      if (ok) done();
+      else LP.ui.notify('Could not copy the link.', 'error');
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(done, fallback);
+    else fallback();
+  }
+
   function commit(state) {
     state.campaign.battle = state.battle;
     LP.storage.touchCampaign(state.campaign);
+    // An open table view follows the battle (only its hash changes, so the page keeps its marks).
+    if (tableWindow && !tableWindow.closed) {
+      const url = tableUrl(state);
+      if (url) tableWindow.location.href = url;
+    }
     draw(state);
   }
 
@@ -394,6 +434,13 @@
     container.appendChild(el('div', { class: 'tab-toolbar' },
       el('p', { class: 'muted' }, battle.generated ? 'Battle generated ' + LP.dom.formatDate(battle.createdAt) : 'No battle generated yet.'),
       el('div', { class: 'toolbar' },
+        battle.generated && r.complete
+          ? el('button', { type: 'button', class: 'btn', 'data-focus': 'battle.table', onclick: () => openTable(state) }, 'Table view')
+          : null,
+        // A link only means something to other people from the hosted copy, not from a file on this PC.
+        battle.generated && r.complete && /^https?:$/.test(location.protocol)
+          ? el('button', { type: 'button', class: 'btn', 'data-focus': 'battle.link', onclick: () => copyTableLink(state) }, 'Copy table link')
+          : null,
         awaitingResult && battle.generated
           ? el('a', { class: 'btn', href: LP.router.campaignPath(state.campaign.id, 'turn') }, 'Record the result →')
           : null,
