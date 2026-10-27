@@ -10,6 +10,9 @@
    *   licence: { required, cost, owned },
    *   patrons: [{ id, entryId, name, patronType, persistent, oneTimeContract, benefit, forces, uniques, notes }],
    *   rivals:  [{ id, entryId, name, enemy: 'Table|rowId' | null, uniques: [uniqueId], hates, notes }],
+   *   disabledPatrons, disabledRivals: same shape as patrons and rivals, plus
+   *     disabled: { turn, reason }. Set aside by events (a Patron who won't work with you,
+   *     a Rival who was settled). Every other function sees only patrons and rivals.
    *   invasion: null | { status: 'invaded' | 'lost' | 'liberated', enemy: 'Table|rowId' | null, makingGround },
    *   notes
    * }]
@@ -73,6 +76,8 @@
       licence: Object.assign({ required: false, cost: 0, owned: false }, p.licence || {}),
       patrons: Array.isArray(p.patrons) ? p.patrons.filter((x) => x && typeof x === 'object').map(withNotes) : [],
       rivals: Array.isArray(p.rivals) ? p.rivals.filter((x) => x && typeof x === 'object').map(withNotes) : [],
+      disabledPatrons: Array.isArray(p.disabledPatrons) ? p.disabledPatrons.filter((x) => x && typeof x === 'object').map(withNotes) : [],
+      disabledRivals: Array.isArray(p.disabledRivals) ? p.disabledRivals.filter((x) => x && typeof x === 'object').map(withNotes) : [],
       invasion: inv && ['invaded', 'lost', 'liberated'].includes(inv.status)
         ? { status: inv.status, enemy: inv.enemy || null, makingGround: inv.makingGround || 0 } : null,
       notes: typeof p.notes === 'string' ? p.notes : ''
@@ -274,6 +279,33 @@
     planet.patrons = planet.patrons.filter((p) => p.id !== patronId);
   }
 
+  /** Set a Rival or Patron aside, keeping it so an event can bring it back. info: { turn, reason }. */
+  function disableContact(planet, key, id, info) {
+    const list = planet[key];
+    const entry = list.find((x) => x.id === id);
+    if (!entry) return null;
+    planet[key] = list.filter((x) => x.id !== id);
+    entry.disabled = { turn: (info && info.turn) || 0, reason: (info && info.reason) || '' };
+    planet['disabled' + key.charAt(0).toUpperCase() + key.slice(1)].push(entry);
+    return entry;
+  }
+
+  function enableContact(planet, key, id) {
+    const offKey = 'disabled' + key.charAt(0).toUpperCase() + key.slice(1);
+    const entry = planet[offKey].find((x) => x.id === id);
+    if (!entry) return null;
+    planet[offKey] = planet[offKey].filter((x) => x.id !== id);
+    delete entry.disabled;
+    entry.name = uniqueName(entry.name, planet[key].map((x) => x.name));
+    planet[key].push(entry);
+    return entry;
+  }
+
+  const disableRival = (planet, id, info) => disableContact(planet, 'rivals', id, info);
+  const enableRival = (planet, id) => enableContact(planet, 'rivals', id);
+  const disablePatron = (planet, id, info) => disableContact(planet, 'patrons', id, info);
+  const enablePatron = (planet, id) => enableContact(planet, 'patrons', id);
+
   /** Move Rivals (by id) and Patrons (by id) from one planet to another. */
   function moveContacts(from, to, rivalIds, patronIds) {
     const rivals = from.rivals.filter((r) => rivalIds.includes(r.id));
@@ -353,6 +385,7 @@
     randomName, uniqueName, normalizePlanet, ensure, get, current, archetypeOf, setCurrent, remove, canVisit,
     pickArchetype, rollWorld, createPlanet, pickForce, patronTypeName,
     newPatron, newRival, patronToRival, removeRival, removePatron, moveContacts,
+    disableRival, enableRival, disablePatron, enablePatron,
     startInvasion, applyWarResult, invadedPlanets, fromMemory, contactNote, addStartingContacts
   };
 })(window.LP);

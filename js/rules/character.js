@@ -32,7 +32,6 @@
   const speciesData = LP.data.species;
 
   const STATS = ['reactions', 'speed', 'combat', 'toughness', 'savvy'];
-  const DEFAULT_MAX = { reactions: 6, speed: 8, combat: 5, toughness: 6, savvy: 5 };
   const STAT_LABELS = { reactions: 'Reactions', speed: 'Speed', combat: 'Combat Skill', toughness: 'Toughness', savvy: 'Savvy', luck: 'Luck' };
 
   const BACKGROUND = 'Background Table';
@@ -100,9 +99,9 @@
    *   excludeIds (row ids never allowed)
    * With no species chosen yet, the standard three fields are returned.
    */
-  function fieldsFor(species) {
+  function fieldsFor(species, basic) {
     const s = species || {};
-    if (s.noOrigins) return [];
+    if (s.noOrigins || basic) return [];
     const forced = s.forced || {};
     const double = s.double || {};
     const specs = [];
@@ -134,7 +133,7 @@
   }
 
   function specsOf(character) {
-    return fieldsFor(currentSpecies(character));
+    return fieldsFor(currentSpecies(character), character.basic);
   }
 
   function specByKey(character, key) {
@@ -431,13 +430,13 @@
    * Returns:
    *   species, complete, profile {reactions..luck}, xp,
    *   origins [{ key, label, table, row, effectiveRow }],
-   *   credits, storyPoints, patrons, rivals, questRumors,
+   *   credits, storyPoints, patrons, rivals, rumors,
    *   items [{ table, row }], savvyIncrease, notes [string], rules [string]
    */
   function resolve(character, options) {
     const opts = options || {};
     const species = currentSpecies(character);
-    const specs = fieldsFor(species);
+    const specs = fieldsFor(species, character.basic);
     const notes = [];
     let complete = !!species;
 
@@ -509,7 +508,7 @@
     storyPoints += bonus.storyPoints || 0;
 
     const base = species ? species.profile : speciesData.byId['baseline-human'].profile;
-    const caps = Object.assign({}, DEFAULT_MAX, s.caps || {});
+    const caps = species ? species.caps : speciesData.DEFAULT_CAPS;
     const profile = {};
     for (const stat of STATS) {
       let delta = total.stats[stat];
@@ -530,12 +529,9 @@
       if (s.bot) notes.push('Bots get no Luck for being Leader.');
       else luck += 1;
     }
-    if (s.noLuck && luck > 0) {
-      notes.push(s.name + ' can never have Luck.');
-      luck = 0;
-    } else if (species && !s.human && luck > 1) {
-      notes.push('Only Humans can have more than 1 Luck.');
-      luck = 1;
+    if (species && luck > caps.luck) {
+      notes.push(caps.luck === 0 ? s.name + ' can never have Luck.' : caps.luck === 1 ? 'Only Humans can have more than 1 Luck.' : 'Luck capped at ' + caps.luck + '.');
+      luck = caps.luck;
     }
     profile.luck = luck;
 
@@ -549,7 +545,7 @@
       storyPoints: storyPoints,
       patrons: total.patrons,
       rivals: total.rivals + (bonus.rivals || 0),
-      questRumors: total.questRumors + (bonus.questRumors || 0),
+      rumors: total.rumors + (bonus.rumors || 0),
       items: items,
       savvyIncrease: profile.savvy > base.savvy,
       notes: notes,

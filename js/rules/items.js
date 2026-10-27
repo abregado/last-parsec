@@ -69,6 +69,15 @@
     return row ? row[table.labelColumn] : null;
   }
 
+  /** What a table row gives: one item, except a pack of grenades, which is that many single grenades. */
+  function expandRow(tableName, rowId) {
+    const name = tableName && rowId ? rowName(tableName, rowId) : null;
+    const m = tableName === 'Grenades Subtable' && name ? /^(\d+)\s+(.+?)\s+grenades?$/i.exec(name) : null;
+    if (!m) return [name];
+    const single = m[2].charAt(0).toUpperCase() + m[2].slice(1) + ' grenade';
+    return Array.from({ length: Number(m[1]) }, () => single);
+  }
+
   /** A new item. fields: { table, rowId, name?, damaged?, source?, turn?, carrierId?, tag?, key? } */
   function make(fields) {
     const f = fields || {};
@@ -84,6 +93,11 @@
       tag: f.tag || null,
       key: f.key || null
     };
+  }
+
+  /** The items a row gives, made with the same fields (see expandRow). */
+  function makeAll(fields) {
+    return expandRow(fields.table, fields.rowId).map((name) => make(name ? Object.assign({}, fields, { name: name }) : fields));
   }
 
   function normalize(raw) {
@@ -137,6 +151,8 @@
     categoryLabel,
     rowName,
     make,
+    makeAll,
+    expandRow,
     normalize,
     sourceText,
     linesIn

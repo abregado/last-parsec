@@ -84,10 +84,10 @@
     }
   });
 
-  test('every row of the three event tables runs to the end, down every choice', (assert) => {
+  test('every row of the Loot and Rewards tables runs to the end, down every choice', (assert) => {
     for (let seed = 1; seed <= 25; seed++) {
       rng.setSource(rng.seeded(seed));
-      for (const name of ['Starship Travel Events Table', 'Trade Table', 'Exploration Table', 'Loot Table', 'Rewards Table']) {
+      for (const name of ['Loot Table', 'Rewards Table']) {
         for (const row of tables[name].rows) {
           for (let option = 0; option < 2; option++) {
             const state = runRow(name, row.id, option);
@@ -100,42 +100,58 @@
   });
 
   test('a full table roll shows the rule text and runs the row script', (assert) => {
-    rng.setSource(() => 0.21); // D100 = 22: Deep space wreckage
-    const state = F.start([{ table: 'Starship Travel Events Table' }], { crewCount: 5 });
+    rng.setSource(() => 0); // the first row of the Injury Table
+    const state = F.start([{ table: 'Injury Table' }], {});
     const top = state.lines[0];
-    assert.equal(top.rowId, 'deep-space-wreckage');
-    assert.ok(/old wreck/.test(top.text));
-    assert.equal(top.children.filter((l) => l.type === 'table' && l.table === 'Gear Subtable').length, 2);
-    assert.ok(/Damaged/.test(allText(top.children)));
+    assert.equal(top.rowId, 'gruesome-fate');
+    assert.ok(/carried equipment is damaged/.test(top.text));
+    rng.setSource(() => 0.99); // the last Rewards row: a Quest-sized reward
+    const reward = runRow('Rewards Table', 'cargo-crate');
+    assert.equal(count(reward.lines, (l) => l.type === 'roll' && l.label === 'Credits'), 1);
   });
 
   /* ---------------------------------------------------------------------- */
   group('Follow-up executor');
 
-  test('Asteroids: avoiding and succeeding rolls a new event', (assert) => {
-    rng.setSource(() => 0.9999); // 1D6 = 6 (safe path); D100 = 100
-    const state = runRow('Starship Travel Events Table', 'asteroids', 0, { table: 'Starship Travel Events Table' });
-    assert.ok(count(state.lines, (l) => l.type === 'table' && l.table === 'Starship Travel Events Table') === 1, 'one new event');
+  test('rollAgain rolls the table being resolved once more', (assert) => {
+    rng.setSource(() => 0.5);
+    const state = F.start([{ table: 'Rewards Table', then: [{ rollAgain: true }] }], {});
+    assert.ok(count(state.lines, (l) => l.type === 'table' && l.table === 'Rewards Table') >= 2);
   });
 
-  test('Asteroids: going through gives three Savvy checks with Hull damage if they fail', (assert) => {
+  test('a Savvy roll with times and ifFail: three checks, and Hull damage for each miss', (assert) => {
     rng.setSource(() => 0); // every die rolls 1
-    const state = runRow('Starship Travel Events Table', 'asteroids', 1);
+    const state = F.start([{ roll: '1D6', label: 'Piloting', times: 3, savvy: true, target: 4, ifFail: [{ roll: '1D6', label: 'Hull damage' }] }], {});
     assert.equal(count(state.lines, (l) => l.type === 'roll' && /Piloting/.test(l.label)), 3);
     assert.equal(count(state.lines, (l) => l.type === 'roll' && l.label === 'Hull damage'), 3);
     assert.ok(/Savvy \+3 or better/.test(allText(state.lines)));
   });
 
   test('roll-again chains stop after a few rolls', (assert) => {
-    rng.setSource(() => 0.385); // D100 = 39: Completely lost, every time
-    const state = F.start([{ table: 'Exploration Table' }], {});
-    assert.ok(/Stopped: too many rolls/.test(allText(state.lines)));
-    assert.equal(state.stack.length, 0);
+    const scripts = LP.data.followups['Rewards Table'];
+    const saved = scripts['cargo-crate'];
+    scripts['cargo-crate'] = [{ rollAgain: true }];
+    try {
+      rng.setSource(() => 0.385); // the Cargo Crate, every time
+      const state = F.start([{ table: 'Rewards Table' }], {});
+      assert.ok(/Stopped: too many rolls/.test(allText(state.lines)));
+      assert.equal(state.stack.length, 0);
+    } finally {
+      scripts['cargo-crate'] = saved;
+    }
   });
 
   test('choices pause the run and resume where they left off', (assert) => {
     rng.setSource(rng.seeded(3));
-    let state = F.start(F.scriptFor('Trade Table', 'contraband'), { table: 'Trade Table' });
+    let state = F.start([{
+      choice: {
+        prompt: 'Accept the contraband?',
+        options: [
+          { value: 'accept', label: 'Accept', then: [{ roll: '1D6', label: 'Credits from selling it' }] },
+          { value: 'decline', label: 'Turn it down', then: [{ text: 'You pass on it.' }] }
+        ]
+      }
+    }], {});
     assert.equal(state.pending.options.length, 2);
     assert.equal(F.pendingChoice(state).prompt, 'Accept the contraband?');
     state = JSON.parse(JSON.stringify(state));
@@ -148,7 +164,15 @@
 
   test('nested choices: Escape pod → wanted criminal → turn them in', (assert) => {
     rng.setSource(() => 0); // 1D6 = 1: wanted criminal
-    let state = F.start(F.scriptFor('Starship Travel Events Table', 'escape-pod'), {});
+    let state = F.start([{
+      choice: {
+        prompt: 'Rescue whoever is in the pod?',
+        options: [{
+          value: 'rescue', label: 'Rescue them',
+          then: [{ choice: { prompt: 'Let them go, or turn them in?', options: [{ value: 'let-go', label: 'Let them go' }, { value: 'turn-in', label: 'Turn them in', then: [{ gain: { rivals: 1 } }] }] } }]
+        }]
+      }
+    }], {});
     F.choose(state, 'rescue');
     assert.ok(/Let them go/.test(state.pending.prompt));
     F.choose(state, 'turn-in');
@@ -158,10 +182,10 @@
 
   test('gains add up (Rumors, story points, Rivals)', (assert) => {
     rng.setSource(() => 0);
-    const a = runRow('Exploration Table', 'meet-someone-interesting');
+    const a = runRow('Rewards Table', 'documents');
     assert.equal(a.gains.rumors, 1);
-    const b = runRow('Starship Travel Events Table', 'navigation-trouble', 0, { table: 'Starship Travel Events Table' });
-    assert.ok(b.gains.storyPoints <= -1);
+    const b = runRow('Rewards Table', 'mysterious-items');
+    assert.equal(b.gains.storyPoints, 2);
   });
 
   test('random crew picks are distinct and within the crew', (assert) => {
@@ -193,26 +217,4 @@
     }
   });
 
-  /* ---------------------------------------------------------------------- */
-  group('Travel event stage');
-
-  test('a travel event choice pauses the turn, and Undo goes back to it', (assert) => {
-    const T = LP.turn;
-    const c = { settings: { difficulty: 'normal', crewSize: 6 }, turnMemory: { hasPlayed: true }, turn: null, models: { disabled: {} } };
-    T.confirm(c, { firstTurn: false, invaded: false, worldTraits: [] });
-    T.confirm(c, { mode: 'ship' });
-    rng.setSource(() => 0.55); // D100 = 56: Escape pod (a choice)
-    T.confirm(c, { crewCount: 5 });
-    const record = c.turn.records[2];
-    assert.equal(record.output.fu.lines[0].rowId, 'escape-pod');
-    assert.equal(record.pending.prompt, 'Rescue whoever is in the pod?');
-    assert.equal(T.walk(c).current, null);
-    rng.setSource(() => 0.6); // 1D6 = 4: Rumor + story point
-    T.choose(c, 'rescue');
-    assert.equal(record.pending, null);
-    assert.deepEqual(T.context(c, c.turn.records).facts.travelGains, { rumors: 1, storyPoints: 1 });
-    assert.equal(T.walk(c).current.id, 'new-world');
-    T.undo(c);
-    assert.ok(c.turn.records[2].pending, 'back at the choice');
-  });
 })(window.LP);

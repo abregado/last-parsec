@@ -28,6 +28,8 @@
 
   /** Confirm the current stage with its pre-filled values, plus overrides. */
   function confirmDefaults(c, overrides) {
+    const done = c.turn && c.turn.records[c.turn.records.length - 1];
+    if (done && T.awaitingApply(done) && !done.pending) T.applyLedger(c);
     const values = {};
     const fields = T.currentFields(c);
     for (const f of fields) if (f.type !== 'info') values[f.key] = f.value;
@@ -38,12 +40,25 @@
     if (r.error) throw new Error(current(c) + ': ' + r.error);
   }
 
+  /** An answer for whatever a stage asks: the first usable option, or something harmless for the free-form prompts. */
+  function answerFor(pending) {
+    switch (pending.kind) {
+      case 'number': return pending.min || 0;
+      case 'pickList': return Array.from({ length: pending.k }, () => pending.options[0].value);
+      case 'offer': return null;
+      case 'recruit': return { accepted: false };
+      case 'alternatives': return 0;
+      default: return (pending.options.find((o) => !o.disabled) || pending.options[0]).value;
+    }
+  }
+
   /** Answer every pending choice with its first option. */
   function settle(c) {
     let guard = 0;
     while (current(c) === 'pending' && guard++ < 20) {
       const rec = c.turn.records[c.turn.records.length - 1];
-      T.choose(c, rec.pending.options[0].value);
+      if (!rec.pending) { T.applyLedger(c); continue; }
+      T.choose(c, answerFor(rec.pending));
     }
   }
 
@@ -56,6 +71,7 @@
       models: { disabled: {}, invasion: {} }
     }, campaignExtra);
     T.confirm(c, { firstTurn: false, invaded: false, worldTraits: traits || [] });
+    if (memory && memory.onQuest) LP.events.ledger.commit(c, LP.conditions.addOps(c, 'on-quest'));
     T.confirm(c, { mode: 'stay' });
     T.confirm(c, { crewCount: 6, sickBay: 0, hasShip: true, debt: 0, payment: 0, hullDamage: 0 });
     T.confirm(c, { tasks: {} });
@@ -191,7 +207,7 @@
     playOut(c);
     assert.equal(record(c, 'loot').input.rolls, 3);
     assert.ok(/Completed the Quest/.test(JSON.stringify(record(c, 'experience').output)));
-    assert.equal(c.turnMemory.onQuest, false);
+    assert.ok(!LP.conditions.has(c, 'on-quest'), 'the Quest condition ends');
   });
 
   test('Get paid: Winning makes a 1–2 count as 3; Danger Pay and bounty add on', (assert) => {
@@ -259,7 +275,7 @@
   test('every post-battle event table script runs to the end', (assert) => {
     for (let seed = 1; seed <= 15; seed++) {
       rng.setSource(rng.seeded(seed));
-      for (const name of ['Campaign Events Table', 'Character Events Table', 'Battlefield Finds Table', 'Injury Table', 'Bot Injury Table']) {
+      for (const name of ['Battlefield Finds Table', 'Injury Table', 'Bot Injury Table']) {
         for (const row of LP.data.tables[name].rows) {
           const run = LP.followup.start(LP.followup.scriptFor(name, row.id), { table: name, crewCount: 5 });
           let guard = 0;

@@ -49,7 +49,8 @@
     assert.ok(a.patrons.every((p) => p.forces.length === 47 && p.uniques.length === 22 && p.patronType));
     assert.ok(a.rivals.every((r) => r.forces.length === 1 && r.uniques.length === 22));
     assert.equal(a.rivals.find((r) => r.forces[0] === 'Criminal Elements|pirates').name, 'Pirates');
-    for (const [key, table] of Object.entries(A.EVENT_TABLES)) assert.equal(a.events[key].length, LP.data.tables[table].rows.length, key);
+    for (const key of A.EVENT_KINDS) assert.equal(a.events[key].length, LP.data.basePack.events.filter((e) => e.table === key).length, key);
+    assert.ok(a.events.travel.includes('base:asteroids'));
     assert.deepEqual(A.warnings(a), []);
   });
 
@@ -69,19 +70,12 @@
     assert.equal(copy.name, 'All options (copy)');
   });
 
-  test('event restrictions merge with Models exclusions for follow-up rolls', (assert) => {
+  test('Models exclusions go to follow-up rolls', (assert) => {
     const c = campaign();
     c.models.disabled['Criminal Elements'] = ['gangers'];
-    const a = A.emptyArchetype('Quiet');
-    a.events.travel = ['uneventful-trip'];
-    const map = A.disabledMap(c, a);
+    const map = A.disabledMap(c, A.emptyArchetype('Quiet'));
     assert.deepEqual(map['Criminal Elements'], ['gangers']);
-    assert.equal(map['Starship Travel Events Table'].length, 15);
-    assert.deepEqual(map['Trade Table'], [], 'empty list = full table');
-    for (let i = 0; i < 50; i++) {
-      const run = LP.followup.start([{ table: 'Starship Travel Events Table' }], { disabled: map });
-      assert.equal(run.lines[0].rowId, 'uneventful-trip');
-    }
+    assert.deepEqual(map['Trade Table'], undefined, 'event tables are no longer rolled by follow-ups');
   });
 
   test('the follow-up species step uses the given weights', (assert) => {
@@ -230,5 +224,78 @@
     P.ensure(copy);
     assert.equal(copy.planets[0].archetypeId, copy.archetypes[0].id);
     assert.equal(copy.currentPlanetId, null);
+  });
+
+  /* ---------------------------------------------------------------------- */
+  group('Disabled Rivals and Patrons');
+
+  test('a disabled Rival leaves the active list and can come back', (assert) => {
+    const c = campaign();
+    const p = { id: 'p1', name: 'Ka', archetypeId: c.archetypes[0].id, rivals: [], patrons: [] };
+    c.planets.push(p);
+    P.ensure(c);
+    const world = c.planets[0];
+    const rival = P.newRival(c, world);
+    const twin = P.newRival(c, world);
+    P.disableRival(world, rival.id, { turn: 4, reason: 'settled' });
+    assert.ok(!world.rivals.some((r) => r.id === rival.id));
+    assert.equal(world.disabledRivals.length, 1);
+    assert.deepEqual(world.disabledRivals[0].disabled, { turn: 4, reason: 'settled' });
+    assert.ok(world.rivals.some((r) => r.id === twin.id));
+    P.enableRival(world, rival.id);
+    assert.equal(world.disabledRivals.length, 0);
+    assert.ok(world.rivals.some((r) => r.id === rival.id));
+    assert.ok(!world.rivals.find((r) => r.id === rival.id).disabled);
+  });
+
+  test('a disabled Patron is kept through normalizing, and renamed if its name was reused', (assert) => {
+    const c = campaign();
+    c.planets.push({ id: 'p1', name: 'Ka', archetypeId: c.archetypes[0].id });
+    P.ensure(c);
+    const world = c.planets[0];
+    const patron = P.newPatron(c, world);
+    const name = patron.name;
+    P.disablePatron(world, patron.id, { turn: 2, reason: 'bad reputation' });
+    P.ensure(c);
+    assert.equal(c.planets[0].disabledPatrons.length, 1);
+    c.planets[0].patrons.push({ id: 'new', name: name, patronType: null, forces: [], uniques: [], notes: '' });
+    P.enablePatron(c.planets[0], patron.id);
+    assert.equal(c.planets[0].patrons.length, 2);
+    assert.equal(c.planets[0].patrons[1].name, name + ' (2)');
+  });
+
+  /* ---------------------------------------------------------------------- */
+  group('Archetypes and the event packs');
+
+  test('an archetype’s event list filters what the runner may roll; an empty list allows the kind', (assert) => {
+    const c = campaign();
+    const a = A.emptyArchetype('Quiet');
+    a.events.travel = ['base:asteroids'];
+    const allowed = A.eventFilter(c, a);
+    assert.ok(allowed('base:asteroids'));
+    assert.ok(!allowed('base:accident'));
+    assert.ok(allowed('base:fuel'), 'trade has an empty list: all of it');
+    assert.equal(A.eventFilter(c, null), null);
+  });
+
+  test('the event list for the archetype tab covers the pack, and normalizing drops unknown ids', (assert) => {
+    const c = campaign();
+    assert.equal(A.eventList(c, 'travel').length, 25);
+    const a = A.emptyArchetype('Odd');
+    a.events.travel = ['base:asteroids', 'base:no-such-event', 'asteroids'];
+    c.archetypes = [a];
+    A.ensure(c);
+    assert.deepEqual(c.archetypes[0].events.travel, ['base:asteroids']);
+  });
+
+  test('the env a stage gives the runner carries packs, disabled events and the archetype filter', (assert) => {
+    const c = campaign();
+    c.eventsDisabled = ['base:asteroids'];
+    const env = LP.events.pack.env(c, {});
+    assert.equal(env.packs[0].pack.id, 'base');
+    assert.deepEqual(env.disabled, ['base:asteroids']);
+    assert.equal(env.followup.crewSize, 6);
+    const state = LP.events.run.start(c, [{ table: 'travel' }], Object.assign(env, { vars: {} }));
+    assert.ok(state.lines[0].rowId !== 'base:asteroids');
   });
 })(window.LP);

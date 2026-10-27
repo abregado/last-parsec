@@ -411,4 +411,29 @@
     T.nextTurn(c);
     assert.equal(c.turnNumber, 2);
   });
+
+  /* ---------------------------------------------------------------------- */
+  group('Base profile');
+
+  test('a member keeps the profile they joined with', (assert) => {
+    const c = campaign();
+    const m = R.addMember(c, { name: 'Ava', profile: { reactions: 1, speed: 4, combat: 0, toughness: 3, savvy: 1, luck: 0 } });
+    m.profile.savvy = 3;
+    assert.equal(m.baseProfile.savvy, 1);
+    assert.equal(m.profile.savvy, 3);
+    R.ensure(c);
+    assert.equal(c.roster.members[0].baseProfile.savvy, 1, 'survives normalizing');
+  });
+
+  test('a saved member without a base profile gets one from the profile', (assert) => {
+    const c = campaign();
+    c.roster.members.push({ id: 'old', name: 'Old', profile: { savvy: 2 } });
+    R.ensure(c);
+    assert.equal(c.roster.members[0].baseProfile.savvy, 2);
+  });
+
+  test('resources are credits, story points, Rumors, fuel and ship parts only', (assert) => {
+    const c = campaign();
+    assert.deepEqual(Object.keys(c.roster.resources), ['credits', 'storyPoints', 'rumors', 'fuel', 'shipParts']);
+  });
 })(window.LP);

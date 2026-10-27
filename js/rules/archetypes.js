@@ -8,7 +8,7 @@
    *   id, name,
    *   worldTraits: [traitId],                 allowed World Traits
    *   species: { speciesId: weight },         recruit weights on the combined species table
-   *   events: { campaign, character, exploration, trade, travel: [rowId] },
+   *   events: { campaign, character, exploration, trade, travel: [packId:eventId] },
    *   patrons: [{ id, name, patronType | null, forces: ['Table|rowId'], uniques: [uniqueId] }],
    *   rivals:  [{ id, name, forces: ['Table|rowId'], uniques: [uniqueId] }]
    * }]
@@ -21,13 +21,7 @@
 
   const WORLD_TRAITS = 'World Traits Table';
   const FORCE_TABLES = ['Criminal Elements', 'Hired Muscle', 'Interested Parties'];
-  const EVENT_TABLES = {
-    campaign: 'Campaign Events Table',
-    character: 'Character Events Table',
-    exploration: 'Exploration Table',
-    trade: 'Trade Table',
-    travel: 'Starship Travel Events Table'
-  };
+  const EVENT_KINDS = ['campaign', 'character', 'exploration', 'trade', 'travel'];
   const EVENT_LABELS = {
     campaign: 'Campaign Events',
     character: 'Character Events',
@@ -42,6 +36,21 @@
 
   function ids(tableName) {
     return rng.getTable(tableName).rows.map((r) => r.id);
+  }
+
+  /** Every event of a kind (campaign, character, exploration, trade, travel) in the campaign's packs, as { id, title, weight, pack }. */
+  function eventList(campaign, key) {
+    const out = [];
+    for (const pack of LP.conditions.packs(campaign)) {
+      for (const e of pack.events || []) {
+        if (e.table === key) out.push({ id: pack.pack.id + ':' + e.id, title: e.title, weight: e.weight, pack: pack.pack.id });
+      }
+    }
+    return out;
+  }
+
+  function eventIds(campaign, key) {
+    return eventList(campaign, key).map((e) => e.id);
   }
 
   function clone(value) {
@@ -99,11 +108,11 @@
   }
 
   /** The "All options" archetype: plays exactly like the rules as written. */
-  function defaultArchetype() {
+  function defaultArchetype(campaign) {
     const uniques = ids('Unique Individuals');
     const forces = allForces();
     const events = {};
-    for (const [key, table] of Object.entries(EVENT_TABLES)) events[key] = ids(table);
+    for (const key of EVENT_KINDS) events[key] = eventIds(campaign, key);
     return {
       id: newId(),
       name: 'All options',
@@ -164,7 +173,7 @@
     return entry;
   }
 
-  function normalize(raw) {
+  function normalize(raw, campaign) {
     const a = raw && typeof raw === 'object' ? raw : {};
     const species = {};
     const defaults = defaultSpeciesWeights();
@@ -173,8 +182,8 @@
       species[id] = isFinite(w) && w >= 0 ? Math.round(w) : 0;
     }
     const events = {};
-    for (const [key, table] of Object.entries(EVENT_TABLES)) {
-      events[key] = validIds(a.events && a.events[key], ids(table));
+    for (const key of EVENT_KINDS) {
+      events[key] = validIds(a.events && a.events[key], eventIds(campaign, key));
     }
     return {
       id: typeof a.id === 'string' && a.id ? a.id : newId(),
@@ -189,8 +198,8 @@
 
   /** Adds the default archetype when there are none. */
   function ensure(campaign) {
-    const list = Array.isArray(campaign.archetypes) ? campaign.archetypes.map(normalize) : [];
-    campaign.archetypes = list.length ? list : [defaultArchetype()];
+    const list = Array.isArray(campaign.archetypes) ? campaign.archetypes.map((a) => normalize(a, campaign)) : [];
+    campaign.archetypes = list.length ? list : [defaultArchetype(campaign)];
     return campaign.archetypes;
   }
 
@@ -212,20 +221,36 @@
     return archetype ? excluded(archetype.worldTraits, WORLD_TRAITS) : [];
   }
 
-  /**
-   * A `disabled` map for follow-up runs: Models-tab exclusions plus this
-   * archetype's event restrictions.
-   */
-  function disabledMap(campaign, archetype) {
+  /** A `disabled` map for follow-up runs: the Models-tab exclusions. */
+  function disabledMap(campaign) {
     const out = {};
     const models = campaign && campaign.models && campaign.models.disabled ? campaign.models.disabled : {};
     for (const [table, list] of Object.entries(models)) out[table] = list.slice();
-    if (archetype) {
-      for (const [key, table] of Object.entries(EVENT_TABLES)) {
-        out[table] = (out[table] || []).concat(excluded(archetype.events[key], table));
-      }
-    }
     return out;
+  }
+
+  /** Let the "All options" archetype play events (one with an empty list for a kind already allows all of it). */
+  function joinDefault(campaign, fullIds) {
+    const list = campaign.archetypes || [];
+    const a = list.find((x) => x.name === 'All options') || list[0];
+    if (!a) return;
+    const kindOf = {};
+    for (const key of EVENT_KINDS) for (const e of eventList(campaign, key)) kindOf[e.id] = key;
+    for (const id of fullIds) {
+      const key = kindOf[id];
+      if (key && a.events[key].length && !a.events[key].includes(id)) a.events[key].push(id);
+    }
+  }
+
+  /** (fullId) -> bool for the event runner: does this archetype allow the event? An empty list for a kind allows all of it. */
+  function eventFilter(campaign, archetype) {
+    if (!archetype) return null;
+    const kindOf = {};
+    for (const key of EVENT_KINDS) for (const e of eventList(campaign, key)) kindOf[e.id] = key;
+    return (fullId) => {
+      const list = archetype.events[kindOf[fullId]];
+      return !list || !list.length || list.includes(fullId);
+    };
   }
 
   /** Species weights to roll with: the archetype's, or the defaults when all are 0 or there is none. */
@@ -257,7 +282,7 @@
   }
 
   LP.archetypes = {
-    WORLD_TRAITS, FORCE_TABLES, EVENT_TABLES, EVENT_LABELS,
+    WORLD_TRAITS, FORCE_TABLES, EVENT_KINDS, EVENT_LABELS, eventList, eventIds, eventFilter, joinDefault,
     speciesTable, defaultSpeciesWeights, allForces, enemyName,
     defaultArchetype, emptyArchetype, copyArchetype, normalize, ensure, get,
     excludedTraits, disabledMap, speciesWeights, rollSpecies, warnings

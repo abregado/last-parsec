@@ -8,6 +8,8 @@
    *   invasion: { tableName: [rowId, ...] }    entries that can form an invasion force;
    *                                            a table not listed uses the book's
    *                                            "Invasion Threat" entries
+   *   weaponsOff: [weaponName]                 weapons the player has no models for, anywhere
+   *                                            they appear in the weapon tables
    * }
    * Weights stay as printed; switching an entry off removes its weight from
    * the table, so every remaining entry becomes proportionally more likely.
@@ -61,6 +63,58 @@
   /** Roll an enemy from the enabled entries only. Null if all are off. */
   function rollEnemy(campaign, tableName) {
     return rng.weightedPick(rng.getTable(tableName).rows, { exclude: disabledIds(campaign, tableName) });
+  }
+
+  /* ---------------------------------------------------------------------- */
+  /* Weapons                                                                */
+  /* ---------------------------------------------------------------------- */
+
+  const WEAPON_TABLES = {
+    basic: { table: 'Varied Armaments Table', column: (n) => 'weapon_' + n },
+    specialist: { table: 'Specialists Table', column: (n) => 'specialist_' + String(n).toLowerCase() }
+  };
+
+  function weaponsOff(campaign) {
+    return (campaign.models && campaign.models.weaponsOff) || [];
+  }
+
+  function isWeaponOn(campaign, name) {
+    return !weaponsOff(campaign).includes(name);
+  }
+
+  function setWeapon(campaign, name, on) {
+    const current = weaponsOff(campaign).filter((n) => n !== name);
+    if (!on) current.push(name);
+    campaign.models.weaponsOff = current;
+  }
+
+  /** The distinct weapons in a column, in table order: ['Handgun', 'Colony rifle', ...]. */
+  function weaponNames(kind, code) {
+    const spec = WEAPON_TABLES[kind];
+    const column = spec.column(code);
+    const names = [];
+    for (const row of rng.getTable(spec.table).rows) {
+      if (row[column] && !names.includes(row[column])) names.push(row[column]);
+    }
+    return names;
+  }
+
+  /** A unit's weapon lists, { basic: [...], specialist: [...] }, or null for fixed or melee-only weapons. */
+  function weaponsFor(row) {
+    const code = /^\s*([123])\s*([ABC])\s*$/.exec(row.weapons || '');
+    return code ? { basic: weaponNames('basic', code[1]), specialist: weaponNames('specialist', code[2]) } : null;
+  }
+
+  /**
+   * Row ids of a weapon table to leave out of a roll in one column because their weapon is switched off.
+   * Returns [] when that would leave nothing to roll, so a roll is never blocked.
+   */
+  function weaponExclude(campaign, kind, code) {
+    const spec = WEAPON_TABLES[kind];
+    const column = spec.column(code);
+    const rows = rng.getTable(spec.table).rows.filter((r) => r[column] && r.weight > 0);
+    const off = rows.filter((r) => !isWeaponOn(campaign, r[column])).map((r) => r.id);
+    return off.length < rows.length ? off : [];
   }
 
   /* ---------------------------------------------------------------------- */
@@ -120,6 +174,7 @@
   LP.models = {
     ENEMY_TABLES, isEnabled, setEnabled, setAll, enabledRows, odds, rollEnemy,
     isInvasionThreat, defaultInvasionIds, invasionIds, isInvasion, setInvasion, resetInvasion,
-    invasionCandidates, rollInvasion
+    invasionCandidates, rollInvasion,
+    isWeaponOn, setWeapon, weaponNames, weaponsFor, weaponExclude
   };
 })(window.LP);

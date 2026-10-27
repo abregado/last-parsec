@@ -5,7 +5,7 @@
   const T = LP.turn;
 
   const STEP_HEADINGS = {
-    start: 'Start',
+    start: 'Start of turn',
     travel: 'Step 1 · Travel',
     world: 'Step 2 · World',
     post: 'Step 4 · Post-Battle'
@@ -15,7 +15,7 @@
     return el('div', { class: 'stage-head' },
       el('span', { class: 'stage-number' }, def.number),
       el('h3', { class: 'stage-title' }, def.title),
-      el('span', { class: 'stage-page' }, 'p.' + def.page),
+      def.page ? el('span', { class: 'stage-page' }, 'p.' + def.page) : null,
       extra || null
     );
   }
@@ -30,6 +30,23 @@
   function commit(state, after) {
     LP.storage.touchCampaign(state.campaign);
     draw(state, after);
+  }
+
+  /** What an event is about to change, with the button that makes it happen. */
+  function ledgerPanel(state, record) {
+    const lines = LP.events.ledger.preview(state.campaign, record.output.ops);
+    return el('div', { class: 'ledger' },
+      el('h4', { class: 'ledger-title' }, 'What will happen'),
+      el('ul', { class: 'ledger-list' }, lines.map((l) => el('li', { class: l.destructive ? 'ledger-destructive' : null }, l.text))),
+      el('button', {
+        type: 'button', class: 'btn btn-primary',
+        onclick: () => {
+          const result = T.applyLedger(state.campaign);
+          if (result.error) LP.ui.notify(result.error, 'error');
+          commit(state, 'current');
+        }
+      }, 'Apply')
+    );
   }
 
   function stageItem(state, item) {
@@ -64,8 +81,14 @@
             const result = T.choose(state.campaign, value);
             if (result.error) LP.ui.notify(result.error, 'error');
             commit(state, 'current');
+          },
+          onRecruit: (pending) => {
+            LP.recruit.begin(state.campaign, pending.variant);
+            LP.storage.touchCampaign(state.campaign);
+            LP.router.go(LP.router.campaignPath(state.campaign.id, 'characters'));
           }
-        })
+        }),
+        T.awaitingApply(item.record) && !item.record.pending ? ledgerPanel(state, item.record) : null
       );
     }
 
@@ -94,7 +117,8 @@
   async function restart(state) {
     const ok = await LP.ui.confirm({
       title: 'Restart this turn?',
-      message: 'All results from this turn are thrown away, and remembered values go back to how they were when the turn began.',
+      message: 'All results from this turn are thrown away, and remembered values go back to how they were when the turn began.' +
+        (T.restartWarning(state.campaign) ? ' ' + T.restartWarning(state.campaign) : ''),
       confirmLabel: 'Restart turn',
       danger: true
     });
@@ -116,7 +140,9 @@
           type: 'button',
           class: 'btn',
           disabled: !T.canUndo(campaign),
-          onclick: () => {
+          onclick: async () => {
+            const warning = T.undoWarning(campaign);
+            if (warning && !(await LP.ui.confirm({ title: 'Undo this stage?', message: warning, confirmLabel: 'Undo', danger: true }))) return;
             T.undo(campaign);
             commit(state, 'current');
           }

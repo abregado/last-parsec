@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Last Parsec · Table view (mock-up)</title>
+<style>
+  /* Mock-up only: static sample data, no connection to the app. Tokens copied from css/styles.css. */
+  :root {
+    --bg:#0d1117; --bg-raised:#151b24; --bg-sunken:#0a0d12; --surface:#1b2330; --surface-alt:#151c27;
+    --border:#2c3747; --border-strong:#3d4b60; --text:#e3e9f1; --text-muted:#93a1b5;
+    --accent:#4fd1c5; --accent-contrast:#062421; --danger:#f2706a; --warn:#ffcf5c;
+    --font-body:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    --font-display:"Bahnschrift","DIN Alternate","Arial Narrow",system-ui,sans-serif;
+    --radius:8px;
+  }
+  :root[data-theme="light"] {
+    --bg:#f3f5f8; --bg-raised:#fff; --bg-sunken:#e1e7ee; --surface:#fff; --surface-alt:#edf1f6;
+    --border:#d3dae3; --border-strong:#b5c0ce; --text:#17202b; --text-muted:#5a6778;
+    --accent:#0f8a80; --accent-contrast:#fff; --danger:#c23b33; --warn:#b7791f;
+  }
+  * { box-sizing:border-box; }
+  html { -webkit-text-size-adjust:100%; }
+  body { margin:0; background:var(--bg); color:var(--text); font:15px/1.4 var(--font-body); }
+  h1,h2,h3 { font-family:var(--font-display); margin:0; }
+  button { font:inherit; color:inherit; cursor:pointer; touch-action:manipulation; }
+
+  .btn { min-height:48px; min-width:48px; padding:0 16px; border-radius:var(--radius); border:1px solid var(--border-strong);
+         background:var(--surface); font-weight:600; display:inline-flex; align-items:center; justify-content:center; }
+  .btn:active { transform:scale(.97); }
+  .btn-primary { background:var(--accent); color:var(--accent-contrast); border-color:var(--accent); }
+  .btn-out { min-width:64px; }
+  .btn-out.on { background:var(--danger); color:#fff; border-color:var(--danger); }
+
+  .bar { position:sticky; top:0; z-index:10; background:var(--bg-raised); border-bottom:1px solid var(--border);
+         display:flex; align-items:center; gap:12px; padding:6px 12px; }
+  .bar .grow { flex:1; min-width:0; }
+  .bar h1 { font-size:18px; }
+  .bar .sub { color:var(--text-muted); font-size:13px; }
+
+  main { padding:10px 12px 40px; display:grid; grid-template-columns:minmax(0,1fr); gap:18px; }
+  section > h2 { font-size:15px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-muted); margin:0 0 6px; display:flex; justify-content:space-between; align-items:baseline; }
+  section > h2 small { font:600 14px var(--font-body); text-transform:none; letter-spacing:0; }
+
+  /* battle brief: at most 2 columns, one rule per line */
+  .brief { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 28px; margin:0; }
+  .brief > div { padding:6px 0; border-bottom:1px solid var(--border); }
+  .brief dt { font-size:12px; text-transform:uppercase; color:var(--accent); font-weight:700; }
+  .brief dd { margin:0; padding:1px 0; }
+
+  /* team rules sit above their table */
+  .team { margin:0 0 8px; padding:0; list-style:none; }
+  .team li { padding:2px 0; }
+  .team b, .rule b { color:var(--accent); }
+
+  /* units: one grid row each. Left half = name, stats, character rules. Right half = weapons and their rules. */
+  .tablewrap { overflow-x:auto; border:1px solid var(--border); border-radius:var(--radius); }
+  .grid { min-width:760px; --stats:6; }
+  .grid.foes { --stats:5; }
+  .row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 64px; align-items:stretch; }
+  .head { background:var(--bg-sunken); font:700 12px var(--font-body); text-transform:uppercase; color:var(--text-muted); text-align:center; }
+  .head > div { padding:6px 0; }
+  .unit:nth-child(odd) { background:var(--surface); }
+  .unit:nth-child(even) { background:var(--surface-alt); }
+  .unit + .unit { border-top:1px solid var(--border-strong); }
+  .left { display:grid; grid-template-columns:120px repeat(var(--stats), minmax(0,1fr)); padding:0 0 0 12px; align-content:start; }
+  .right { display:grid; grid-template-columns:minmax(0,1fr) 54px 54px 54px; align-content:start; border-left:1px solid var(--border-strong); padding:0 8px 0 12px; }
+  .head .left, .head .right { padding-top:0; padding-bottom:0; align-content:center; }
+  .head .right { border-left-color:transparent; }
+  .head .left > div, .head .right > div { padding:6px 0; }
+  .head .l { text-align:left; }
+  .name b { font:700 19px/1.1 var(--font-display); display:block; }
+  .name span { font-size:12px; color:var(--text-muted); font-weight:400; text-transform:none; }
+  .stat { font:700 26px/1.2 var(--font-display); text-align:center; align-self:center; padding:6px 0; }
+  .name { padding:6px 0; }
+  .wn { font:700 19px/1.2 var(--font-display); align-self:center; }
+  .wv { font:700 22px/1.2 var(--font-display); text-align:center; align-self:center; }
+  .wn, .wv { padding-top:6px; padding-bottom:6px; }
+  /* Out: a full-height cell attached to the right of the row */
+  .act { display:flex; }
+  .btn-out { flex:1; width:100%; min-height:48px; border:0; border-left:1px solid var(--border-strong); border-radius:0; padding:0;
+             background:#8f3732; color:#fff; }
+  .btn-out svg { width:26px; height:26px; fill:currentColor; }
+  .btn-out.on { background:#e0443c; box-shadow:inset 0 0 0 3px rgba(255,255,255,.55); }
+  /* ability areas are darker than the stat block */
+  .rules { background:var(--bg-sunken); padding:5px 8px; }
+  .left .rules { grid-column:1 / -1; margin-left:-12px; padding-left:24px; }
+  .right .rules { grid-column:1 / -1; margin:0 -8px 0 -12px; padding-left:12px; }
+  .rule { padding:1px 0; font-size:15px; }
+  .rule i { font-style:normal; }
+  .unit.out > :not(.act) { opacity:.28; }
+  .unit.out .name b { text-decoration:line-through; }
+
+  /* events */
+  .events { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:10px 24px; }
+  .event { display:flex; gap:14px; align-items:flex-start; }
+  .event .btn { flex:none; min-height:64px; }
+  .event h3 { font-size:17px; }
+  .event p { margin:2px 0 0; }
+  .event .dice { font:12px ui-monospace,Consolas,monospace; color:var(--text-muted); }
+  .muted { color:var(--text-muted); }
+
+  .note { position:fixed; right:8px; bottom:8px; background:var(--warn); color:#222; padding:4px 10px; border-radius:99px; font-size:12px; font-weight:700; pointer-events:none; z-index:20; }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="grow">
+    <h1>Patron job · Deep Space Station Kappa</h1>
+    <div class="sub">Punks (Criminal Elements) · 7 vs 6 · Seized the Initiative (rolled 11)</div>
+  </div>
+  <button class="btn" id="theme" aria-label="Toggle light or dark">◐</button>
+  <button class="btn" onclick="alert('Closes this window.')">Close</button>
+</header>
+
+<main>
+
+  <section>
+    <h2>Battle</h2>
+    <dl class="brief">
+      <div><dt>Objective</dt><dd>Fight Off: hold the field.</dd><dd>Bounty: 2 credits if you Hold the Field.</dd></div>
+      <div><dt>Deployment</dt><dd>Line: within 2" of your table edge.</dd><dd>Enemy within 2" of the opposite edge.</dd><dd>No figures within 18" of the other side.</dd></div>
+      <div><dt>Notable sight</dt><dd>Peculiar item, 10" from centre.</dd><dd>Move into contact and give up other actions to grab it.</dd></div>
+      <div><dt>Terrain</dt><dd>2.5×2.5 ft: 2 large, 5 small, 4 linear.</dd><dd>Heavily enforced world: −1 enemy.</dd></div>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Your crew <small id="crewcount"></small></h2>
+    <ul class="team" id="crew-team"></ul>
+    <div class="tablewrap"><div class="grid" id="crew">
+      <div class="row head"><div class="left"><div class="l">Crew</div><div>React</div><div>Speed</div><div>Combat</div><div>Tough</div><div>Savvy</div><div>Luck</div></div>
+        <div class="right"><div class="l">Weapon</div><div>Range</div><div>Shots</div><div>Dmg</div></div><div></div></div>
+    </div></div>
+  </section>
+
+  <section>
+    <h2>Enemy force <small id="foecount"></small></h2>
+    <ul class="team" id="foe-team"></ul>
+    <div class="tablewrap"><div class="grid foes" id="foes">
+      <div class="row head"><div class="left"><div class="l">Enemy</div><div>Panic</div><div>Speed</div><div>Combat</div><div>Tough</div><div>Save</div></div>
+        <div class="right"><div class="l">Weapon</div><div>Range</div><div>Shots</div><div>Dmg</div></div><div></div></div>
+    </div></div>
+  </section>
+
+  <section>
+    <h2>Battle events <small class="muted">optional rule, p.116</small></h2>
+    <div class="events">
+      <div class="event"><button class="btn btn-primary" data-ev="2">Roll: end of round 2</button><div id="ev2"><span class="muted">Not rolled yet</span></div></div>
+      <div class="event"><button class="btn btn-primary" data-ev="4">Roll: end of round 4</button><div id="ev4"><span class="muted">Not rolled yet</span></div></div>
+    </div>
+    <p class="muted" style="margin:8px 0 0;font-size:13px">If the two events contradict each other, discard the second.</p>
+  </section>
+
+</main>
+<div class="note">MOCK-UP · sample data</div>
+
+<script>
+const TRAITS = {
+  'Pistol':    'Range 6" or less: +1 to hit. Can be used with a Melee weapon in the other hand.',
+  'Critical':  'A natural 6 on the hit die is a Critical Hit: the target takes 2 Hits instead of 1.',
+  'Heavy':     'Cannot move and fire in the same activation unless Speed 4" or more is spent first.',
+  'Piercing':  'Ignores Armour Saving Throws.',
+  'Elegant':   'Reroll a missed hit roll when you did not Move this round.',
+  'Clumsy':    '−1 to Brawling rolls.',
+  'Snap Shot': '+1 to hit at 6" or less.'
+};
+// weapon: [name, range, shots, dmg, [traits]]   rules: [title, text]
+const crew = [
+  { n:'Vex Harrow', c:'Captain', st:[2,'4"','+1',4,'+1',1],
+    rules:[['Captain','Once per battle, reroll one die.'], ['Combat Armour','5+ Save.'], ['Frakk Grenade ×2','Area: hits every figure within 2" of the target.']],
+    wp:[['Military Rifle','24"',1,'+0',['Heavy']], ['Handgun','6"',1,'+0',['Pistol']]] },
+  { n:'Doc Pell', c:'Medic', st:[1,'4"','+0',3,'+2',0],
+    rules:[['Repair bot','Repair one damaged item after the battle.']],
+    wp:[['Hand Laser','12"',1,'+0',['Pistol','Critical']]] },
+  { n:'Rook', c:'K\'Erin', st:[1,'4"','+1',4,'+0',0],
+    rules:[['K\'Erin','Roll two dice in a Brawl and use the best.'], ['Screen generator','4+ Save against ranged hits.']],
+    wp:[['Shotgun','12"',2,'+1',['Critical']], ['Blade','Brawl',1,'+0',['Elegant']]] },
+  { n:'Mina Okoro', c:'Scout', st:[1,'5"','+0',3,'+1',1],
+    rules:[['Motion tracker','Detects unseen enemies within 12".']],
+    wp:[['Hunting Rifle','30"',1,'+1',['Heavy','Piercing']]] },
+  { n:'Tix', c:'Engineer', st:[2,'6"','+0',3,'+1',0],
+    rules:[['Swift','Move +2" when running.'], ['Hand grenade ×3','Area. Single use.']],
+    wp:[['Scrap Pistol','9"',1,'+0',['Snap Shot']]] },
+  { n:'Grey Bishop', c:'Bot', st:[1,'4"','+0',4,'+0',0],
+    rules:[['Bot','Cannot be healed.']],
+    wp:[['Machine Pistol','8"',3,'+0',['Pistol','Clumsy']]] }
+];
+const foes = [
+  { n:'Punk 1', c:'Regular', st:['1–2','4"','+0',3,'—'], rules:[], wp:[['Handgun','6"',1,'+0',['Pistol']]] },
+  { n:'Punk 2', c:'Regular', st:['1–2','4"','+0',3,'—'], rules:[], wp:[['Handgun','6"',1,'+0',['Pistol']]] },
+  { n:'Punk 3', c:'Regular', st:['1–2','4"','+0',3,'—'], rules:[], wp:[['Scrap Pistol','9"',1,'+0',['Snap Shot']]] },
+  { n:'Punk 4', c:'Regular', st:['1–2','4"','+0',3,'—'], rules:[], wp:[['Scrap Pistol','9"',1,'+0',['Snap Shot']]] },
+  { n:'Specialist', c:'Specialist', st:['1–2','4"','+0',3,'—'], rules:[], wp:[['Shotgun','12"',2,'+1',['Critical']]] },
+  { n:'Lieutenant', c:'Lieutenant', st:['1–2','4"','+1',3,'—'],
+    rules:[['Lieutenant','Allies within 6" ignore the first Panic result each round.']], wp:[['Hand Laser','12"',1,'+0',['Pistol','Critical']]] },
+  { n:'Big Tony ★', c:'Unique Individual', st:['—','5"','+2',4,'—'],
+    rules:[['Fearless','Not affected by Morale.'], ['Luck 1','Can spend Luck to ignore a Hit.']], wp:[['Machine Pistol','8"',3,'+0',['Pistol','Clumsy']]] }
+];
+const crewTeam = [
+  ['Seized the Initiative','Before round 1, each crew member may Move or fire (shots only Hit on a natural 6).'],
+  ['Outnumbered','Enemy has more figures than your crew in the field.']
+];
+const foeTeam = [
+  ['AI: Aggressive','Advance on the closest target. Brawlers close in; shooters move to Cover, then fire at the nearest.'],
+  ['Criminal Elements','Take Cover when a crew figure is within Speed + 4".'],
+  ['Criminal Elements','Do not Flee if a Lieutenant is within 6".'],
+  ['Punks','Reroll a missed shot when no friendly figure is within 2".']
+];
+
+const $ = (s, r=document) => r.querySelector(s);
+const ruleLine = (t, x) => `<div class="rule"><b>${t}</b> — ${x}</div>`;
+const teamLine = r => `<li><b>${r[0]}</b> — ${r[1]}</li>`;
+
+const SKULL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.9 2 3 5.7 3 10.5c0 3 1.5 5.2 3.5 6.5V20a1 1 0 0 0 1 1H9v-2h2v2h2v-2h2v2h.5a1 1 0 0 0 1-1v-3c2-1.3 3.5-3.500 3.500-6.500C21 5.700 17.100 2 12 2zM8.500 12.500a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm7 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM12 14l1.200 2.200h-2.400L12 14z"/></svg>';
+function unit(u) {
+  const left = `<div class="left"><div class="name"><b>${u.n}</b><span>${u.c}</span></div>${u.st.map(v => `<div class="stat">${v}</div>`).join('')}
+    ${u.rules.length ? `<div class="rules">${u.rules.map(r => ruleLine(r[0], r[1])).join('')}</div>` : ''}</div>`;
+  const right = `<div class="right">${u.wp.map(w => `<div class="wn">${w[0]}</div><div class="wv">${w[1]}</div><div class="wv">${w[2]}</div><div class="wv">${w[3]}</div>
+    ${w[4].length ? `<div class="rules">${w[4].map(t => ruleLine(t, TRAITS[t])).join('')}</div>` : ''}`).join('')}</div>`;
+  return `<div class="row unit">${left}${right}<div class="act"><button class="btn btn-out" aria-pressed="false" aria-label="Out of action">${SKULL}</button></div></div>`;
+}
+$('#crew').insertAdjacentHTML('beforeend', crew.map(unit).join(''));
+$('#foes').insertAdjacentHTML('beforeend', foes.map(unit).join(''));
+$('#crew-team').innerHTML = crewTeam.map(teamLine).join('');
+$('#foe-team').innerHTML = foeTeam.map(teamLine).join('');
+
+/* Out is the only tracking */
+document.addEventListener('click', e => {
+  const b = e.target.closest('.btn-out');
+  if (!b) return;
+  const on = b.classList.toggle('on');
+  b.setAttribute('aria-pressed', on);
+  b.closest('.unit').classList.toggle('out', on);
+  count();
+});
+function count() {
+  const c = document.querySelectorAll('#crew .unit.out').length, f = document.querySelectorAll('#foes .unit.out').length;
+  $('#crewcount').textContent = (crew.length - c) + ' of ' + crew.length + ' in action';
+  $('#foecount').textContent = (foes.length - f) + ' of ' + foes.length + ' in action';
+}
+count();
+
+/* events: the one roll (sample results) */
+const EVENTS = [
+  ['Renewed Fury', 'All enemies gain +1 Combat Skill until the end of the next round.'],
+  ['Reinforcements', 'Place 1 additional Regular on the enemy table edge.'],
+  ['Sudden Fog', 'Visibility is 8" for the next round.']
+];
+document.querySelectorAll('[data-ev]').forEach(b => b.onclick = () => {
+  const e = EVENTS[Math.floor(Math.random() * EVENTS.length)], d = 1 + Math.floor(Math.random() * 100);
+  $('#ev' + b.dataset.ev).innerHTML = `<span class="dice">D100: ${d}</span><h3>${e[0]}</h3><p>${e[1]}</p>`;
+  b.textContent = 'Reroll: end of round ' + b.dataset.ev;
+});
+
+$('#theme').onclick = () => {
+  const d = document.documentElement;
+  d.dataset.theme = d.dataset.theme === 'light' ? 'dark' : 'light';
+};
+</script>
+</body>
+</html>

@@ -122,6 +122,34 @@
     };
   }
 
+  const ABILITY_START = /(?:(?<=[.!?"”]\s)|^)(?=[A-Z][A-Za-z'’ -]{1,32}:\s)/;
+  const TAGS = [/\s*Invasion Threat\.?/i, /\s*Test at [+-]\d\.?/i, /\s*\d\+ (?:Armor )?Saving Throw\.?/i];
+
+  /**
+   * An enemy's notes split into { description, abilities: [{ name, text }], tags: ['Invasion Threat', '6+ Saving Throw'] }.
+   * An ability starts at a "Name: " that opens a sentence; everything before the first one is the description.
+   */
+  function splitNotes(notes) {
+    let text = String(notes || '');
+    const tags = [];
+    for (const pattern of TAGS) {
+      const m = pattern.exec(text);
+      if (m) {
+        tags.push(m[0].trim().replace(/\.$/, ''));
+        text = text.replace(pattern, '');
+      }
+    }
+    const parts = text.split(ABILITY_START).map((p) => p.trim()).filter(Boolean);
+    const abilities = [];
+    let description = '';
+    for (const part of parts) {
+      const m = /^([A-Z][A-Za-z'’ -]{1,32}):\s+([\s\S]*)$/.exec(part);
+      if (m) abilities.push({ name: m[1], text: m[2].trim() });
+      else description = description ? description + ' ' + part : part;
+    }
+    return { description, abilities, tags };
+  }
+
   function getEnemy(tableName, rowId) {
     const row = rng.getTable(tableName).rows.find((r) => r.id === rowId);
     return row ? parse(tableName, row) : null;
@@ -159,5 +187,5 @@
     };
   }
 
-  LP.enemies = { AI_NAMES, DEPLOYMENT, CATEGORIES, categoryOfTable, parse, getEnemy, parseUnique };
+  LP.enemies = { AI_NAMES, DEPLOYMENT, CATEGORIES, categoryOfTable, parse, splitNotes, getEnemy, parseUnique };
 })(window.LP);

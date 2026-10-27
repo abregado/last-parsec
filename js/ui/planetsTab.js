@@ -122,6 +122,7 @@
         el('label', { class: 'field' }, el('span', { class: 'field-label' }, 'Archetype'), archetype)
       ),
       el('div', { class: 'planet-badges' }, badges(campaign, planet)),
+      LP.ui.conditionBadges(campaign, (c) => c.scope === 'planet' && c.targetId === planet.id, () => commit(state)),
       notes
     );
   }
@@ -252,6 +253,22 @@
     ));
   }
 
+  /** Rivals and Patrons an event set aside, with a way to bring them back. */
+  function setAsideBlock(state, planet) {
+    const rows = [];
+    const entry = (c, kind, enable) => el('li', { class: 'entry-card' },
+      el('div', { class: 'entry-head' },
+        el('strong', null, c.name),
+        el('span', { class: 'field-detail' }, kind + ' · set aside' + (c.disabled && c.disabled.reason ? ' (' + c.disabled.reason + ')' : '') + (c.disabled && c.disabled.turn ? ' on turn ' + c.disabled.turn : '')),
+        el('button', { type: 'button', class: 'btn btn-sm', onclick: () => { enable(planet, c.id); commit(state); } }, 'Bring back')
+      )
+    );
+    for (const r of planet.disabledRivals) rows.push(entry(r, 'Rival', P.enableRival));
+    for (const p of planet.disabledPatrons) rows.push(entry(p, 'Patron', P.enablePatron));
+    if (!rows.length) return null;
+    return block('Set aside (' + rows.length + ')', el('div', { class: 'arch-body' }, el('ul', { class: 'entry-list' }, rows)));
+  }
+
   function invasionBlock(state, planet) {
     const status = el('select', { class: 'input select', 'aria-label': 'Invasion status', 'data-focus': 'inv-status' },
       el('option', { value: '' }, 'Not invaded'),
@@ -337,6 +354,7 @@
           licenceBlock(state, planet),
           patronsBlock(state, planet),
           rivalsBlock(state, planet),
+          setAsideBlock(state, planet),
           invasionBlock(state, planet)
         )
       ));

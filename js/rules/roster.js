@@ -12,14 +12,16 @@
    *     ship: Ship | null,
    *     leaderId: string | null,
    *     metThrough, characterizedAs: string | null,   // labels from crew creation
-   *     start: { credits, storyPoints, patrons, rivals, questRumors } | null,
-   *     resources: { credits, storyPoints, rumors, questRumors, invasionRumors, fuel, shipParts },
+   *     start: { credits, storyPoints, patrons, rivals, rumors } | null,
+   *     resources: { credits, storyPoints, rumors, fuel, shipParts },
    *     counters: [{ id, name, amount }],   // anything else the player tracks
    *     notes: string
    *   }
    *   Member = {
-   *     id, name, speciesId, origins: [{ label, value }],
+   *     id, name, speciesId, origins: [{ label, value, table?, row? }],   // table and row ids when known
    *     profile: { reactions, speed, combat, toughness, savvy, luck },
+   *     baseProfile: same shape; what they joined with. Fixed once set, so events can tell
+   *                  which abilities have never been raised.
    *     xp, status: 'active' | 'sick-bay', sickBayTurns, joinedTurn, notes,
    *     portrait: data URL (1:2 JPEG) | null
    *   }
@@ -33,8 +35,6 @@
     { key: 'credits', label: 'Credits' },
     { key: 'storyPoints', label: 'Story points' },
     { key: 'rumors', label: 'Rumors' },
-    { key: 'questRumors', label: 'Quest Rumors' },
-    { key: 'invasionRumors', label: 'Invasion rumors' },
     { key: 'fuel', label: 'Fuel (credits)' },
     { key: 'shipParts', label: 'Ship parts (credits)' }
   ];
@@ -65,12 +65,19 @@
     if (!raw || typeof raw !== 'object') return null;
     const profile = {};
     for (const stat of STATS) profile[stat] = int(raw.profile && raw.profile[stat], 0);
+    const baseProfile = {};
+    for (const stat of STATS) baseProfile[stat] = int(raw.baseProfile && raw.baseProfile[stat], profile[stat]);
     return {
       id: typeof raw.id === 'string' && raw.id ? raw.id : newId(),
       name: text(raw.name),
       speciesId: typeof raw.speciesId === 'string' ? raw.speciesId : null,
-      origins: Array.isArray(raw.origins) ? raw.origins.filter((o) => o && o.label).map((o) => ({ label: String(o.label), value: text(o.value) })) : [],
+      origins: Array.isArray(raw.origins) ? raw.origins.filter((o) => o && o.label).map((o) => {
+        const origin = { label: String(o.label), value: text(o.value) };
+        if (typeof o.table === 'string' && typeof o.row === 'string') Object.assign(origin, { table: o.table, row: o.row });
+        return origin;
+      }) : [],
       profile: profile,
+      baseProfile: baseProfile,
       xp: Math.max(0, int(raw.xp, 0)),
       status: STATUSES.some((s) => s.id === raw.status) ? raw.status : 'active',
       sickBayTurns: Math.max(0, int(raw.sickBayTurns, 0)),
@@ -117,7 +124,7 @@
       characterizedAs: typeof raw.characterizedAs === 'string' ? raw.characterizedAs : null,
       start: start ? {
         credits: int(start.credits, 0), storyPoints: int(start.storyPoints, 0), patrons: int(start.patrons, 0),
-        rivals: int(start.rivals, 0), questRumors: int(start.questRumors, 0)
+        rivals: int(start.rivals, 0), rumors: int(start.rumors, 0)
       } : null,
       resources: normalizeResources(raw.resources),
       counters: (Array.isArray(raw.counters) ? raw.counters : []).filter((c) => c && typeof c === 'object').map((c) => ({
@@ -216,6 +223,7 @@
     r.members = r.members.filter((m) => m.id !== id);
     for (const item of r.items) if (item.carrierId === id) item.carrierId = null;
     if (r.leaderId === id) r.leaderId = null;
+    campaign.conditions = (campaign.conditions || []).filter((c) => !(c.scope === 'character' && c.targetId === id));
   }
 
   /* ---------------------------------------------------------------------- */
@@ -285,22 +293,24 @@
     r.items = r.items.filter((i) => i.tag !== tag);
     for (const f of found) {
       if (f.manual) continue;
-      const kept = old.find((i) => i.key === f.key && i.rowId === f.line.rowId);
-      if (kept) {
-        r.items.push(kept);
+      const kept = old.filter((i) => i.key === f.key && i.rowId === f.line.rowId);
+      if (kept.length) {
+        r.items.push(...kept);
         continue;
       }
-      r.items.push(LP.items.make({ table: f.line.table, rowId: f.line.rowId, damaged: f.damaged, source: f.line.itemSource, turn: what.turn, tag: tag, key: f.key }));
+      r.items.push(...LP.items.makeAll({ table: f.line.table, rowId: f.line.rowId, damaged: f.damaged, source: f.line.itemSource, turn: what.turn, tag: tag, key: f.key }));
     }
   }
 
   /** Add an item the player confirmed from a result card (a "manual" line). */
   function addFromLine(campaign, tag, line) {
     if (!hasCrew(campaign)) return null;
-    return addItem(campaign, {
+    const made = LP.items.makeAll({
       table: line.table, rowId: line.rowId, damaged: !!line.itemDamaged, source: line.itemSource || '',
       turn: turnNumber(campaign), tag: tag + '#manual', key: line.itemKey
     });
+    roster(campaign).items.push(...made);
+    return made[0];
   }
 
   function hasManual(campaign, tag, line) {
@@ -330,7 +340,7 @@
       id: character.id,
       name: character.name,
       speciesId: r.species ? r.species.id : null,
-      origins: r.origins.map((o) => ({ label: o.label, value: LP.character.rowLabel(o.table, o.row) })),
+      origins: r.origins.map((o) => ({ label: o.label, value: LP.character.rowLabel(o.table, o.row), table: o.table, row: o.row })),
       profile: r.profile,
       xp: r.xp,
       joinedTurn: turn
@@ -384,9 +394,9 @@
       r.characterizedAs = label('We Are Best Characterized As Table', crew.characterizedAs.value);
       r.start = {
         credits: summary.credits.total, storyPoints: summary.storyPoints, patrons: summary.patrons,
-        rivals: summary.rivals, questRumors: summary.questRumors
+        rivals: summary.rivals, rumors: summary.rumors
       };
-      Object.assign(r.resources, { credits: r.start.credits, storyPoints: r.start.storyPoints, questRumors: r.start.questRumors });
+      Object.assign(r.resources, { credits: r.start.credits, storyPoints: r.start.storyPoints, rumors: r.start.rumors });
     }
 
     // Empty the generator, ready for recruits.
@@ -401,6 +411,7 @@
     STATUSES,
     RESOURCES,
     ensure,
+    roster,
     hasCrew,
     turnNumber,
     species,
@@ -428,6 +439,7 @@
     crewCount,
     crewEnv,
     finalizeProblem,
+    memberFrom,
     finalize
   };
 })(window.LP);

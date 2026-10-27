@@ -39,7 +39,7 @@
       storyPoints: 0,
       patrons: 0,
       rivals: 0,
-      questRumors: 0,
+      rumors: 0,
       items: [],
       unknown: []
     };
@@ -73,7 +73,7 @@
     },
     {
       pattern: /^(\+?\s*\d+\s+)?(?:quest\s+)?rumou?rs?$/i,
-      apply: (out, m) => { out.questRumors += num(m[1], 1); }
+      apply: (out, m) => { out.rumors += num(m[1], 1); }
     },
     {
       pattern: /^(\+?\s*\d+\s+)?patrons?$/i,
@@ -132,7 +132,7 @@
       out.storyPoints += r.storyPoints;
       out.patrons += r.patrons;
       out.rivals += r.rivals;
-      out.questRumors += r.questRumors;
+      out.rumors += r.rumors;
       out.items.push(...r.items);
       out.unknown.push(...r.unknown);
     }

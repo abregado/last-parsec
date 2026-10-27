@@ -40,10 +40,24 @@
     return P.get(c, planet.id);
   }
 
+  /** An answer for whatever a stage asks: the first usable option, or something harmless for the free-form prompts. */
+  function answerFor(pending) {
+    switch (pending.kind) {
+      case 'number': return pending.min || 0;
+      case 'pickList': return Array.from({ length: pending.k }, () => pending.options[0].value);
+      case 'offer': return null;
+      case 'recruit': return { accepted: false };
+      case 'alternatives': return 0;
+      default: return (pending.options.find((o) => !o.disabled) || pending.options[0]).value;
+    }
+  }
+
   function settle(c, pick) {
     let guard = 0;
     while (current(c) === 'pending' && guard++ < 20) {
       const rec = last(c);
+      if (!rec.pending) { T.applyLedger(c); continue; }
+      if (rec.pending.free) { T.choose(c, answerFor(rec.pending)); continue; }
       const option = pick ? rec.pending.options.find(pick) || rec.pending.options[0] : rec.pending.options[0];
       T.choose(c, option.value);
     }
@@ -183,22 +197,10 @@
     assert.equal(fresh(c, planet).invasion.status, 'invaded', 'still invaded, tracked for the Galactic War');
   });
 
-  test('the departure planet’s archetype limits travel events', (assert) => {
-    const { c, planet } = onPlanet();
-    const quiet = A.emptyArchetype('Quiet lanes');
-    quiet.events.travel = ['uneventful-trip'];
-    c.archetypes.push(quiet);
-    planet.archetypeId = quiet.id;
-    confirm(c);
-    confirm(c, { mode: 'ship', destination: 'new' });
-    confirm(c, { crewCount: 6 });
-    assert.equal(last(c).output.fu.lines[0].rowId, 'uneventful-trip');
-  });
-
   /* ---------------------------------------------------------------------- */
   group('Planets in the turn: world and battle');
 
-  test('Pick a fight creates a named Rival; recruits use archetype species', (assert) => {
+  test('recruits use archetype species', (assert) => {
     const { c, planet } = onPlanet((c, p) => {
       const a = A.copyArchetype(c.archetypes[0]);
       a.species = { swift: 1 };
@@ -208,9 +210,7 @@
     confirm(c);
     confirm(c, { mode: 'stay' });
     confirm(c, { crewCount: 4 });
-    rng.setSource(() => 0.585); // D100 = 59: Pick a fight
-    confirm(c, { tasks: { explore: 1, recruit: 1 } });
-    assert.equal(fresh(c, planet).rivals.length, 1);
+    confirm(c, { tasks: { recruit: 1 } });
     const lines = JSON.stringify(last(c).output.fu.lines);
     assert.ok(/Swift \(Primary Alien\)/.test(lines), 'recruit rolled from the archetype weights');
   });

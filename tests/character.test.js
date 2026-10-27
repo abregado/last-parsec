@@ -246,7 +246,7 @@
     }
     const c = make('hakshan', { background: 'mining-colony', motivation: 'survival', class: 'soldier' });
     const r = C.resolve(c);
-    assert.equal(r.questRumors, 1, 'Truth rumor');
+    assert.equal(r.rumors, 1, 'Truth rumor');
     assert.equal(r.storyPoints, 1, 'Truth story point');
   });
 
@@ -299,12 +299,12 @@
     assert.equal(r.savvyIncrease, false);
   });
 
-  test('Traveler: Truth plus +2 story points and 2 Quest Rumors', (assert) => {
+  test('Traveler: Truth plus +2 story points and 2 Rumors', (assert) => {
     const c = make('traveler', { background: 'mining-colony', class: 'soldier' });
     const r = C.resolve(c);
     assert.equal(value(c, 'motivation'), 'truth');
     assert.equal(r.storyPoints, 3);
-    assert.equal(r.questRumors, 3);
+    assert.equal(r.rumors, 3);
   });
 
   test('Luck: Humans can exceed 1, others cannot; Bots and Emo-suppressed get none', (assert) => {
@@ -346,5 +346,25 @@
     const r = C.resolve(make('baseline-human', { background: 'giant-overcrowded-dystopian-city', motivation: 'escape', class: 'scientist' }));
     assert.deepEqual(r.profile, { reactions: 1, speed: 6, combat: 0, toughness: 3, savvy: 1, luck: 0 });
     assert.deepEqual(r.items.map((i) => i.table), ['Gadget Table']);
+  });
+
+  /* ---------------------------------------------------------------------- */
+  group('Species caps');
+
+  test('every species lists all six caps, Luck included', (assert) => {
+    for (const s of LP.data.species.list) {
+      for (const stat of ['reactions', 'speed', 'combat', 'toughness', 'savvy', 'luck']) {
+        assert.ok(Number.isInteger(s.caps[stat]), s.id + ' ' + stat);
+      }
+    }
+  });
+
+  test('Luck caps: Humans 3, Emo-suppressed none, everyone else 1', (assert) => {
+    const cap = LP.data.species.capFor;
+    assert.equal(cap('baseline-human', 'luck'), 3);
+    assert.equal(cap('emo-suppressed', 'luck'), 0);
+    assert.equal(cap('kerin', 'luck'), 1);
+    assert.equal(cap('engineer', 'toughness'), 4);
+    assert.equal(cap('kerin', 'toughness'), 6);
   });
 })(window.LP);

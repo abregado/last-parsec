@@ -88,7 +88,7 @@
     const c = campaign();
     assert.ok(T.confirm(c, { firstTurn: true, generateWorld: false, worldTraits: ['haze'] }).ok);
     const s = status(c);
-    assert.deepEqual(s.skipped, ['flee-invasion', 'travel', 'travel-event', 'new-world']);
+    assert.deepEqual(s.skipped, ['conditions', 'flee-invasion', 'travel', 'travel-event', 'new-world']);
     assert.equal(s.current, 'upkeep', 'on to the World steps');
     assert.equal(c.turnMemory.hasPlayed, true);
     assert.deepEqual(c.turnMemory.worldTraits, ['haze']);
@@ -141,8 +141,8 @@
     const travel = c.turn.records[1].output;
     assert.equal(travel.data.cost, 3 + 3, 'refinery 3 + shortage 1D3 (=3)');
     assert.equal(status(c).current, 'travel-event');
-    T.confirm(c, { crewCount: 6 });
-    assert.equal(c.turn.records[2].output.fu.lines[0].rowId, 'locked-in-the-library-data-by-night'); // D100 = 100
+    T.confirm(c, {});
+    assert.equal(c.turn.records[2].output.run.lines[0].rowId, 'base:locked-in-the-library-data-by-night'); // the last event on the table
   });
 
   test('invasion: fleeing must leave; a failed flee skips Travel', (assert) => {

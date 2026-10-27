@@ -460,3 +460,49 @@ New, from the changes in this round:
 - **Fractional weights.** The roll shows the event, not a die value, for any table with fractional weights. Archetype lists and the Models odds display already handle weights, so this should only touch the table roll display.
 - **Asteroids weight.** I picked 4. Say if you'd prefer another figure.
 - **Best-crew rule.** Asteroids was your call. I also applied it to Raided, Drive trouble and Distress call, since they also say "select a crew member". Say if you'd rather leave those random.
+
+## 10. Changes made while building Phase 2
+
+- **Selectors.** Disabled Rivals and Patrons are picked with `disabled: true` on the selector (not inside `where`). Items take `carrier: '$actor' | 'stash' | 'any'`.
+- **Condition syntax.** Leaves are `{ fact, of?, ...settings, <op> }`, `{ var: '$x', <op> }` and `{ ask }`, with ops `eq ne gt gte lt lte in includes`. `hasCondition` is the fact `condition.has`; `member.motivation` is `member.motivations` (a list; use `includes`).
+- **Steps.** Added `forEach`, `again`, `manual` and `__bind` (internal). Prompts are one step, `ask`, with `yesno`, `options`, `number`, `pickList`, `offer` and `recruit`.
+- **Disabled contacts** live in `planet.disabledRivals` and `planet.disabledPatrons`, so nothing else needed changing.
+- **Species caps.** Humans have a Luck cap of 3. This is my assumption: the old code allowed any amount, and I couldn't check the rulebook.
+- **Snapshots** leave portraits out; the turn keeps one copy.
+- **Not yet built:** `injuryRoll`, the recruit generator, condition types, Step 0.
+
+## 11. Changes made while building Phase 3
+
+- **Condition types** are in `js/data/basePack.js` (37; `bound` was dropped because `rival.add` with `bindTo` and `member.remove` handle it). Asks are separate from hooks: `asks: [{ key, trigger, label }]`. Modifiers support `add`, `set` and `floor`, and an `ask` that must be answered Yes.
+- **Hook questions** are Yes/No fields on the stage form, answered before Confirm.
+- **Wired stages** are ledger stages with optional ops; a stage with no ops needs no Apply. The Turn tab shows "What will happen" and Apply.
+- **Numbering:** Step 0 is Conditions; Start of turn is 0.5.
+- **Spare parts** are used up when the Repair roll's first die is 1, decided in Crew tasks.
+- **First meeting** is used up at Battle result, not when the battle is chosen, because the Battle tab needs the modifier.
+- **Humans' Luck cap of 3** is confirmed by the Experience stage text ("Luck 10 (max 1, or 3 for Humans)").
+- **Not wired:** the Quest stages (`onQuest`), `xpAward` and `memberRemoved` triggers (nothing needs them yet).
+
+## 12. Changes made while building Phase 4
+
+- **Authored events are Python** (`tools/events/*.py` with helpers), not JSON, so steps can share shorthand. `tools/build-events.py` writes `js/data/baseEvents.js`.
+- **151 events**, with the book text for unchanged rows and short texts of my own for split and reworked events.
+- **New engine pieces:** `injuryRoll`, `stat.raiseRandom` (an effect can report "impossible", which plays the event's `fallback`), `actor` on `table` and `rollGroup`, `item.add` by name, `condition` uniqueness `extend` (Grounded adds up), `as` on `rival.add`, `patron.add` and `planets.generate`, selector `count` and `repeat` `times` as variables, `list` on `select`, `turn.casualtyCount`.
+- **Single grenades:** `LP.items.makeAll` turns a pack row into single items; Loot and result-card lines use it.
+- **Quest:** `on-quest` replaces `turnMemory.onQuest`. The Rumor count stays in `turnMemory.rumors` until the stages move to the event runner.
+- **Step 0** applies only at the very start of a turn, so a condition added mid-turn doesn't send the turn back.
+- **Archetype event ids** are `packId:eventId`; the live follow-up rolls still honour them through a title bridge in `disabledMap()`.
+
+## 13. Changes made while building Phase 5
+
+- **Campaign Turn tab** is closed until a crew is finalized, and event stages always assume a crew.
+- **Old event scripts are gone** from `followups.js` (Company store is now a note), and so is the title bridge in `disabledMap()`.
+- **Undo** on an applied record first takes back Apply, then the answers.
+- **Recruit variants:** `species`, `feral`, `baseProfileOnly` (the character has no origin rolls), `equipment: false`, `xp`. `member.add` ops carry the recruit's items.
+- **Rumors** with a crew are the roster's `rumors`; a new Quest uses them up, a step closer adds one, and a finished Quest clears them.
+
+## 14. Changes made while building Phase 6
+
+- **Schema layer** (`js/rules/events/schema.js`): step kinds, prompts, selector options and summaries; the editor forms and the reference come from it and the registries.
+- **Pack management** (`js/rules/events/packs.js`): ids are fixed once made; duplicates go in "My events"; import adds a new pack and its events join "All options".
+- **Events tab** with Events, Conditions, Packs and Reference views; locked base events are read-only; a test roll plays one event on a copy of the campaign.
+- **Broken events** of the campaign's own packs are left out of rolls.

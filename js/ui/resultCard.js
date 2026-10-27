@@ -153,14 +153,15 @@
 
   /**
    * A stage's output. options:
-   *   onChoose(value)        a pending choice button was pressed
+   *   onChoose(value)        a pending choice was answered (a button, or a prompt panel's answer)
+   *   onRecruit(pending)     the recruit prompt's "Generate recruit" button
    *   todo: [text]           changes to make by hand (shown in the summary)
    *   full, onToggle()       show the full working out; the toggle button swaps views
    *   crew, onAddItem(line), isAdded(line)   Stash badges (see itemBadge)
    */
   function resultCard(output, pending, options) {
     const opts = options || {};
-    const lines = (output.lines || []).concat(output.fu ? output.fu.lines : []);
+    const lines = (output.lines || []).concat(output.fu ? output.fu.lines : [], output.run ? output.run.lines : []);
     const full = opts.full || !opts.onToggle;
     const todo = opts.todo || [];
     return el('div', { class: 'result-card' + (output.tone ? ' tone-' + output.tone : '') },
@@ -179,13 +180,17 @@
           el('p', { class: 'todo-title' }, 'Change by hand'),
           el('ul', null, todo.map((t) => el('li', null, t))))
         : null,
-      pending
+      pending && LP.ui.promptPanel.KINDS.includes(pending.kind)
+        ? LP.ui.promptPanel(pending, { onAnswer: (value) => opts.onChoose && opts.onChoose(value), onRecruit: opts.onRecruit })
+        : null,
+      pending && !LP.ui.promptPanel.KINDS.includes(pending.kind)
         ? el('div', { class: 'choice', role: 'group', 'aria-label': pending.prompt },
           el('p', { class: 'choice-prompt' }, pending.prompt),
           el('div', { class: 'toolbar' },
             pending.options.map((o, i) => el('button', {
               type: 'button',
               class: 'btn ' + (i === 0 ? 'btn-primary' : ''),
+              disabled: o.disabled ? true : null,
               'data-focus': 'choice:' + o.value,
               onclick: () => opts.onChoose && opts.onChoose(o.value)
             }, o.label))

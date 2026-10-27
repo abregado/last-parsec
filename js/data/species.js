@@ -7,7 +7,6 @@
    * Fields (all optional except id/name/group/profile):
    *   group            'human' | 'bot' | 'primary-alien' | 'strange'
    *   sourceTable/Row  the subtable row this species comes from (for odds)
-   *   human            may hold more than 1 Luck (only Humans can, p.12)
    *   bot              Bot rules: no Luck from being Leader, no XP
    *   profile          starting abilities: reactions, speed ("), combat, toughness, savvy, luck
    *   rules            short summaries shown with the character
@@ -20,12 +19,13 @@
    *   ignoreBackgroundCredits  credits from the Background roll are ignored
    *   creditPenalty / storyPointPenalty  reduce origin bonuses by N (not below 0)
    *   minorAbility     roll on the Minor Alien Ability Table
-   *   bonus            { luck, storyPoints, questRumors, rivals } added at creation
-   *   caps             per-ability maximums overriding the defaults
+   *   bonus            { luck, storyPoints, rumors, rivals } added at creation
+   *   caps             per-ability maximums, Luck included. Missing stats use DEFAULT_CAPS, so after
+   *                    loading every species lists all six. Only Humans can pass 1 Luck (p.12).
    *   fixedSavvy       Savvy can never be improved
-   *   noLuck           can never have Luck
    */
 
+  const DEFAULT_CAPS = { reactions: 6, speed: 8, combat: 5, toughness: 6, savvy: 5, luck: 1 };
   const HUMAN_PROFILE = { reactions: 1, speed: 4, combat: 0, toughness: 3, savvy: 0, luck: 0 };
   const BOT_PROFILE = { reactions: 2, speed: 4, combat: 1, toughness: 4, savvy: 2, luck: 0 };
 
@@ -41,7 +41,7 @@
       group: 'human',
       sourceTable: 'Crew Type Table',
       sourceRow: 'baseline-human',
-      human: true,
+      caps: { luck: 3 },
       profile: profile(),
       rules: ['The only species that can have more than 1 Luck.']
     },
@@ -146,7 +146,7 @@
       group: 'strange',
       sourceTable: 'Strange Character Table',
       sourceRow: 'de-converted',
-      human: true,
+      caps: { luck: 3 },
       profile: profile(),
       forced: { motivation: 'revenge' },
       fixedSavvy: true,
@@ -162,7 +162,7 @@
       group: 'strange',
       sourceTable: 'Strange Character Table',
       sourceRow: 'unity-agent',
-      human: true,
+      caps: { luck: 3 },
       profile: profile({ reactions: 2 }),
       forced: { motivation: 'order' },
       rules: [
@@ -175,7 +175,7 @@
       group: 'strange',
       sourceTable: 'Strange Character Table',
       sourceRow: 'mysterious-past',
-      human: true,
+      caps: { luck: 3 },
       profile: profile(),
       double: { background: true },
       ignoreStoryPoints: true,
@@ -197,7 +197,7 @@
       group: 'strange',
       sourceTable: 'Strange Character Table',
       sourceRow: 'stalker',
-      human: true,
+      caps: { luck: 3 },
       profile: profile(),
       rules: [
         'Alternative Movement: teleport 1D6" and act normally.',
@@ -210,7 +210,7 @@
       group: 'strange',
       sourceTable: 'Strange Character Table',
       sourceRow: 'hulker',
-      human: true,
+      caps: { luck: 3 },
       profile: profile({ combat: 1, toughness: 5 }),
       classMap: { technician: 'primitive', scientist: 'primitive', hacker: 'primitive' },
       rules: [
@@ -225,7 +225,7 @@
       group: 'strange',
       sourceTable: 'Strange Character Table',
       sourceRow: 'hopeful-rookie',
-      human: true,
+      caps: { luck: 3 },
       profile: profile(),
       bonus: { luck: 1 },
       rules: [
@@ -239,7 +239,7 @@
       group: 'strange',
       sourceTable: 'Strange Character Table',
       sourceRow: 'genetic-uplift',
-      human: true,
+      caps: { luck: 3 },
       profile: profile({ reactions: 2, speed: 5, combat: 1, toughness: 4, savvy: 1 }),
       ignoreBackgroundCredits: true,
       bonus: { rivals: 1 },
@@ -251,7 +251,7 @@
       group: 'strange',
       sourceTable: 'Strange Character Table',
       sourceRow: 'mutant',
-      human: true,
+      caps: { luck: 3 },
       profile: profile(),
       forced: { background: 'lower-megacity-class' },
       rules: ['Cannot be sent on Recruit or Find a Patron tasks.']
@@ -291,7 +291,7 @@
       group: 'strange',
       sourceTable: 'Strange Character Table',
       sourceRow: 'primitive',
-      human: true,
+      caps: { luck: 3 },
       profile: profile(),
       forced: { background: 'primitive-or-regressed-world' },
       rules: [
@@ -305,7 +305,7 @@
       group: 'strange',
       sourceTable: 'Strange Character Table',
       sourceRow: 'feeler',
-      human: true,
+      caps: { luck: 3 },
       profile: profile(),
       double: { motivation: true },
       rules: [
@@ -319,10 +319,9 @@
       group: 'strange',
       sourceTable: 'Strange Character Table',
       sourceRow: 'emo-suppressed',
-      human: true,
       profile: profile(),
       forced: { motivation: 'survival' },
-      noLuck: true,
+      caps: { luck: 0 },
       rules: [
         'Never leaves the crew voluntarily; may ignore events forcing a fight with a local or crew member.',
         'Can never have Luck.'
@@ -349,12 +348,12 @@
       group: 'strange',
       sourceTable: 'Strange Character Table',
       sourceRow: 'traveler',
-      human: true,
+      caps: { luck: 3 },
       profile: profile({ reactions: 3, toughness: 4, savvy: 2 }),
       forced: { motivation: 'truth' },
-      bonus: { storyPoints: 2, questRumors: 2 },
+      bonus: { storyPoints: 2, rumors: 2 },
       rules: [
-        'Begins with +2 story points and 2 Quest Rumors.',
+        'Begins with +2 story points and 2 Rumors.',
         'Speed +2" when moving directly away from a visible enemy.',
         'After every battle roll 2D6: on 2 they vanish (claim 2 story points); on 11-12 the crew gains a Quest.'
       ]
@@ -365,7 +364,7 @@
       group: 'strange',
       sourceTable: 'Strange Character Table',
       sourceRow: 'empath',
-      human: true,
+      caps: { luck: 3 },
       profile: profile(),
       rules: [
         '+1 to Recruit and Find a Patron rolls.',
@@ -378,7 +377,7 @@
       group: 'strange',
       sourceTable: 'Strange Character Table',
       sourceRow: 'bio-upgrade',
-      human: true,
+      caps: { luck: 3 },
       profile: profile(),
       creditPenalty: 2,
       rules: [
@@ -396,8 +395,17 @@
   ];
 
   const byId = {};
-  for (const s of SPECIES) byId[s.id] = s;
+  for (const s of SPECIES) {
+    s.caps = Object.assign({}, DEFAULT_CAPS, s.caps);
+    byId[s.id] = s;
+  }
+
+  /** The most a species can have of a stat (reactions … savvy, luck). */
+  function capFor(speciesId, stat) {
+    const s = byId[speciesId];
+    return (s ? s.caps : DEFAULT_CAPS)[stat];
+  }
 
   LP.data = LP.data || {};
-  LP.data.species = { list: SPECIES, byId, GROUPS };
+  LP.data.species = { list: SPECIES, byId, GROUPS, DEFAULT_CAPS, capFor };
 })(window.LP);

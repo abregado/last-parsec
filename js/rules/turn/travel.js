@@ -45,7 +45,7 @@
   T.register({
     id: 'start',
     step: 'start',
-    number: '0',
+    number: '0.5',
     title: 'Start of turn',
     page: 68,
     fields(ctx) {
@@ -393,47 +393,29 @@
     number: '1.3',
     title: 'Starship travel event',
     page: 70,
+    ledger: true,
     applies(ctx) {
       if (!ctx.facts.traveling) return 'Not travelling this turn.';
       if (ctx.facts.travelMode !== 'ship') return 'Commercial passage: no Starship Travel Event.';
       return true;
     },
-    itemSource: 'a starship travel event',
     fields(ctx) {
-      if (LP.roster.hasCrew(ctx.campaign)) {
-        return [{ key: 'note', type: 'info', text: 'Roll on the Starship Travel Events Table. Events that pick crew members pick from your ' + plural(LP.roster.members(ctx.campaign).length, 'crew member', 'crew') + '; items found go into the Stash.' }];
-      }
       return [{
-        key: 'crewCount', type: 'number', label: 'Crew members', min: 1, max: 30,
-        value: ctx.memory.crewCount || ctx.settings.crewSize,
-        help: 'Used when an event picks random crew members (by their order on your roster).'
+        key: 'note', type: 'info',
+        text: 'An event is rolled from the Starship Travel Events. It picks from your ' + plural(LP.roster.members(ctx.campaign).length, 'crew member', 'crew members') + ' and lists what it changes for you to apply.'
       }];
     },
     resolve(input, ctx) {
-      const archetype = ctx.planet ? LP.planets.archetypeOf(ctx.campaign, ctx.planet) : null;
-      const run = LP.followup.start([{ table: 'Starship Travel Events Table' }], Object.assign(LP.roster.crewEnv(ctx, input.crewCount), {
-        crewSize: ctx.settings.crewSize,
-        disabled: LP.archetypes ? LP.archetypes.disabledMap(ctx.campaign, archetype) : (ctx.campaign.models ? ctx.campaign.models.disabled : {}),
-        speciesWeights: LP.archetypes ? LP.archetypes.speciesWeights(archetype) : null
-      }));
-      return {
-        output: { headline: run.lines[0].title, lines: [], fu: run },
-        pending: LP.followup.pendingChoice(run)
-      };
+      return T.eventStage.start(ctx, [{ table: 'travel' }], { source: 'a starship travel event' });
     },
-    choose(record, value) {
-      const run = JSON.parse(JSON.stringify(record.output.fu));
-      LP.followup.choose(run, value);
-      return {
-        output: Object.assign({}, record.output, { fu: run }),
-        pending: LP.followup.pendingChoice(run)
-      };
+    choose(record, value, ctx) {
+      return T.eventStage.choose(record, value, ctx);
     },
     facts(input, output) {
-      return { travelEvent: output.fu.lines[0].rowId, travelGains: output.fu.gains };
-    },
-    remember(input) {
-      return input.crewCount ? { crewCount: input.crewCount } : {};
+      return {
+        travelEvent: T.eventStage.firstEvent(output),
+        travelGains: { rumors: T.eventStage.gained(output, 'rumors'), storyPoints: T.eventStage.gained(output, 'storyPoints') }
+      };
     }
   });
 
@@ -475,17 +457,30 @@
     return line;
   }
 
+  /** The worlds a "Locked in the library" event offered, if that condition is in play. */
+  function offeredWorlds(ctx) {
+    const inst = LP.conditions.active(ctx.campaign).find((c) => c.type === 'destinations');
+    return inst ? (inst.params.planetIds || []).map((id) => LP.planets.get(ctx.campaign, id)).filter(Boolean) : [];
+  }
+
   /** New world arrival fields when planets are in use. */
   function planetFields(ctx) {
+    const offered = offeredWorlds(ctx);
+    if (offered.length) {
+      return [{
+        key: 'pickDestination', type: 'select', label: 'Which of the worlds you looked up will you visit?', value: offered[0].id,
+        options: offered.map((p) => ({ value: p.id, label: p.name + ' (' + traitList(p.worldTraits) + ')' }))
+      }].concat(LP.conditions.fields(ctx.campaign, 'arrive'));
+    }
     const revisit = !ctx.facts.firstTurn && ctx.facts.destination && ctx.facts.destination !== 'new';
     if (revisit) {
       const dest = LP.planets.get(ctx.campaign, ctx.facts.destination);
-      return [{ key: 'note', type: 'info', text: 'Returning to ' + (dest ? dest.name : 'a saved world') + '. Its traits, licence, Patrons and Rivals are as you left them.' }];
+      return [{ key: 'note', type: 'info', text: 'Returning to ' + (dest ? dest.name : 'a saved world') + '. Its traits, licence, Patrons and Rivals are as you left them.' }].concat(LP.conditions.fields(ctx.campaign, 'arrive'));
     }
     return [{
       key: 'wildGalaxy', type: 'yesno', value: !!ctx.memory.wildGalaxy,
       label: 'Use the Wild Galaxy optional rule (roll twice for world traits)?'
-    }];
+    }].concat(LP.conditions.fields(ctx.campaign, 'arrive'));
   }
 
   /** New world arrival with planets: Rivals follow by name, then a new or saved world. */
@@ -511,11 +506,12 @@
       lines.push(L.text('2. Dismiss Patrons: ' + (persistent.length ? persistent.map((p) => p.name).join(', ') + ' (Persistent) come with you; the rest stay behind.' : 'all Patrons stay behind on ' + from.name + '.')));
     }
 
-    const revisit = !ctx.facts.firstTurn && ctx.facts.destination && ctx.facts.destination !== 'new' ? P.get(ctx.campaign, ctx.facts.destination) : null;
+    const looked = input.pickDestination ? P.get(ctx.campaign, input.pickDestination) : null;
+    const revisit = looked || (!ctx.facts.firstTurn && ctx.facts.destination && ctx.facts.destination !== 'new' ? P.get(ctx.campaign, ctx.facts.destination) : null);
     if (revisit) {
       data.destinationId = revisit.id;
       data.traits = revisit.worldTraits.slice();
-      lines.push(L.text('Back on ' + revisit.name + ': ' + plural(revisit.patrons.length, 'Patron', 'Patrons') + ' and ' + plural(revisit.rivals.length, 'Rival', 'Rivals') + ' were waiting here.'));
+      lines.push(L.text((looked ? 'You choose ' : 'Back on ') + revisit.name + ': ' + plural(revisit.patrons.length, 'Patron', 'Patrons') + ' and ' + plural(revisit.rivals.length, 'Rival', 'Rivals') + ' were waiting here.'));
       lines.push(L.facts([
         ['Traits', traitList(revisit.worldTraits)],
         ['License', revisit.licence.required ? (revisit.licence.owned ? 'Owned' : 'Required (' + revisit.licence.cost + ' credits)') : 'Not needed']
@@ -687,4 +683,98 @@
       return keep;
     }
   });
+
+  /* ---------------------------------------------------------------------- */
+  /* Conditions                                                             */
+  /* ---------------------------------------------------------------------- */
+
+  /** What conditions do when the crew stays or leaves: lines and ops for the ledger. */
+  function departureHooks(input, ctx) {
+    const C = LP.conditions;
+    const out = { lines: [], ops: [] };
+    if (!ctx.facts.fled) {
+      const check = C.travelCheck(ctx.campaign, input);
+      out.lines.push(...check.lines);
+      out.ops.push(...check.ops);
+    }
+    const depart = C.run(ctx.campaign, 'depart', input);
+    out.lines.push(...depart.lines);
+    out.ops.push(...depart.ops);
+    const cost = C.modifiers(ctx.campaign, 'cost.travel', { input });
+    if (cost.set !== undefined) {
+      out.lines.push(L.text('Travel costs ' + plural(cost.set, 'credit', 'credits') + ' instead.', 'good'));
+      out.cost = cost.set;
+      out.ops.push(...C.consumeOps(cost.used));
+    }
+    return out;
+  }
+
+  function applyHooks(result, hooks) {
+    const output = result.output;
+    output.lines = output.lines.concat(hooks.lines);
+    output.ops = (output.ops || []).concat(hooks.ops);
+    if (hooks.cost !== undefined) output.data.cost = hooks.cost;
+  }
+
+  const travelStage = T.getStage('travel');
+  const travelFieldsBase = travelStage.fields;
+  const travelResolveBase = travelStage.resolve;
+  const travelChooseBase = travelStage.choose;
+  const travelValidateBase = travelStage.validate;
+  travelStage.ledger = true;
+  travelStage.fields = function (ctx) {
+    const notStay = (v) => v.mode !== 'stay';
+    const extra = (ctx.facts.fled ? [] : LP.conditions.travelFields(ctx.campaign)).concat(LP.conditions.fields(ctx.campaign, 'depart'));
+    return travelFieldsBase(ctx).concat(extra.map((f) => Object.assign(f, { showIf: notStay })));
+  };
+  travelStage.validate = function (input, ctx) {
+    const error = travelValidateBase(input, ctx);
+    if (error) return error;
+    if (input.mode === 'stay' || ctx.facts.fled) return null;
+    return LP.conditions.travelCheck(ctx.campaign, input).error || null;
+  };
+  travelStage.resolve = function (input, ctx) {
+    const result = travelResolveBase(input, ctx);
+    if (input.mode === 'stay') {
+      applyHooks(result, LP.conditions.run(ctx.campaign, 'stay', input));
+    } else if (result.pending) {
+      // Delayed by bureaucracy: what happens waits for the bribe decision.
+      result.output.data.held = { depart: departureHooks(input, ctx), stay: LP.conditions.run(ctx.campaign, 'stay', input) };
+    } else {
+      applyHooks(result, departureHooks(input, ctx));
+    }
+    return result;
+  };
+  travelStage.choose = function (record, value, ctx) {
+    const result = travelChooseBase(record, value, ctx);
+    const held = record.output.data.held;
+    if (held) applyHooks(result, value === 'pay' ? held.depart : held.stay);
+    return result;
+  };
+
+  // Arriving: package, trade goods and other conditions that act on arrival, and the
+  // conditions that count arrivals. The hooks see the world arrived at as the current one.
+  const arriveStage = T.getStage('new-world');
+  const arriveFieldsBase = arriveStage.fields;
+  const arriveResolveBase = arriveStage.resolve;
+  arriveStage.ledger = true;
+  arriveStage.fields = function (ctx) {
+    const fields = arriveFieldsBase(ctx);
+    if (planetsOn(ctx)) return fields;
+    return fields.concat(LP.conditions.fields(ctx.campaign, 'arrive'));
+  };
+  arriveStage.resolve = function (input, ctx) {
+    const result = arriveResolveBase(input, ctx);
+    if (!planetsOn(ctx)) return result;
+    const d = result.output.data || {};
+    const view = LP.snapshot.scratch(ctx.campaign);
+    const planet = d.newPlanet ? LP.planets.normalizePlanet(d.newPlanet) : LP.planets.get(view, d.destinationId);
+    if (planet) {
+      if (!LP.planets.get(view, planet.id)) view.planets.push(planet);
+      view.currentPlanetId = planet.id;
+    }
+    const hooks = LP.conditions.run(view, 'arrive', input);
+    applyHooks(result, { lines: hooks.lines, ops: hooks.ops.concat(LP.conditions.arrivalTicks(view)) });
+    return result;
+  };
 })(window.LP);

@@ -5,6 +5,7 @@
 `js/ui/charactersTab.js`, with `js/ui/crewSection.js` for crew-level rolls.
 - **Rules:** `js/rules/character.js` (one character) and `js/rules/crew.js` (Leader, 8 starting equipment rolls, ship and debt, flavour tables).
 - **Slots:** every rollable value is a slot `{ mode: 'random' | 'fixed' | 'forced', value }`. Generate rolls Random slots; a reroll never repeats (`LP.rng.rerollTable`); forced slots come from species rules.
+- **Names:** rolled from the campaign's name tables (see `planets.md`, Names).
 - **Resolving:** `character.resolve()` works out the profile, credits, items and so on from the slots. Nothing derived is stored.
 
 ## Finalize
@@ -18,13 +19,15 @@
 ## Crew tab (current state)
 
 `js/ui/crewTab.js` edits `campaign.roster` (its shape is in the header of `roster.js`):
-- **Resources:** credits, story points, Rumors, Quest Rumors, invasion rumors, fuel and ship parts, plus free `counters`.
+- **Resources:** credits, story points, Rumors, fuel and ship parts, plus free `counters`.
 - **Member cards:**
   - portrait: drop or click an image; stored as a 240×480 JPEG data URL;
   - name and leader;
   - status, and Sick Bay turns;
-  - stats and XP as plain text boxes;
+  - stats and XP as plain text boxes (a stat's tooltip shows what the member joined with; `baseProfile` never changes);
   - carried items and notes.
+- **Conditions:** badges on member cards and in a Conditions panel (crew, ship, campaign and current-planet conditions), each with a Remove button.
+- **Recruits for events:** when an event offers a recruit, the Characters tab shows that one character with Accept, Reroll and Decline (`js/rules/recruit.js`).
 - **Stash:** with an Add item form.
 - **Ship and crew info.**
 

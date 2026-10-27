@@ -25,7 +25,7 @@
     return JSON.parse(JSON.stringify(value));
   }
 
-  /** { disabled: {...}, invasion: {...} } keyed by table — older saves stored an empty array here. */
+  /** { disabled: {...}, invasion: {...}, weaponsOff: [...] }, the first two keyed by table — older saves stored an empty array here. */
   function normalizeModels(raw) {
     const idLists = (source) => {
       const out = {};
@@ -38,7 +38,8 @@
     };
     const models = raw && typeof raw === 'object' ? raw : {};
     // invasion: tables the player has customised; other tables use the book defaults.
-    return { disabled: idLists(models.disabled), invasion: idLists(models.invasion) };
+    const weaponsOff = Array.isArray(models.weaponsOff) ? models.weaponsOff.filter((n) => typeof n === 'string') : [];
+    return { disabled: idLists(models.disabled), invasion: idLists(models.invasion), weaponsOff };
   }
 
   /** Archetypes, planets and the current planet; every campaign gets the default archetype. */
@@ -65,10 +66,17 @@
       turn: raw.turn && typeof raw.turn === 'object' && !Array.isArray(raw.turn) ? raw.turn : null,
       turnMemory: raw.turnMemory && typeof raw.turnMemory === 'object' && !Array.isArray(raw.turnMemory) ? raw.turnMemory : {},
       battle: raw.battle && typeof raw.battle === 'object' && !Array.isArray(raw.battle) ? raw.battle : null,
+      conditions: Array.isArray(raw.conditions) ? raw.conditions.filter((c) => c && typeof c === 'object') : [],
+      pendingRecruit: raw.pendingRecruit && typeof raw.pendingRecruit === 'object' && typeof raw.pendingRecruit.characterId === 'string' ? raw.pendingRecruit : null,
+      eventsDisabled: Array.isArray(raw.eventsDisabled) ? raw.eventsDisabled.filter((id) => typeof id === 'string') : [],
+      eventPacks: Array.isArray(raw.eventPacks) ? raw.eventPacks.filter((p) => p && typeof p === 'object' && p.pack && Array.isArray(p.events)) : [],
+      nameTables: raw.nameTables,
+      speciesNames: raw.speciesNames,
       ...geography(raw),
       roster: raw.roster,
       turnNumber: raw.turnNumber
     };
+    if (LP.names) LP.names.ensure(campaign);
     if (LP.roster) LP.roster.ensure(campaign);
     return campaign;
   }

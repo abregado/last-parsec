@@ -120,6 +120,7 @@
     number: '4.0',
     title: 'Battle result',
     page: 119,
+    ledger: true,
     fields(ctx) {
       const s = battleSummary(ctx);
       const fromTurn = ctx.facts.battleType && LP.battle ? LP.battle.FROM_TURN[ctx.facts.battleType] : null;
@@ -132,7 +133,7 @@
         ? [
           {
             key: 'participantIds', type: 'multiselect', label: 'Crew who took part', options: R.memberOptions(crew),
-            value: deployed && deployed.length ? deployed.filter((id) => R.getMember(ctx.campaign, id)) : R.available(ctx.campaign).map((m) => m.id),
+            value: deployed && deployed.length ? deployed.filter((id) => R.getMember(ctx.campaign, id)) : R.available(ctx.campaign).filter((m) => !LP.conditions.blocked(ctx.campaign, 'battle', { memberId: m.id, mission: type })).map((m) => m.id),
             help: deployed && deployed.length ? 'Pre-filled from the Battle tab.' : null
           },
           {
@@ -161,7 +162,7 @@
         { key: 'dangerPay', type: 'number', label: 'Danger Pay (credits)', min: 0, max: 10, value: 0, showIf: isType('patron') },
         { key: 'payTwice', type: 'yesno', label: 'Danger Pay lets you roll twice for pay (10+ result)?', value: false, showIf: isType('patron') },
         { key: 'hotJob', type: 'yesno', label: 'Was it a Hot Job (enemies become Rivals on 1–2)?', value: false, showIf: isType('patron') },
-        { key: 'questRumors', type: 'number', label: 'Quest Rumors gathered on this Quest', min: 0, max: 30, value: ctx.memory.rumors || 0, showIf: isType('quest') },
+        { key: 'questRumors', type: 'number', label: 'Quest Rumors gathered on this Quest', min: 0, max: 30, value: hasCrew(ctx) ? R.roster(ctx.campaign).resources.rumors : ctx.memory.rumors || 0, showIf: isType('quest') },
         ctx.planet && ctx.planet.rivals.length ? {
           key: 'rivalId', type: 'select', label: 'Which Rival did you fight?',
           value: ctx.facts.rivalId || (s && s.rivalId) || '',
@@ -175,11 +176,15 @@
           showIf: isType('patron')
         } : null,
         { key: 'bounty', type: 'number', label: 'Criminal bounty (credits, if any)', min: 0, max: 3, value: s && s.bounty ? s.bounty : 0, showIf: (v) => v.category === 'criminal-elements' && v.type !== 'invasion' }
-      ]);
+      ], LP.conditions.fields(ctx.campaign, 'battleResult'));
     },
-    validate(input) {
+    validate(input, ctx) {
       if (input.participantIds) {
         if (!input.participantIds.length) return 'Pick the crew who took part.';
+        for (const id of input.participantIds) {
+          const stop = LP.conditions.blocked(ctx.campaign, 'battle', { memberId: id, mission: input.type });
+          if (stop) return R.nameOf(R.getMember(ctx.campaign, id)) + ' can’t fight this turn (' + LP.conditions.typeOf(ctx.campaign, stop.type).name + ').';
+        }
         if ((input.casualtyIds || []).some((id) => !input.participantIds.includes(id))) return 'Casualties must be crew who took part.';
         return null;
       }
@@ -198,7 +203,10 @@
       } else {
         items.push(['Casualties', String((input.casualties || 0) + (input.botCasualties || 0))]);
       }
-      return { output: { headline: type + (input.heldField ? ': held the field' : ': driven off'), lines: [L.facts(items)] } };
+      const hooks = LP.conditions.run(ctx.campaign, 'battleResult', input, {
+        turn: { mission: input.type, casualtyIds: input.casualtyIds || [] }, rivalId: input.rivalId || null
+      });
+      return { output: { headline: type + (input.heldField ? ': held the field' : ': driven off'), lines: [L.facts(items)].concat(hooks.lines), ops: hooks.ops } };
     },
     facts(input, output, ctx) {
       const s = battleSummary(ctx) || {};
@@ -249,6 +257,7 @@
     number: '4.1',
     title: 'Resolve Rival status',
     page: 119,
+    ledger: true,
     applies(ctx) {
       const p = pb(ctx);
       if (!p) return needs(ctx);
@@ -285,7 +294,8 @@
           data.rivals = Math.max(0, (input.rivals || 0) - data.removed);
         }
         const lines = [roll, L.text('Vigilantes are Persistent: −1 to this roll against them.', 'note')];
-        return { output: { headline: roll.success ? (named ? named.name + ' removed' : 'Rival removed') : 'The Rival remains', tone: roll.success ? 'good' : undefined, lines, data } };
+        const resolved = named && roll.success ? LP.conditions.run(ctx.campaign, 'rivalResolved', input, { rivalId: named.id }) : { lines: [], ops: [] };
+        return { output: { headline: roll.success ? (named ? named.name + ' removed' : 'Rival removed') : 'The Rival remains', tone: roll.success ? 'good' : undefined, lines: lines.concat(resolved.lines), data, ops: resolved.ops } };
       }
 
       const threshold = hasTrait(ctx, 'vendetta-system') || p.hotJob ? 2 : 1;
@@ -378,6 +388,14 @@
   /* 3. Quest progress                                                      */
   /* ---------------------------------------------------------------------- */
 
+  /** The Quest Rumors on the Crew tab: one more, or (with -Infinity) all of them gone when the Quest ends. */
+  function questRumorOps(ctx, change) {
+    if (!hasCrew(ctx)) return [];
+    const have = R.roster(ctx.campaign).resources.rumors;
+    const amount = change === -Infinity ? -have : change;
+    return amount ? [{ effect: 'resource', key: 'rumors', amount: amount }] : [];
+  }
+
   T.register({
     id: 'quest-progress',
     itemSource: 'quest progress',
@@ -385,6 +403,7 @@
     number: '4.3',
     title: 'Determine Quest progress',
     page: 120,
+    ledger: true,
     applies(ctx) {
       const p = pb(ctx);
       if (!p) return needs(ctx);
@@ -403,7 +422,8 @@
             lines: [L.text(p.won
               ? 'You finished the Quest. Pay rolls twice (pick the better, +1), you get three Loot rolls, and every crew member in the battle earns +1 XP.'
               : 'You didn’t complete the final mission. You can try the finale again later.')],
-            data: { done: p.won, finaleNext: !p.won, rumorGained: 0 }
+            data: { done: p.won, finaleNext: !p.won, rumorGained: 0 },
+            ops: p.won ? LP.conditions.removeOps(ctx.campaign, 'on-quest').concat(questRumorOps(ctx, -Infinity)) : []
           }
         };
       }
@@ -427,15 +447,15 @@
         where.text = where.total >= 5 ? 'The next step is on another world: you must travel before you can progress (no hurry).' : 'The next step is on this world.';
         lines.push(where);
       }
-      return { output: { headline: data.finaleNext ? 'Finale next!' : (data.rumorGained ? 'A step closer' : 'Dead end'), lines, data } };
+      return { output: { headline: data.finaleNext ? 'Finale next!' : (data.rumorGained ? 'A step closer' : 'Dead end'), lines, data, ops: data.rumorGained ? questRumorOps(ctx, 1) : [] } };
     },
     facts(input, output) {
       return { questDone: !!output.data.done };
     },
     remember(input, output, ctx) {
       const d = output.data;
-      if (d.done) return { onQuest: false, rumors: 0, questFinaleNext: false };
-      return { onQuest: true, rumors: (pb(ctx).questRumors || 0) + d.rumorGained, questFinaleNext: d.finaleNext };
+      if (d.done) return { rumors: 0, questFinaleNext: false };
+      return { rumors: (pb(ctx).questRumors || 0) + d.rumorGained, questFinaleNext: d.finaleNext };
     }
   });
 
@@ -555,10 +575,11 @@
       if (!p) return needs(ctx);
       if (!p.invasionThreat) return 'The enemy wasn’t an Invasion Threat.';
       if (hasTrait(ctx, 'unity-safe-sector')) return 'Unity safe sector: this world can’t be Invaded.';
-      if (ctx.facts.travelEvent === 'patrol-ship') return 'The Unity patrol ship means this world can’t be Invaded.';
+      if (ctx.facts.travelEvent === 'patrol-ship' || LP.conditions.has(ctx.campaign, 'no-invasion-next')) return 'The Unity patrol ship means this world can’t be Invaded.';
       return true;
     },
-    fields() {
+    fields(ctx) {
+      if (LP.conditions.modifiers(ctx.campaign, 'roll.invasion').mods.length) return [];
       return [{ key: 'warRumors', type: 'yesno', label: 'Are there rumors of war on this world (Campaign Event, +2)?', value: false }];
     },
     resolve(input, ctx) {
@@ -578,7 +599,7 @@
           { label: 'Military outpost', value: hasTrait(ctx, 'military-outpost') ? 2 : 0 },
           { label: 'Rumors of war', value: input.warRumors ? 2 : 0 },
           { label: 'Liberated world', value: ctx.planet && ctx.planet.invasion && ctx.planet.invasion.status === 'liberated' ? -2 : 0 }
-        ],
+        ].concat(LP.conditions.modifiers(ctx.campaign, 'roll.invasion').mods),
         successText: 'The world is about to be Invaded! Next campaign turn you must try to Flee Invasion.',
         failText: 'No invasion this time.'
       });
@@ -638,6 +659,7 @@
     number: '4.8',
     title: 'Determine injuries and recovery',
     page: 121,
+    ledger: true,
     applies(ctx) {
       const p = pb(ctx);
       if (!p) return needs(ctx);
@@ -652,8 +674,16 @@
       const p = pb(ctx);
       const steps = [];
       const hurt = (p.casualtyIds || []).map((id) => R.getMember(ctx.campaign, id)).filter(Boolean);
+      const ignoredOps = [];
       if (hurt.length) {
-        for (const m of hurt) steps.push({ group: R.nameOf(m) + (R.isMachine(m) ? ' (Bot Injury Table)' : ''), steps: [{ table: R.isMachine(m) ? 'Bot Injury Table' : 'Injury Table' }] });
+        for (const m of hurt) {
+          if (LP.conditions.blocked(ctx.campaign, 'injury', { memberId: m.id })) {
+            steps.push({ group: R.nameOf(m), steps: [{ text: 'Feeling great: this injury roll is ignored.', tone: 'good' }] });
+            ignoredOps.push(...LP.conditions.run(ctx.campaign, 'injuryRoll', input, { memberId: m.id }).ops);
+          } else {
+            steps.push({ group: R.nameOf(m) + (R.isMachine(m) ? ' (Bot Injury Table)' : ''), steps: [{ table: R.isMachine(m) ? 'Bot Injury Table' : 'Injury Table' }] });
+          }
+        }
         steps.push({ text: 'Set recovery times on the Crew tab (status In Sick Bay).', tone: 'note' });
       } else {
         for (let i = 1; i <= p.casualties; i++) steps.push({ group: 'Casualty ' + i, steps: [{ table: 'Injury Table' }] });
@@ -661,7 +691,9 @@
       }
       steps.push({ text: 'A character with Luck who would die survives instead, but loses ALL Luck. Otherwise spent Luck comes back now. Medical school lets one casualty roll twice and keep the better.', tone: 'note' });
       const run = F.start(steps, env(ctx));
-      return runOutput(plural(p.casualties + p.botCasualties, 'injury roll', 'injury rolls'), run);
+      const result = runOutput(plural(p.casualties + p.botCasualties, 'injury roll', 'injury rolls'), run);
+      result.output.ops = ignoredOps;
+      return result;
     },
     choose: chooseInRun
   });
@@ -704,6 +736,11 @@
           if (!m) continue;
           if (R.isBot(m)) {
             perCharacter.push([R.nameOf(m), 'No XP (Bot)']);
+            continue;
+          }
+          const stop = LP.conditions.blocked(ctx.campaign, 'xp', { memberId: id });
+          if (stop) {
+            perCharacter.push([R.nameOf(m), 'No XP (' + LP.conditions.typeOf(ctx.campaign, stop.type).name + ')']);
             continue;
           }
           const hurt = p.casualtyIds.includes(id);
@@ -805,35 +842,31 @@
   /* 12. Campaign event                                                     */
   /* ---------------------------------------------------------------------- */
 
+  /** What the battle just fought means for events that ask about casualties and the mission. */
+  function battleFacts(ctx) {
+    const p = pb(ctx) || {};
+    return { casualtyIds: p.casualtyIds || [], mission: p.type };
+  }
+
   T.register({
     id: 'campaign-event',
-    itemSource: 'a campaign event',
     step: 'post',
     number: '4.12',
     title: 'Roll for a Campaign Event',
     page: 125,
+    ledger: true,
     applies(ctx) {
       if (!pb(ctx)) return needs(ctx);
       return fleeing(ctx) ? 'No Campaign Events while fleeing an invasion.' : true;
     },
     fields() {
-      return [{ key: 'note', type: 'info', text: 'Roll D100 on the Campaign Events Table. If an event makes no sense, adjust or ignore it.' }];
+      return [{ key: 'note', type: 'info', text: 'An event is rolled from the Campaign Events and lists what it changes for you to apply.' }];
     },
     resolve(input, ctx) {
-      const run = F.start([{ table: 'Campaign Events Table' }], env(ctx));
-      return runOutput(run.lines[0].title, run);
+      return T.eventStage.start(ctx, [{ table: 'campaign' }], { turn: battleFacts(ctx), source: 'a campaign event' });
     },
-    choose: chooseInRun,
-    remember(input, output, ctx) {
-      const g = output.fu.gains || {};
-      const keep = {};
-      if (g.rivals) keep.rivals = (ctx.memory.rivals || 0) + g.rivals;
-      if (g.patrons) keep.patrons = (ctx.memory.patrons || 0) + g.patrons;
-      if (g.rumors) keep.rumors = (ctx.memory.rumors || 0) + g.rumors;
-      return keep;
-    },
-    apply(input, output, ctx) {
-      addGained(ctx, output.fu.gains, 'a campaign event');
+    choose(record, value, ctx) {
+      return T.eventStage.choose(record, value, ctx);
     }
   });
 
@@ -841,56 +874,48 @@
   /* 13. Character event                                                    */
   /* ---------------------------------------------------------------------- */
 
+  /** Crew who can have a Character Event: not Bots or Soulless, and not away. */
+  function eventCrew(ctx) {
+    return R.members(ctx.campaign).filter((m) => !R.isMachine(m) && !LP.conditions.blocked(ctx.campaign, 'event-target', { memberId: m.id }));
+  }
+
   T.register({
     id: 'character-event',
     step: 'post',
     number: '4.13',
     title: 'Roll for a Character Event',
     page: 126,
+    ledger: true,
     applies: needs,
     itemSource(input, output) {
       return output.data && output.data.target ? 'a character event for ' + output.data.target : 'a character event';
     },
     fields(ctx) {
-      if (hasCrew(ctx)) {
-        const eligible = R.members(ctx.campaign).filter((m) => !R.isMachine(m));
-        return [{ key: 'note', type: 'info', text: eligible.length ? 'The event happens to one of ' + R.listText(eligible.map(R.nameOf)) + ', at random (Bots and Soulless don’t have Character Events).' : 'Nobody in the crew can have a Character Event (Bots and Soulless don’t).' }];
-      }
-      return [{
-        key: 'eligible', type: 'number', label: 'Crew members who aren’t Bots or Soulless', min: 1, max: 30,
-        value: ctx.memory.crewCount || ctx.settings.crewSize,
-        help: 'Anyone else in the crew is eligible, even in Sick Bay.'
-      }];
+      const eligible = eventCrew(ctx);
+      return [{ key: 'note', type: 'info', text: eligible.length ? 'The event happens to one of ' + R.listText(eligible.map(R.nameOf)) + ', at random (Bots and Soulless don’t have Character Events).' : 'Nobody in the crew can have a Character Event (Bots and Soulless don’t).' }];
     },
     resolve(input, ctx) {
-      let target = null;
-      if (hasCrew(ctx)) {
-        const eligible = R.members(ctx.campaign).filter((m) => !R.isMachine(m));
-        if (!eligible.length) return runOutput('No Character Event', F.start([{ text: 'Nobody in the crew can have a Character Event.' }], env(ctx)));
-        target = R.nameOf(eligible[LP.rng.int(eligible.length)]);
-      }
+      const eligible = eventCrew(ctx);
+      if (!eligible.length) return { output: { headline: 'No Character Event', lines: [L.text('Nobody in the crew can have a Character Event.')], ops: [], data: { target: null } } };
+      const who = eligible[LP.rng.int(eligible.length)];
       const steps = [
-        target ? { text: 'The event happens to ' + target + '.' } : { randomCrew: true, label: 'The event happens to' },
-        { table: 'Character Events Table' },
-        { when: 'If the character is a Precursor, you may roll a second event and choose either', steps: [{ table: 'Character Events Table', label: 'Alternative' }] }
+        { say: 'The event happens to {actor}.' },
+        {
+          if: { fact: 'member.species', of: '$actor', eq: 'precursor' },
+          then: [{ alternatives: { n: 2, table: 'character' }, prompt: 'A Precursor may roll a second event and choose either. Keep which?' }],
+          else: [{ table: 'character' }]
+        }
       ];
-      const run = F.start(steps, env(ctx, { crewCount: input.eligible, crewNames: null }));
-      const first = run.lines.find((l) => l.type === 'table');
-      const result = runOutput(first ? first.title : 'Character Event', run, [L.text('If an event is impossible, the character gets +1 XP instead.', 'note')]);
-      result.output.data = { target: target };
+      const result = T.eventStage.start(ctx, steps, {
+        vars: { actor: { ref: 'member', id: who.id } }, turn: battleFacts(ctx), source: 'a character event for ' + R.nameOf(who)
+      });
+      result.output.data = { target: R.nameOf(who) };
       return result;
     },
-    choose: chooseInRun,
-    remember(input, output, ctx) {
-      const g = output.fu.gains || {};
-      const keep = {};
-      if (g.rivals) keep.rivals = (ctx.memory.rivals || 0) + g.rivals;
-      if (g.patrons) keep.patrons = (ctx.memory.patrons || 0) + g.patrons;
-      if (g.rumors) keep.rumors = (ctx.memory.rumors || 0) + g.rumors;
-      return keep;
-    },
-    apply(input, output, ctx) {
-      addGained(ctx, output.fu.gains, 'a character event');
+    choose(record, value, ctx) {
+      const result = T.eventStage.choose(record, value, ctx);
+      if (result.output) result.output.data = record.output.data;
+      return result;
     }
   });
 

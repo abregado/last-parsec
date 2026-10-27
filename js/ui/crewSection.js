@@ -122,7 +122,7 @@
     const leaderSpecies = leader ? C.getSpecies(leader.species.value) : null;
     let leaderNote = 'The Leader gets +1 Luck and never leaves the crew through random events.';
     if (leaderSpecies && leaderSpecies.bot) leaderNote = 'Bots can lead, but get no Luck for it.';
-    else if (leaderSpecies && leaderSpecies.noLuck) leaderNote = leaderSpecies.name + ' can never have Luck, so gets none for leading.';
+    else if (leaderSpecies && leaderSpecies.caps.luck === 0) leaderNote = leaderSpecies.name + ' can never have Luck, so gets none for leading.';
 
     /* -------------------------------------------------------------- */
     /* Totals                                                          */
@@ -132,7 +132,7 @@
       ['Story points', totals.storyPoints, 'from characters'],
       ['Patrons', totals.patrons, ''],
       ['Rivals', totals.rivals, ''],
-      ['Quest Rumors', totals.questRumors, '']
+      ['Rumors', totals.rumors, '']
     ];
 
     const ship = totals.ship;

@@ -121,6 +121,7 @@
 
     const change = (action) => {
       if (action() !== false) {
+        LP.names.assign(state.campaign, character, false);
         flash = key;
         commit(state);
       }
@@ -185,7 +186,7 @@
     if (r.storyPoints) resources.push(r.storyPoints + (r.storyPoints === 1 ? ' story point' : ' story points'));
     if (r.patrons) resources.push(r.patrons + (r.patrons === 1 ? ' Patron' : ' Patrons'));
     if (r.rivals) resources.push(r.rivals + (r.rivals === 1 ? ' Rival' : ' Rivals'));
-    if (r.questRumors) resources.push(r.questRumors + (r.questRumors === 1 ? ' Quest Rumor' : ' Quest Rumors'));
+    if (r.rumors) resources.push(r.rumors + (r.rumors === 1 ? ' Rumor' : ' Rumors'));
 
     const items = r.items.map((i) => C.rowLabel(i.table, i.row) + ' (' + tableShortName(i.table) + ')');
 
@@ -233,6 +234,7 @@
     nameInput.value = character.name;
     nameInput.addEventListener('input', () => {
       character.name = nameInput.value;
+      character.nameAuto = false;
       LP.storage.touchCampaign(state.campaign);
       const selector = '[data-card-name="' + character.id + '"], [data-name-of="' + character.id + '"]';
       state.container.querySelectorAll(selector).forEach((node) => {
@@ -244,14 +246,28 @@
       el('div', { class: 'editor-head' },
         el('label', { class: 'field editor-name' },
           el('span', { class: 'field-label' }, 'Name'),
-          nameInput
+          el('span', { class: 'name-row' },
+            nameInput,
+            el('button', {
+              type: 'button',
+              class: 'btn btn-sm',
+              'data-focus': 'name-reroll',
+              title: 'Roll a random name for this species',
+              'aria-label': 'Roll a random name',
+              disabled: !character.species.value,
+              onclick: () => {
+                LP.names.reroll(state.campaign, character);
+                commit(state);
+              }
+            }, '🎲')
+          )
         ),
         el('button', {
           type: 'button',
           class: 'btn btn-primary',
           'data-focus': 'generate',
           onclick: () => {
-            C.generate(character);
+            generate(state, character);
             flash = null;
             commit(state);
           }
@@ -300,7 +316,7 @@
           'data-focus': 'card-generate:' + character.id,
           'aria-label': 'Generate ' + characterName(character),
           onclick: () => {
-            C.generate(character);
+            generate(state, character);
             flash = null;
             commit(state);
           }
@@ -328,8 +344,14 @@
     if (name) name.focus();
   }
 
+  /** Generate a character and give it a rolled name unless the player typed one. */
+  function generate(state, character) {
+    C.generate(character);
+    LP.names.assign(state.campaign, character, true);
+  }
+
   function generateAll(state) {
-    state.campaign.characters.forEach((c) => C.generate(c));
+    state.campaign.characters.forEach((c) => generate(state, c));
     flash = null;
     commit(state);
     LP.ui.notify('Generated ' + state.campaign.characters.length + ' characters.', 'success');
@@ -392,12 +414,36 @@
   /* Render                                                                 */
   /* ---------------------------------------------------------------------- */
 
+  /** The banner while an event is waiting for a recruit: accept, reroll or decline. */
+  function recruitBanner(state, recruit) {
+    const campaign = state.campaign;
+    const answer = (accepted) => {
+      const reply = LP.recruit.finish(campaign, accepted);
+      if (reply) {
+        const result = LP.turn.choose(campaign, reply);
+        if (result.error) LP.ui.notify(result.error, 'error');
+      }
+      LP.storage.touchCampaign(campaign);
+      LP.router.go(LP.router.campaignPath(campaign.id, 'turn'));
+    };
+    return el('section', { class: 'panel recruit-banner' },
+      el('h3', null, 'A recruit for the event'),
+      el('p', null, 'The event offers a new character: ' + LP.recruit.describe(recruit.variant) + '. Name them if you like, reroll if you want different results, then accept or decline.'),
+      el('div', { class: 'toolbar' },
+        el('button', { type: 'button', class: 'btn btn-primary', 'data-focus': 'recruit-accept', onclick: () => answer(true) }, 'Accept'),
+        el('button', { type: 'button', class: 'btn', 'data-focus': 'recruit-reroll', onclick: () => { generate(state, recruit.character); commit(state); } }, 'Reroll'),
+        el('button', { type: 'button', class: 'btn btn-danger', 'data-focus': 'recruit-decline', onclick: () => answer(false) }, 'Decline')
+      )
+    );
+  }
+
   function draw(state) {
     const active = document.activeElement;
     const focusKey = active && state.container.contains(active) && active.dataset ? active.dataset.focus : null;
 
     const { container, campaign } = state;
-    const characters = campaign.characters;
+    const recruit = LP.recruit.current(campaign);
+    const characters = recruit ? [recruit.character] : campaign.characters;
     const recruiting = LP.roster.hasCrew(campaign);
     clear(container);
 
@@ -407,7 +453,7 @@
       selectedByCampaign[campaign.id] = selected.id;
     }
 
-    container.appendChild(el('div', { class: 'tab-toolbar' },
+    container.appendChild(recruit ? recruitBanner(state, recruit) : el('div', { class: 'tab-toolbar' },
       el('p', { class: 'muted' }, characters.length === 1 ? '1 character' : characters.length + ' characters'),
       el('div', { class: 'toolbar' },
         el('button', { type: 'button', class: 'btn btn-primary', 'data-focus': 'add', onclick: () => addCharacter(state) }, '+ Add character'),
@@ -420,7 +466,7 @@
       )
     ));
 
-    if (recruiting) {
+    if (recruiting && !recruit) {
       container.appendChild(el('p', { class: 'muted recruit-note' },
         'Your crew is on the ', el('a', { href: LP.router.campaignPath(campaign.id, 'crew') }, 'Crew tab'),
         '. Characters made here join it as recruits when you press Add to crew.'));

@@ -12,22 +12,29 @@
    *     startedAt,
    *     memoryAtStart,                // turnMemory when the turn began (for Restart)
    *     draft: { id, input } | null,  // input to pre-fill after an Undo
-   *     records: [{ id, input, output, pending, facts, todo, history, memoryBefore, geoBefore }]
+   *     records: [{ id, input, output, pending, facts, todo, history, memoryBefore, geoBefore,
+   *                 snapBefore?, applied?, snapAfter? }]   // the last three: stages with `ledger`
+   *     portraits: { memberId: dataUrl }   // kept once for the snapshots, which leave portraits out
    *   }
    *   campaign.turnMemory = { ... }   // values remembered between turns (pre-fills)
    *
    * Stage definition:
-   *   id, step ('travel' | 'world' | 'post'), number ('1.2'), title, page
+   *   id, step ('start' | 'travel' | 'world' | 'post'), number ('1.2'), title, page (optional)
    *   applies(ctx)               -> true, or a string saying why it is skipped
    *   fields(ctx)                -> input fields (see ui/stageForm.js), with default values
    *   validate(input, ctx)       -> error message or null            (optional)
    *   resolve(input, ctx)        -> { output, pending? }             all dice rolled here
-   *   choose(record, value, ctx) -> { output, pending? }             (if it can be pending)
+   *   choose(record, value, ctx) -> { output, pending? } | { error }   (if it can be pending)
+   *                              pending: { prompt, options: [{ value, label }] }, or `free: true` for an
+   *                              answer that isn't one of the options (the stage checks it)
    *   facts(input, output, ctx)  -> values later stages read         (optional)
    *   remember(input, output, ctx) -> values kept for the next turn  (optional)
    *   todo(input, output, ctx)  -> [text] changes the player makes by hand (Crew tab) (optional)
    *   itemSource                 -> what gained items are credited to ("a trade roll"), text or
    *                                 (input, output, ctx) -> text                     (optional)
+   *   ledger: true               the stage plans event ops (output.ops, see js/rules/events). The
+   *                              result waits for applyLedger(); Undo and Restart put the roster,
+   *                              planets and conditions back from snapBefore.
    *   apply(input, output, ctx)  -> changes planets (campaign.planets / currentPlanetId).
    *                                 Runs after resolve and again after each choice, always
    *                                 starting from the planets as they were before the stage,
@@ -128,7 +135,7 @@
       const record = records[index];
       if (record && record.id === def.id) {
         index++;
-        if (record.pending) {
+        if (record.pending || awaitingApply(record)) {
           items.push({ def, record, status: 'pending' });
           return { items, current: null, finished: false };
         }
@@ -145,6 +152,46 @@
       return { items, current: def, finished: false };
     }
     return { items, current: null, finished: true };
+  }
+
+  /** A ledger stage whose changes the player hasn't applied yet. */
+  function awaitingApply(record) {
+    return !!(record.snapBefore && !record.applied && record.output && record.output.ops && record.output.ops.length);
+  }
+
+  /**
+   * Apply the last stage's ledger (its planned changes) to the campaign.
+   * Returns { ok: true } or { error }.
+   */
+  function applyLedger(campaign) {
+    const turn = ensure(campaign);
+    const record = turn.records[turn.records.length - 1];
+    if (!record || !record.snapBefore) return { error: 'Nothing is waiting to be applied.' };
+    if (record.applied) return { error: 'This has already been applied.' };
+    if (record.pending) return { error: 'Answer the question first.' };
+    LP.events.ledger.commit(campaign, (record.output && record.output.ops) || []);
+    record.applied = true;
+    record.snapAfter = LP.snapshot.take(campaign);
+    return { ok: true };
+  }
+
+  /** Text for a confirm dialog when Undo would throw away Crew-tab changes made since an applied stage; else null. */
+  function undoWarning(campaign) {
+    const turn = ensure(campaign);
+    const record = turn.records[turn.records.length - 1];
+    if (!record || !record.applied) return null;
+    return LP.snapshot.changedSince(campaign, record.snapAfter)
+      ? 'Changes made on the Crew tab or Planets tab since this was applied will be lost too.' : null;
+  }
+
+  /** Same, for Restart: it undoes every applied stage this turn. */
+  function restartWarning(campaign) {
+    const turn = ensure(campaign);
+    const applied = turn.records.filter((r) => r.applied);
+    const last = applied[applied.length - 1];
+    if (!last) return null;
+    return LP.snapshot.changedSince(campaign, last.snapAfter)
+      ? 'Changes made on the Crew tab or Planets tab since an event was applied will be lost too.' : null;
   }
 
   /** Fields for the current stage, with Undo drafts applied over the defaults. */
@@ -231,6 +278,10 @@
       memoryBefore: clone(campaign.turnMemory),
       geoBefore: geo(campaign)
     };
+    if (def.ledger) {
+      record.snapBefore = LP.snapshot.take(campaign);
+      turn.portraits = Object.assign({}, turn.portraits, LP.snapshot.portraitsOf(campaign));
+    }
     applyResult(campaign, def, record, def.resolve(clone(input), ctx), ctx);
     turn.records.push(record);
     turn.draft = null;
@@ -242,9 +293,11 @@
     const turn = ensure(campaign);
     const record = turn.records[turn.records.length - 1];
     if (!record || !record.pending) return { error: 'Nothing is waiting for a choice.' };
-    if (!record.pending.options.some((o) => o.value === value)) return { error: 'Unknown choice.' };
+    if (!record.pending.free && !record.pending.options.some((o) => o.value === value)) return { error: 'Unknown choice.' };
     const def = getStage(record.id);
     const ctx = context(campaign, turn.records.slice(0, -1));
+    const result = def.choose(record, value, ctx);
+    if (result.error) return { error: result.error };
     record.history.push({
       output: clone(record.output),
       pending: clone(record.pending),
@@ -252,7 +305,7 @@
       memory: clone(campaign.turnMemory),
       geo: geo(campaign)
     });
-    applyResult(campaign, def, record, def.choose(record, value, ctx), ctx);
+    applyResult(campaign, def, record, result, ctx);
     return { ok: true };
   }
 
@@ -265,6 +318,13 @@
     const turn = ensure(campaign);
     const record = turn.records[turn.records.length - 1];
     if (!record) return false;
+    if (record.applied) {
+      // The first Undo takes back what Apply did; the next goes back through its choices.
+      LP.snapshot.restore(campaign, record.snapBefore, turn.portraits);
+      record.applied = false;
+      delete record.snapAfter;
+      return true;
+    }
     if (record.history.length) {
       const previous = record.history.pop();
       record.output = previous.output;
@@ -278,6 +338,7 @@
     turn.records.pop();
     campaign.turnMemory = record.memoryBefore || {};
     setGeo(campaign, record.geoBefore);
+    if (record.applied) LP.snapshot.restore(campaign, record.snapBefore, turn.portraits);
     if (LP.roster) LP.roster.removeTagged(campaign, itemTag(campaign, record), true);
     turn.draft = { id: record.id, input: record.input };
     return true;
@@ -288,6 +349,8 @@
     ensure(campaign);
     campaign.turnMemory = clone(campaign.turn.memoryAtStart) || {};
     setGeo(campaign, campaign.turn.geoAtStart);
+    const firstApplied = campaign.turn.records.find((r) => r.applied);
+    if (firstApplied) LP.snapshot.restore(campaign, firstApplied.snapBefore, campaign.turn.portraits);
     if (LP.roster) LP.roster.removeTagged(campaign, campaign.turn.startedAt + '/', true);
     campaign.turn = newTurn(campaign);
   }
@@ -396,11 +459,15 @@
     ensure,
     itemTag,
     walk,
+    awaitingApply,
     currentFields,
     context,
     confirm,
     choose,
     canUndo,
+    applyLedger,
+    undoWarning,
+    restartWarning,
     undo,
     restart,
     nextTurn,

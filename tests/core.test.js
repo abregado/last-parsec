@@ -195,8 +195,8 @@
     assert.equal(r.patrons, 1);
     assert.equal(r.storyPoints, 1);
     assert.equal(effects.parse('Rival').rivals, 1);
-    assert.equal(effects.parse('1 Rumor, +1 story point').questRumors, 1);
-    assert.equal(effects.parse('2 Quest Rumors').questRumors, 2);
+    assert.equal(effects.parse('1 Rumor, +1 story point').rumors, 1);
+    assert.equal(effects.parse('2 Quest Rumors').rumors, 2);
   });
 
   test('starting rolls become table names', (assert) => {

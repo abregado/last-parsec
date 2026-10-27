@@ -247,7 +247,7 @@
   /**
    * Totals across the whole crew:
    *   members, credits { perMember, rolled, total }, storyPoints, patrons,
-   *   rivals, questRumors, savvyCount, highTechUsed,
+   *   rivals, rumors, savvyCount, highTechUsed,
    *   characterItems [{ character, table, row }], xp [{ character, xp }],
    *   ship { row, hull, debt, traits [{ name, text }] } | null,
    *   warnings [string]
@@ -261,7 +261,7 @@
       storyPoints: 0,
       patrons: 0,
       rivals: 0,
-      questRumors: 0,
+      rumors: 0,
       savvyCount: 0,
       highTechUsed: highTechUsed(crew),
       characterItems: [],
@@ -276,7 +276,7 @@
       out.storyPoints += r.storyPoints;
       out.patrons += r.patrons;
       out.rivals += r.rivals;
-      out.questRumors += r.questRumors;
+      out.rumors += r.rumors;
       if (r.savvyIncrease) out.savvyCount++;
       for (const item of r.items) out.characterItems.push({ character: character, table: item.table, row: item.row });
       out.xp.push({ character: character, xp: r.xp });

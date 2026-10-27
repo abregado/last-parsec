@@ -11,6 +11,7 @@ Companion web app for Five Parsecs From Home. Plain HTML, CSS and vanilla JS, no
 | Campaign Turn tab, stages, follow-up scripts, result cards | `docs/campaign-turn.md` |
 | Battle tab | `docs/battle.md` (and `docs/campaign-turn.md` for Post-Battle) |
 | Species, Archetypes, Planets, Rivals and Patrons, Models | `docs/planets.md` |
+| Events (Character, Trade, Exploration, Travel, Campaign), packs, effects, conditions, the Events tab | `docs/events.md` (and `docs/event-authoring.md` for writing packs) |
 | Equipment tab, roll tables | `docs/architecture.md` (Tables) |
 | Writing docs or code comments | `docs/writing-docs.md` |
 
@@ -19,6 +20,7 @@ Companion web app for Five Parsecs From Home. Plain HTML, CSS and vanilla JS, no
 - Classic `<script>` tags on the global `LP` namespace only: no ES modules, no `fetch()` (both break on `file://`).
 - Rules code (`js/core`, `js/rules`) never touches the DOM; UI code lives in `js/ui`.
 - Run `python tools/bump-version.py` after changing any JS or CSS file, and add new scripts to both `index.html` and (for rules code) `tests.html`.
+- Base events: edit `tools/events/*.py`, then run `python tools/build-events.py` (never edit `js/data/baseEvents.js`).
 - Tests: open `tests.html` (served or as a file). All tests must pass.
 - Keep the docs current when a feature changes (see `docs/writing-docs.md`).
 - The rulebook PDF is copyrighted: never commit or publish it.

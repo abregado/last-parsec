@@ -21,11 +21,12 @@
    *       Roll on a table, then run that row's own script and `then`.
    *       note: shown under the result (e.g. "Damaged: needs Repair.").
    *   { rollAgain: true, label? }       roll again on the table being resolved
-   *   { roll: '1D6', label?, times?, keep?: 'highest', add?: [{ label, value }], target?, invert?,
+   *   { roll: '1D6', label?, times?, keep?: 'highest', add?: [{ label, value }], floor?, floorLabel?, target?, invert?,
    *     savvy?: true, engineer?: true, text?,
    *     outcomes?: [{ natural? | range | min/max, text, tone?, gain?, then? }],
    *     ifFail?: [steps] }
    *       add: modifiers added to the total (zero values are dropped).
+   *       floor: the total is raised to at least this (a condition guarantees a result).
    *       savvy: a "1D6 + Savvy" check. The verdict is left open and a note
    *       says what Savvy is needed; ifFail steps are shown as "If it fails".
    *       outcomes are checked in order; `natural` matches the first die alone;
@@ -172,6 +173,10 @@
     if (step.keep === 'highest') {
       line.keep = 'highest';
       line.total = Math.max(...r.dice);
+    }
+    if (step.floor !== undefined && line.total < step.floor) {
+      line.modifiers = line.modifiers.concat([{ label: step.floorLabel || 'at least ' + step.floor, value: step.floor - line.total }]);
+      line.total = step.floor;
     }
     if (step.target !== undefined && (!step.savvy || who)) {
       line.target = step.target;

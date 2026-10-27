@@ -137,13 +137,30 @@
     ));
   }
 
+  /** Check-grid items for events; events that share a title (a split row) are told apart by the end of their id. */
+  function eventItems(events) {
+    const shared = (e) => events.filter((x) => x.title === e.title);
+    return events.map((e) => {
+      const same = shared(e);
+      let label = e.title;
+      if (same.length > 1) {
+        let n = 0;
+        while (same.every((x) => x.id.charAt(n) === e.id.charAt(n))) n++;
+        label += ' · ' + (e.id.slice(n).replace(/^[-:]+/, '').replace(/-/g, ' ') || 'main');
+      }
+      return { id: e.id, label: label, hint: 'weight ' + e.weight };
+    });
+  }
+
   function eventsSection(state, a) {
-    const counts = Object.entries(A.EVENT_TABLES).map(([key, table]) => a.events[key].length + '/' + rng.getTable(table).rows.length);
+    const lists = {};
+    for (const key of A.EVENT_KINDS) lists[key] = A.eventList(state.campaign, key);
+    const counts = A.EVENT_KINDS.map((key) => a.events[key].length + '/' + lists[key].length);
     return section(state, 'events', 'Events', counts.join(' · '), () => el('div', { class: 'arch-body' },
-      Object.entries(A.EVENT_TABLES).map(([key, tableName]) => {
-        const table = rng.getTable(tableName);
+      A.EVENT_KINDS.map((key) => {
+        const events = lists[key];
         const allowed = new Set(a.events[key]);
-        const set = (ids) => { a.events[key] = table.rows.map((r) => r.id).filter((id) => ids.includes(id)); commit(state); };
+        const set = (ids) => { a.events[key] = events.map((e) => e.id).filter((id) => ids.includes(id)); commit(state); };
         const subKey = 'events-' + key;
         const open = openSections.has(subKey);
         return el('div', { class: 'event-group' },
@@ -154,15 +171,15 @@
             },
               el('span', { class: 'models-caret', 'aria-hidden': 'true' }, open ? '▾' : '▸'),
               el('h4', null, A.EVENT_LABELS[key]),
-              el('span', { class: 'models-count' }, allowed.size + ' of ' + table.rows.length)
+              el('span', { class: 'models-count' }, allowed.size + ' of ' + events.length)
             ),
             toolbar([
-              ['All', () => set(table.rows.map((r) => r.id)), 'ev-all-' + key],
+              ['All', () => set(events.map((e) => e.id)), 'ev-all-' + key],
               ['None', () => set([]), 'ev-none-' + key]
             ])
           ),
           open ? checkGrid(
-            table.rows.map((r) => ({ id: r.id, label: r[table.labelColumn], hint: r.ranges.weight })),
+            eventItems(events),
             allowed,
             (id, on) => set(on ? a.events[key].concat(id) : a.events[key].filter((x) => x !== id)),
             'ev:' + key + ':'

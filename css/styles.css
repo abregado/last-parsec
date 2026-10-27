@@ -2381,3 +2381,281 @@ main:focus {
 .crew-resources > .btn {
   justify-self: start;
 }
+
+/* What an event will change, before Apply */
+.ledger {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent);
+  border-radius: 3px;
+  background: var(--bg-sunken);
+}
+.ledger-title { margin: 0 0 6px; font-size: 0.95rem; }
+.ledger-list { margin: 0 0 10px; padding-left: 20px; }
+.ledger-destructive { color: var(--danger); }
+
+/* Conditions on the Crew and Planets tabs */
+.condition-badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.condition-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 0.85rem;
+}
+.condition-badge.pending { opacity: 0.7; border-style: dashed; }
+.condition-badge button { border: 0; background: none; color: var(--text-muted); cursor: pointer; padding: 0 2px; }
+
+.tab-disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Prompts in a result card */
+.prompt-fields { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 6px 0; }
+.prompt-list { list-style: none; margin: 6px 0; padding: 0; display: grid; gap: 6px; }
+.prompt-option { display: flex; align-items: flex-start; gap: 8px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); cursor: pointer; }
+.prompt-option input { margin-top: 3px; }
+.prompt-cost { color: var(--text-muted); font-size: 0.9rem; }
+.prompt-error { color: var(--danger); margin: 4px 0 0; }
+
+/* Events tab */
+.ev-layout { align-items: start; }
+.ev-list-wrap { display: grid; gap: 8px; }
+.ev-filters { display: grid; gap: 6px; }
+.ev-group h4 { margin: 8px 0 4px; }
+.ev-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.ev-item { display: flex; align-items: center; gap: 6px; padding: 2px 4px; border-radius: 4px; }
+.ev-item.is-selected { background: var(--surface-hover); outline: 1px solid var(--accent); }
+.ev-item.is-off .ev-title { text-decoration: line-through; opacity: 0.6; }
+.ev-pick { flex: 1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; text-align: left; background: none; border: 0; color: inherit; padding: 4px; cursor: pointer; font: inherit; }
+.ev-title { font-weight: 600; }
+.ev-warn { color: var(--danger); }
+.ev-head-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.ev-head-top h2, .ev-head-top h3 { margin: 0; }
+.ev-editor { display: grid; gap: 10px; }
+.ev-form { display: grid; gap: 10px; }
+.ev-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.ev-row > * { flex: 1 1 140px; }
+.ev-problems { border-left: 3px solid var(--danger); }
+.ev-tokens { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.step-list { display: grid; gap: 6px; }
+.step-card { border: 1px solid var(--border); border-radius: 6px; background: var(--surface); }
+.step-card.has-problem { border-color: var(--danger); }
+.step-head { display: flex; align-items: center; gap: 6px; }
+.step-toggle { flex: 1; display: flex; align-items: baseline; gap: 8px; text-align: left; background: none; border: 0; color: inherit; padding: 6px 8px; cursor: pointer; font: inherit; }
+.step-kind { font-weight: 600; white-space: nowrap; }
+.step-summary { color: var(--text-muted); overflow-wrap: anywhere; }
+.step-tools { display: flex; padding-right: 4px; }
+.step-problems { margin: 0 8px 6px; padding-left: 18px; color: var(--danger); font-size: 0.9rem; }
+.step-body { display: grid; gap: 8px; padding: 6px 10px 10px; border-top: 1px solid var(--border); }
+.step-add { max-width: 240px; }
+.ef-block { display: grid; gap: 4px; padding-left: 8px; border-left: 2px solid var(--border); }
+.ef-list, .ef-pairs { display: grid; gap: 6px; }
+.ef-item { display: grid; gap: 6px; padding: 8px; border: 1px dashed var(--border); border-radius: 4px; }
+.ef-item-tools { display: flex; justify-content: space-between; align-items: center; }
+.ef-pair { display: flex; gap: 6px; }
+.ef-selector { display: grid; gap: 6px; border: 1px solid var(--border); border-radius: 4px; padding: 8px; }
+.ef-short { max-width: 150px; }
+.pred { display: grid; gap: 4px; }
+.pred-node { display: grid; gap: 4px; padding: 6px; border: 1px solid var(--border); border-radius: 4px; }
+.pred-head { display: flex; gap: 6px; align-items: center; }
+.pred-leaf { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pred-children { display: grid; gap: 4px; padding-left: 12px; }
+.outline, .outline ul { margin: 2px 0; padding-left: 20px; }
+.outline-sub { list-style: none; }
+.pack-card { display: grid; gap: 8px; }
+.pack-fragments { display: grid; gap: 6px; }
+.ref-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.ref-table th, .ref-table td { text-align: left; vertical-align: top; padding: 4px 8px; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.ref-key { font-weight: 600; white-space: nowrap; }
+.reference { display: grid; gap: 10px; }
+.ev-tester { display: grid; gap: 8px; }
+.recruit-banner { margin-bottom: 8px; }
+
+/* Names ------------------------------------------------------------------- */
+.name-row {
+  display: flex;
+  gap: 6px;
+}
+
+.name-row .input {
+  flex: 1 1 auto;
+}
+
+.name-table-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.name-table-btn {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.name-editor {
+  display: grid;
+  gap: 12px;
+}
+
+.name-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.name-chips li,
+.name-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.name-chips li {
+  padding: 2px 4px 2px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.species-names {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.name-pill button {
+  padding: 0 3px;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Models: description, stat block, weapons ---------------------------------- */
+.enemy-desc {
+  display: none;
+  max-width: 70ch;
+  margin-top: 2px;
+}
+
+@media (min-width: 900px) and (orientation: landscape) {
+  .enemy-desc {
+    display: block;
+  }
+
+  .enemy-notes {
+    display: none;
+  }
+}
+
+.statblock {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: 6px;
+  max-width: 560px;
+  margin: 8px 0;
+}
+
+.statblock .stat {
+  padding: 6px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--surface-2, transparent);
+  text-align: center;
+}
+
+.statblock dt {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.statblock dd {
+  margin: 2px 0 0;
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.weapon-list {
+  margin: 6px 0 0;
+  padding: 6px 10px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.weapon-list legend {
+  padding: 0 4px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.weapon-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
+.weapon-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.weapon-check input {
+  accent-color: var(--accent);
+}
+
+.weapon-check.is-off {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.statblock dd small {
+  display: block;
+  font-family: var(--font-body, inherit);
+  font-size: 0.7rem;
+  font-weight: 400;
+}
+
+.enemy-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 4px 0;
+}
+
+.abilities {
+  display: grid;
+  gap: 6px;
+  max-width: 70ch;
+  margin: 8px 0 0;
+}
+
+.abilities dt {
+  display: inline;
+  font-weight: 700;
+}
+
+.abilities dt::after {
+  content: ': ';
+}
+
+.abilities dd {
+  display: inline;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}

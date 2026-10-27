@@ -17,17 +17,52 @@
     return text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   }
 
-  function profileLine(row) {
-    const parts = [
+  // Expanded profiles, as 'table|rowId' (per page visit only).
+  const expanded = new Set();
+
+  /** The tables' printed marks are garbled in the data (4� for 4"). */
+  function clean(text) {
+    return String(text).replace(/�/g, '"');
+  }
+
+  function statBlock(row) {
+    const aiName = LP.enemies.AI_NAMES[row.ai];
+    const ai = row.ai ? [row.ai, aiName ? el('small', null, aiName) : null] : '';
+    const stats = [
       ['Numbers', row.numbers],
       ['Panic', row.panic],
       ['Speed', row.speed],
-      ['CS', row.combat_skill],
+      ['Combat', row.combat_skill],
       ['Toughness', row.tough_ness],
-      ['AI', row.ai],
-      ['Weapons', row.weapons]
+      ['AI', ai]
     ].filter(([, value]) => value !== undefined && value !== '');
-    return parts.map(([name, value]) => name + ' ' + value).join(' · ');
+    return el('dl', { class: 'statblock' }, stats.map(([name, value]) =>
+      el('div', { class: 'stat' }, el('dt', null, name), el('dd', null, Array.isArray(value) ? value : clean(value)))));
+  }
+
+  function weaponChecks(state, title, names) {
+    const { campaign } = state;
+    return el('fieldset', { class: 'weapon-list' },
+      el('legend', null, title),
+      names.map((name) => {
+        const box = el('input', { type: 'checkbox', checked: M.isWeaponOn(campaign, name), 'data-focus': 'weapon:' + title + ':' + name });
+        box.addEventListener('change', () => {
+          M.setWeapon(campaign, name, box.checked);
+          commit(state);
+        });
+        return el('label', { class: 'weapon-check' + (box.checked ? '' : ' is-off') }, box, clean(name));
+      })
+    );
+  }
+
+  function weaponBlock(state, row) {
+    const w = M.weaponsFor(row);
+    if (!w) return el('p', { class: 'field-detail' }, 'Weapons: ' + clean(row.weapons) + ' (fixed)');
+    return el('div', { class: 'weapons' },
+      el('p', { class: 'field-detail' }, 'Weapons (' + clean(row.weapons) + '). Untick any you have no models for; they are skipped when rolling.'),
+      weaponChecks(state, 'Basic weapons', w.basic),
+      weaponChecks(state, 'Specialist weapons', w.specialist)
+    );
   }
 
   function tableSection(state, tableName) {
@@ -40,6 +75,27 @@
     const change = (action) => {
       action();
       commit(state);
+    };
+
+    const profile = (st, table, row) => {
+      const key = table + '|' + row.id;
+      const notes = LP.enemies.splitNotes(row.notes);
+      const details = el('details', { class: 'enemy-profile' },
+        el('summary', null, 'Profile'),
+        statBlock(row),
+        notes.tags.length ? el('p', { class: 'enemy-tags' }, notes.tags.map((t) => el('span', { class: 'badge' }, t))) : null,
+        notes.description ? el('p', { class: 'field-detail enemy-notes' }, notes.description) : null,
+        notes.abilities.length
+          ? el('dl', { class: 'abilities' }, notes.abilities.map((a) => el('div', null, el('dt', null, a.name), el('dd', null, a.text))))
+          : null,
+        weaponBlock(st, row)
+      );
+      details.open = expanded.has(key);
+      details.addEventListener('toggle', () => {
+        if (details.open) expanded.add(key);
+        else expanded.delete(key);
+      });
+      return details;
     };
 
     const rows = o.rows.map(({ row, enabled, chance }) => {
@@ -66,11 +122,8 @@
         el('td', { class: 'col-check' }, checkbox),
         el('td', { class: 'col-name' },
           el('label', { for: checkboxId, class: 'enemy-name' }, row.enemy),
-          el('details', { class: 'enemy-profile' },
-            el('summary', null, 'Profile'),
-            el('p', { class: 'field-detail' }, profileLine(row)),
-            row.notes ? el('p', { class: 'field-detail' }, row.notes) : null
-          )
+          LP.enemies.splitNotes(row.notes).description ? el('p', { class: 'field-detail enemy-desc' }, LP.enemies.splitNotes(row.notes).description) : null,
+          profile(state, tableName, row)
         ),
         el('td', { class: 'col-num' }, row.ranges.weight),
         el('td', { class: 'col-num col-weight' }, String(row.weight)),
@@ -100,6 +153,25 @@
           invasionCount ? el('span', { class: 'models-count' }, '· ' + invasionCount + ' can invade') : null
         ),
         el('div', { class: 'toolbar' },
+          el('button', {
+            type: 'button',
+            class: 'btn btn-sm',
+            'data-focus': 'expand:' + tableName,
+            onclick: () => {
+              for (const { row } of o.rows) expanded.add(tableName + '|' + row.id);
+              collapsed.delete(tableName);
+              draw(state);
+            }
+          }, 'Expand all'),
+          el('button', {
+            type: 'button',
+            class: 'btn btn-sm',
+            'data-focus': 'collapse:' + tableName,
+            onclick: () => {
+              for (const { row } of o.rows) expanded.delete(tableName + '|' + row.id);
+              draw(state);
+            }
+          }, 'Collapse all'),
           el('button', {
             type: 'button',
             class: 'btn btn-sm',
@@ -186,20 +258,12 @@
   function draw(state) {
     const active = document.activeElement;
     const focusKey = active && state.container.contains(active) && active.dataset ? active.dataset.focus : null;
-    // Keep open "Profile" panels open across redraws.
-    const openProfiles = new Set([...state.container.querySelectorAll('details.enemy-profile[open]')]
-      .map((d) => d.closest('tr').querySelector('input').id));
-
     clear(state.container);
     state.container.appendChild(el('p', { class: 'muted models-intro' },
       'Untick enemies you don’t have models for. Battle rolls only pick ticked entries, and the remaining entries become more likely. Weights are as printed in the book.'));
     state.container.appendChild(invasionPanel(state));
     for (const name of M.ENEMY_TABLES) state.container.appendChild(tableSection(state, name));
 
-    for (const id of openProfiles) {
-      const input = document.getElementById(id);
-      if (input) input.closest('tr').querySelector('details.enemy-profile').open = true;
-    }
     if (focusKey) {
       const target = state.container.querySelector('[data-focus="' + CSS.escape(focusKey) + '"]');
       if (target && !target.disabled) target.focus();

@@ -162,22 +162,6 @@
     assert.ok(/Savvy \+2 or better \(\+1 or better for an Engineer\)/.test(linesText(last(c).output)));
   });
 
-  test('Exploring can pause on a choice and gains carry forward', (assert) => {
-    rng.setSource(() => 0.29); // D100 = 30: Alien merchant (a choice)
-    const c = atUpkeep({ rivals: 1 });
-    upkeep(c, {});
-    T.confirm(c, { tasks: { explore: 1 }, rivals: 1 });
-    assert.equal(current(c), 'pending');
-    T.choose(c, 'pass');
-    assert.equal(current(c), 'job-offers');
-
-    rng.setSource(() => 0.56); // D100 = 57: Overheard some talk (+1 Rumor)
-    const r = atUpkeep();
-    upkeep(r, {});
-    T.confirm(r, { tasks: { explore: 2 }, rivals: 0 });
-    assert.equal(facts(r).rumorsGained, 2);
-  });
-
   test('Travel restricted allows only one explorer', (assert) => {
     const c = atUpkeep({}, ['travel-restricted']);
     upkeep(c, {});
@@ -241,9 +225,12 @@
     T.confirm(c, { offers: 0 });
     T.confirm(c, {});
     assert.equal(T.currentFields(c).find((f) => f.key === 'rumors').value, 2);
-    T.confirm(c, { onQuest: false, rumors: 2 });
+    T.confirm(c, { rumors: 2 });
     assert.equal(last(c).output.headline, 'New Quest!');
-    assert.equal(c.turnMemory.onQuest, true);
+    assert.ok(T.awaitingApply(last(c)), 'the Quest begins when the player applies it');
+    assert.ok(!LP.conditions.has(c, 'on-quest'));
+    assert.deepEqual(T.applyLedger(c), { ok: true });
+    assert.ok(LP.conditions.has(c, 'on-quest'));
     assert.equal(c.turnMemory.rumors, 0);
   });
 
@@ -262,11 +249,13 @@
 
     high();
     const free = atUpkeep({ rivals: 2 });
+    LP.events.ledger.commit(free, LP.conditions.addOps(free, 'on-quest'));
     upkeep(free, {});
     noTasks(free);
     T.confirm(free, { offers: 0 });
     T.confirm(free, {});
-    T.confirm(free, { onQuest: true });
+    assert.deepEqual(T.currentFields(free).map((f) => f.key), ['note'], 'no question about a Quest you are known to be on');
+    T.confirm(free, {});
     T.confirm(free, { rivals: 2, patronJob: true, privateTransport: false });
     assert.equal(current(free), 'pending');
     const options = last(free).pending.options.map((o) => o.value);

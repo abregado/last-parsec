@@ -275,7 +275,7 @@
       commit(state);
     });
 
-    const stats = STAT_SHORT.map(([key, label, short]) => el('label', { class: 'stat crew-stat', title: label },
+    const stats = STAT_SHORT.map(([key, label, short]) => el('label', { class: 'stat crew-stat', title: label + ' (joined with ' + member.baseProfile[key] + ')' },
       el('span', { class: 'crew-stat-name' }, short),
       numberInput(member.profile[key], 'stat:' + member.id + ':' + key, (n) => {
         member.profile[key] = n;
@@ -329,6 +329,7 @@
             }, { min: '0', max: '20', 'aria-label': 'Turns left in Sick Bay' }))
           : null
       ))),
+      LP.ui.conditionBadges(state.campaign, (c) => c.scope === 'character' && c.targetId === member.id, () => commit(state)),
       el('div', { class: 'stat-grid crew-stats' }, stats),
       species && species.rules && species.rules.length
         ? el('details', { class: 'member-rules' }, el('summary', null, 'Species rules'), el('ul', null, species.rules.map((r) => el('li', null, r))))
@@ -442,7 +443,7 @@
       facts.push(['Starting story points', String(start.storyPoints)]);
       if (start.patrons) facts.push(['Starting Patrons', String(start.patrons)]);
       if (start.rivals) facts.push(['Starting Rivals', String(start.rivals)]);
-      if (start.questRumors) facts.push(['Starting Quest Rumors', String(start.questRumors)]);
+      if (start.rumors) facts.push(['Starting Rumors', String(start.rumors)]);
     }
     return el('section', { class: 'panel crew-info' },
       el('h3', null, 'Crew'),
@@ -486,6 +487,8 @@
     ));
 
     container.appendChild(resourcesPanel(state));
+    const lasting = LP.ui.conditionBadges(campaign, (c) => ['crew', 'ship', 'campaign'].includes(c.scope) || (c.scope === 'planet' && c.targetId === campaign.currentPlanetId), () => commit(state));
+    if (lasting) container.appendChild(el('section', { class: 'panel crew-conditions' }, el('h3', null, 'Conditions'), lasting));
     container.appendChild(el('ul', { class: 'member-grid' }, roster.members.map((m) => memberCard(state, m))));
 
     container.appendChild(el('section', { class: 'panel crew-stash' },

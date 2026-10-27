@@ -8,12 +8,14 @@
   const TABS = [
     { id: 'crew', label: 'Crew' },
     { id: 'planets', label: 'Planets' },
-    { id: 'turn', label: 'Campaign Turn' },
+    { id: 'turn', label: 'Campaign Turn', needsCrew: true },
     { id: 'battle', label: 'Battle' },
     { id: 'characters', label: 'Characters', config: true },
     { id: 'models', label: 'Models', config: true },
     { id: 'species', label: 'Species', config: true },
+    { id: 'names', label: 'Names', config: true },
     { id: 'archetypes', label: 'Archetypes', config: true },
+    { id: 'events', label: 'Events', config: true },
     { id: 'equipment', label: 'Equipment', config: true }
   ];
 
@@ -118,7 +120,7 @@
       type: 'button',
       class: 'btn btn-sm mode-toggle',
       'aria-pressed': playing ? 'true' : 'false',
-      title: playing ? 'Show the setup tabs (Characters, Models, Species, Archetypes, Equipment)' : 'Hide the setup tabs while you play',
+      title: playing ? 'Show the setup tabs (Characters, Models, Species, Names, Archetypes, Equipment)' : 'Hide the setup tabs while you play',
       onclick: () => {
         setMode(playing ? 'edit' : 'play');
         // Leaving Edit mode on a setup tab: go to the crew.
@@ -134,11 +136,13 @@
     container.appendChild(el('nav', { class: 'tab-bar', 'aria-label': 'Campaign tools' },
       el('ul', { class: 'tabs' },
         shown.map((t, i) => el('li', { class: t.config && (i === 0 || !shown[i - 1].config) ? 'tab-config-first' : null },
-          el('a', {
-            class: 'tab' + (t.config ? ' tab-config' : ''),
-            href: LP.router.campaignPath(campaign.id, t.id),
-            'aria-current': t.id === tab.id ? 'page' : null
-          }, t.label)
+          t.needsCrew && !LP.roster.hasCrew(campaign)
+            ? el('span', { class: 'tab tab-disabled', 'aria-disabled': 'true', title: 'Finalize your crew first' }, t.label)
+            : el('a', {
+              class: 'tab' + (t.config ? ' tab-config' : ''),
+              href: LP.router.campaignPath(campaign.id, t.id),
+              'aria-current': t.id === tab.id ? 'page' : null
+            }, t.label)
         ))
       ),
       toggle
@@ -153,7 +157,13 @@
 
     const panel = el('div', { class: 'tab-panel' });
     container.appendChild(panel);
-    if (LP.tabs[tab.id]) LP.tabs[tab.id](panel, campaign);
+    if (tab.needsCrew && !LP.roster.hasCrew(campaign)) {
+      panel.appendChild(el('div', { class: 'empty-state' },
+        el('h2', { text: 'No crew yet' }),
+        el('p', { text: 'The Campaign Turn uses your crew, so generate your characters, starting equipment and ship on the Characters tab and press Finalize crew first.' }),
+        el('a', { class: 'btn btn-primary', href: LP.router.campaignPath(campaign.id, 'characters') }, 'Go to Characters')
+      ));
+    } else if (LP.tabs[tab.id]) LP.tabs[tab.id](panel, campaign);
     else panel.appendChild(el('p', { class: 'muted' }, 'Coming soon.'));
   }
 

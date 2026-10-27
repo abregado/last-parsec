@@ -91,6 +91,12 @@
       }));
   }
 
+  /** Weapon rows for a column, marking the ones the Models tab switched off. */
+  function weaponRows(ctx, tableName, column) {
+    const campaign = (ctx && ctx.campaign) || {};
+    return tableRows(tableName, 'weight', (r) => r[column] + (M.isWeaponOn(campaign, r[column]) ? '' : ' — no models'));
+  }
+
   function slotValue(battle, key) {
     const slot = battle.slots[key];
     return slot ? slot.value : null;
@@ -290,21 +296,21 @@
       };
     },
 
-    function weaponBasic(battle) {
+    function weaponBasic(battle, ctx) {
       const e = currentEnemy(battle);
       if (!e || !e.weapons.code) return null;
       const column = 'weapon_' + e.weapons.code.basic;
       return {
         key: 'weaponBasic', label: battle.options.varied ? 'Weapon, group 1 (column ' + e.weapons.code.basic + ')' : 'Weapon (column ' + e.weapons.code.basic + ')',
-        kind: 'table', rows: tableRows('Varied Armaments Table', 'weight', (r) => r[column])
+        kind: 'table', rows: weaponRows(ctx, 'Varied Armaments Table', column), exclude: M.weaponExclude(ctx.campaign || {}, 'basic', e.weapons.code.basic)
       };
     },
 
-    function weaponBasic2(battle) {
+    function weaponBasic2(battle, ctx) {
       const e = currentEnemy(battle);
       if (!e || !e.weapons.code || !battle.options.varied) return null;
       const column = 'weapon_' + e.weapons.code.basic;
-      return { key: 'weaponBasic2', label: 'Weapon, group 2 (column ' + e.weapons.code.basic + ')', kind: 'table', rows: tableRows('Varied Armaments Table', 'weight', (r) => r[column]) };
+      return { key: 'weaponBasic2', label: 'Weapon, group 2 (column ' + e.weapons.code.basic + ')', kind: 'table', rows: weaponRows(ctx, 'Varied Armaments Table', column), exclude: M.weaponExclude(ctx.campaign || {}, 'basic', e.weapons.code.basic) };
     },
 
     function weaponSpecialist(battle, ctx) {
@@ -312,7 +318,7 @@
       if (!e || !e.weapons.code) return null;
       if (force(battle, ctx).specialists === 0) return null;
       const column = 'specialist_' + e.weapons.code.specialist.toLowerCase();
-      return { key: 'weaponSpecialist', label: 'Specialist weapon (column ' + e.weapons.code.specialist + ')', kind: 'table', rows: tableRows('Specialists Table', 'weight', (r) => r[column]) };
+      return { key: 'weaponSpecialist', label: 'Specialist weapon (column ' + e.weapons.code.specialist + ')', kind: 'table', rows: weaponRows(ctx, 'Specialists Table', column), exclude: M.weaponExclude(ctx.campaign || {}, 'specialist', e.weapons.code.specialist) };
     },
 
     function uniqueCheck(battle, ctx) {
@@ -414,6 +420,9 @@
     if ((battle.mission === 'rival' || battle.mission === 'rival-attack') && e.rivalGrudge) add('Grudge (as Rivals)', 1);
     const rival = namedRival(battle, ctx);
     if (rival && rival.hates) add(rival.name + ' hate you', 1);
+    if (rival && ctx.campaign && LP.conditions) {
+      for (const m of LP.conditions.modifiers(ctx.campaign, 'enemies', { rivalId: rival.id }).mods) add(m.label, m.value);
+    }
     if (battle.mission === 'invasion') add('Invasion', 2);
     if (battle.mission === 'patron') {
       if (o.dangerousJob) add('Dangerous Job', 1);

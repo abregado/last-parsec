@@ -120,6 +120,37 @@
     assert.near(swarm / n, 10 / 14, 0.01);
   });
 
+  test('a unit lists the weapons of its basic and specialist columns; fixed weapons have none', (assert) => {
+    const gangers = LP.data.tables['Criminal Elements'].rows.find((r) => r.id === 'gangers');
+    const w = M.weaponsFor(gangers);
+    assert.ok(w.basic.includes('Handgun') && w.specialist.length > 0);
+    assert.equal(M.weaponsFor({ weapons: 'Claws (Damage +1)' }), null);
+  });
+
+  test('switched-off weapons are excluded from the roll, unless that leaves nothing', (assert) => {
+    const c = campaign();
+    const rows = LP.data.tables['Varied Armaments Table'].rows;
+    M.setWeapon(c, 'Handgun', false);
+    assert.equal(M.isWeaponOn(c, 'Handgun'), false);
+    const out = M.weaponExclude(c, 'basic', 2);
+    assert.equal(out.length, rows.filter((r) => r.weapon_2 === 'Handgun').length);
+    for (const name of M.weaponNames('basic', 2)) M.setWeapon(c, name, false);
+    assert.deepEqual(M.weaponExclude(c, 'basic', 2), []);
+    M.setWeapon(c, 'Handgun', true);
+    assert.equal(M.isWeaponOn(c, 'Handgun'), true);
+  });
+
+  test('notes split into a description, abilities and tags', (assert) => {
+    const punks = LP.data.tables['Criminal Elements'].rows.find((r) => r.id === 'punks');
+    const n = LP.enemies.splitNotes(punks.notes);
+    assert.ok(n.description.startsWith('Disaffected delinquents') && !n.description.includes('Careless'));
+    assert.deepEqual(n.abilities.map((a) => a.name), ['Careless', 'Bad shots']);
+    assert.equal(n.abilities[0].text, 'You are +1 to Seize the Initiative.');
+    const acq = LP.enemies.splitNotes('Cyborgs. Built-in: Always count as stationary when firing. Invasion Threat. Test at +1. 6+ Saving Throw.');
+    assert.deepEqual(acq.tags, ['Invasion Threat', 'Test at +1', '6+ Saving Throw']);
+    assert.equal(acq.abilities[0].text, 'Always count as stationary when firing.');
+  });
+
   test('settings normalize to Normal / crew 6 and keep valid values', (assert) => {
     assert.deepEqual(LP.settings.normalize(undefined), { difficulty: 'normal', crewSize: 6 });
     assert.deepEqual(LP.settings.normalize({ difficulty: 'insanity', crewSize: 4 }), { difficulty: 'insanity', crewSize: 4 });
