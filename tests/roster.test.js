@@ -155,6 +155,41 @@
   });
 
   /* ---------------------------------------------------------------------- */
+  group('Crew: consumables and abilities');
+
+  const CONSUMABLE = { table: 'Consumables Subtable', rowId: 'booster-pills' };
+
+  test('a consumable is never carried: it goes to the Consumables stash', (assert) => {
+    const { c, ava } = crewed();
+    const item = R.addItem(c, Object.assign({ carrierId: ava.id }, CONSUMABLE));
+    assert.equal(item.carrierId, null);
+    assert.equal(R.consumables(c).length, 1);
+    assert.equal(R.itemsOf(c, null).length, 0, 'not in the ordinary Stash');
+    assert.equal(R.itemsOf(c, ava.id).length, 0);
+    assert.equal(R.moveItem(c, item.id, ava.id), false);
+    assert.equal(item.carrierId, null);
+  });
+
+  test('a saved consumable that was carried comes back in the Consumables stash', (assert) => {
+    const { c, ava } = crewed();
+    R.addItem(c, Object.assign({}, CONSUMABLE));
+    c.roster.items[0].carrierId = ava.id;
+    R.ensure(c);
+    assert.equal(c.roster.items[0].carrierId, null);
+  });
+
+  test('a member shows their Class and its effect with their species rules', (assert) => {
+    const { c, ava, bren } = crewed();
+    ava.origins = [{ label: 'Class', value: 'Soldier', table: 'Class Table', row: 'soldier' }];
+    assert.deepEqual(R.classOf(ava), { name: 'Soldier', effect: '+1 Combat Skill' });
+    assert.ok(R.abilities(ava).some((a) => a.name === 'Soldier' && a.text === '+1 Combat Skill'));
+    assert.ok(R.abilities(bren).some((a) => a.name === 'Feral'), 'species rules come first');
+    ava.origins = [{ label: 'Class', value: 'Agitator', table: 'Class Table', row: 'agitator' }];
+    assert.equal(R.classOf(ava).effect, '', 'a class with no bonus has no ability line');
+    assert.equal(R.classOf(bren), null);
+  });
+
+  /* ---------------------------------------------------------------------- */
   group('Crew: items from turns');
 
   test('item lines: Damaged passes down, "when" items need confirming', (assert) => {

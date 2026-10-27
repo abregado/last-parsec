@@ -16,7 +16,7 @@
 
 `table.html`, opened by the Table view button on the Battle tab (once a battle is generated). A reference and Out tracker for a phone or tablet in landscape, all on one scrolling screen with large buttons.
 
-- **Layout:** a brief (objective, deployment, sight, terrain, bounty), then the crew and the enemy force. Each unit is one row: name and stats with its species and gear rules on the left, weapons with their trait rules on the right. Rules for a whole team sit above its table. Battle Events can be rolled at the bottom.
+- **Layout:** a brief (objective, deployment, sight, terrain, bounty), then the crew, the crew's Consumables (when it has any) and the enemy force. Each unit is one row: name (with species and Class beneath) and stats, with its species, Class and gear rules, on the left, weapons with their trait rules on the right. Rules for a whole team sit above its table. Battle Events can be rolled at the bottom.
 - **Tracking:** only Out (the skull cell). Nothing else is tracked or rolled for you.
 - **Model:** `js/rules/tableModel.js` (`LP.tableModel.build`) turns the battle and roster into plain JSON; its header documents the shape. The Battle tab passes it to the page in the URL hash (`LP.tableStore.encode` / `decode`), because Firefox gives each `file://` page its own storage. The page never touches campaign data and needs no rules code. It keeps only its own marks (Out, rolled events) in its own localStorage, and they reset when a new battle is generated.
 - **Live:** while the window is open, the Battle tab sets a new hash on every change, and the page redraws on `hashchange`.

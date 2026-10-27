@@ -4,6 +4,7 @@
   const { el, clear } = LP.dom;
   const R = LP.roster;
   const I = LP.items;
+  const TM = LP.tableModel;
 
   const STAT_SHORT = [
     ['reactions', 'Reactions', 'R'],
@@ -75,29 +76,8 @@
     commit(state);
   }
 
-  /** Name, type pip and Edit; Edit opens the full row. */
-  function itemRow(state, item) {
-    const open = openItems.has(item.id);
-    const category = I.categoryOf(item.table);
-    const toggle = el('button', {
-      type: 'button', class: 'btn btn-sm btn-ghost', 'data-focus': 'item-edit:' + item.id,
-      'aria-expanded': open ? 'true' : 'false',
-      onclick: () => {
-        if (open) openItems.delete(item.id);
-        else openItems.add(item.id);
-        draw(state);
-      }
-    }, open ? 'Done' : 'Edit');
-    const head = el('div', { class: 'item-head' },
-      el('span', { class: 'item-name' + (item.damaged ? ' damaged' : ''), title: item.damaged ? 'Damaged: needs Repair' : item.source || null }, item.name),
-      category ? el('span', { class: 'badge item-cat' }, I.categoryLabel(category)) : null,
-      toggle
-    );
-    if (!open) return el('li', { class: 'item-row compact' }, head);
-    return el('li', { class: 'item-row' + (item.damaged ? ' damaged' : '') }, head, itemEditor(state, item));
-  }
-
-  function itemEditor(state, item) {
+  /** The "With" dropdown: Stash or a crew member. Not for consumables, which nobody carries. */
+  function moveSelect(state, item) {
     const campaign = state.campaign;
     const where = el('select', { class: 'input select item-move', 'aria-label': 'Where ' + item.name + ' is', 'data-focus': 'item-move:' + item.id },
       el('option', { value: '' }, 'Stash'),
@@ -108,7 +88,47 @@
       R.moveItem(campaign, item.id, where.value || null);
       commit(state);
     });
+    return where;
+  }
 
+  /** Name, type pip and Details; stash items also show their move dropdown, consumables a Delete button. */
+  function itemRow(state, item) {
+    const open = openItems.has(item.id);
+    const category = I.categoryOf(item.table);
+    const consumable = I.isConsumable(item);
+    const weapon = TM.isWeapon(item);
+    const stats = weapon ? TM.weaponLine(item) : '';
+    const text = weapon ? '' : TM.itemText(item);
+    const toggle = el('button', {
+      type: 'button', class: 'btn btn-sm btn-ghost', 'data-focus': 'item-edit:' + item.id,
+      'aria-expanded': open ? 'true' : 'false',
+      onclick: () => {
+        if (open) openItems.delete(item.id);
+        else openItems.add(item.id);
+        draw(state);
+      }
+    }, open ? 'Done' : 'Details');
+    const head = el('div', { class: 'item-head' },
+      el('span', { class: 'item-name' + (item.damaged ? ' damaged' : ''), title: item.damaged ? 'Damaged: needs Repair' : item.source || null }, item.name),
+      category ? el('span', { class: 'badge item-cat' }, I.categoryLabel(category)) : null,
+      !item.carrierId && !consumable ? moveSelect(state, item) : null,
+      consumable ? el('button', {
+        type: 'button', class: 'btn btn-sm btn-danger', 'data-focus': 'item-remove:' + item.id,
+        'aria-label': 'Delete ' + item.name,
+        onclick: () => {
+          R.removeItem(state.campaign, item.id);
+          commit(state);
+        }
+      }, 'Delete') : null,
+      toggle
+    );
+    const statLine = stats ? el('div', { class: 'item-stats' }, stats) : null;
+    if (!open) return el('li', { class: 'item-row compact' }, head, statLine);
+    return el('li', { class: 'item-row' + (item.damaged ? ' damaged' : '') }, head, statLine,
+      text ? el('p', { class: 'item-text' }, text) : null, itemEditor(state, item));
+  }
+
+  function itemEditor(state, item) {
     const damaged = el('input', { type: 'checkbox', checked: item.damaged, 'data-focus': 'item-damaged:' + item.id });
     damaged.addEventListener('change', () => {
       item.damaged = damaged.checked;
@@ -117,9 +137,9 @@
 
     return el('div', { class: 'item-editor' },
       el('div', { class: 'item-head' },
-        el('label', { class: 'field inline-field' }, el('span', { class: 'field-label' }, 'With'), where),
+        item.carrierId ? el('label', { class: 'field inline-field' }, el('span', { class: 'field-label' }, 'With'), moveSelect(state, item)) : null,
         el('label', { class: 'check item-damaged' }, damaged, ' Damaged'),
-        el('button', {
+        I.isConsumable(item) ? null : el('button', {
           type: 'button', class: 'btn btn-sm btn-danger',
           'data-focus': 'item-remove:' + item.id, onclick: () => removeItem(state, item)
         }, 'Delete')
@@ -157,7 +177,7 @@
     const source = textInput('', 'add-source', () => {}, { maxlength: '200', placeholder: 'Bought / found / gift… (optional)', 'aria-label': 'Where it came from' });
 
     return el('div', { class: 'add-item' },
-      el('span', { class: 'field-label' }, 'Add an item to the Stash'),
+      el('span', { class: 'field-label' }, 'Add an item (consumables go to the Consumables stash)'),
       el('div', { class: 'add-item-row' },
         tableSelect,
         rowSelect,
@@ -170,7 +190,7 @@
               table: tableName, rowId: rowSelect.value, turn: turn,
               source: source.value.trim() || 'Added by hand on turn ' + turn + '.'
             });
-            LP.ui.notify(item.name + ' added to the Stash.', 'success');
+            LP.ui.notify(item.name + (I.isConsumable(item) ? ' added to the Consumables stash.' : ' added to the Stash.'), 'success');
             commit(state);
           }
         }, 'Add')
@@ -265,6 +285,9 @@
     const roster = campaign.roster;
     const species = R.species(member);
     const isLeader = roster.leaderId === member.id;
+    const cls = R.classOf(member);
+    const others = member.origins.filter((o) => o.label !== 'Class');
+    const abilities = R.abilities(member);
 
     const status = el('select', { class: 'input select', 'aria-label': 'Status', 'data-focus': 'status:' + member.id },
       R.STATUSES.map((s) => el('option', { value: s.id }, s.label)));
@@ -315,8 +338,8 @@
         }, 'Remove')
       ),
       el('p', { class: 'member-meta' },
-        el('strong', null, species ? species.name : 'Unknown species'),
-        member.origins.length ? ' · ' + member.origins.map((o) => o.value).join(' · ') : '',
+        el('strong', null, (species ? species.name : 'Unknown species') + (cls ? ' · ' + cls.name : '')),
+        others.length ? ' · ' + others.map((o) => o.value).join(' · ') : '',
         ' · joined ' + (member.joinedTurn ? 'on turn ' + member.joinedTurn : 'at crew creation')
       ),
       el('div', { class: 'member-status' },
@@ -331,8 +354,9 @@
       ))),
       LP.ui.conditionBadges(state.campaign, (c) => c.scope === 'character' && c.targetId === member.id, () => commit(state)),
       el('div', { class: 'stat-grid crew-stats' }, stats),
-      species && species.rules && species.rules.length
-        ? el('details', { class: 'member-rules' }, el('summary', null, 'Species rules'), el('ul', null, species.rules.map((r) => el('li', null, r))))
+      abilities.length
+        ? el('div', { class: 'member-rules' }, el('h4', { class: 'member-sub' }, 'Abilities'),
+          el('ul', null, abilities.map((a) => el('li', null, el('b', null, a.name), ' — ', a.text))))
         : null,
       el('h4', { class: 'member-sub' }, 'Carrying'),
       itemList(state, carried, 'Nothing. Move items here from the Stash.'),
@@ -498,6 +522,15 @@
       ),
       itemList(state, stash, 'The Stash is empty.'),
       addItemForm(state)
+    ));
+
+    const consumables = R.consumables(campaign);
+    container.appendChild(el('section', { class: 'panel crew-stash crew-consumables' },
+      el('div', { class: 'models-head' },
+        el('h3', null, 'Consumables'),
+        el('span', { class: 'models-count' }, consumables.length + (consumables.length === 1 ? ' item' : ' items') + ' · anyone can use them in battle')
+      ),
+      itemList(state, consumables, 'No consumables.')
     ));
 
     container.appendChild(el('div', { class: 'crew-bottom' }, shipPanel(state), infoPanel(state)));

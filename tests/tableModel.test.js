@@ -122,6 +122,25 @@
     assert.equal(LP.tableStore.decode('#m=@@@'), null);
   });
 
+  test('the crew unit names its Class; consumables are listed once with a count', (assert) => {
+    const s = setup([['Low-tech Weapon Table', 'blade']]);
+    s.ava.origins = [{ label: 'Class', value: 'Soldier', table: 'Class Table', row: 'soldier' }];
+    for (let i = 0; i < 2; i++) R.addItem(s.campaign, { table: 'Consumables Subtable', rowId: 'booster-pills', carrierId: s.ava.id });
+    const m = T.build(s.campaign, s.battle, s.ctx);
+    assert.ok(/Soldier/.test(m.crew.units[0].sub));
+    assert.ok(m.crew.units[0].rules.some((r) => r.name === 'Soldier'));
+    assert.equal(m.consumables.length, 1);
+    assert.equal(m.consumables[0].name, 'Booster Pills');
+    assert.equal(m.consumables[0].count, 2);
+    assert.ok(m.consumables[0].text.length > 0, 'the rulebook text comes with it');
+  });
+
+  test('a weapon is one stat line with its traits named, not explained', (assert) => {
+    assert.equal(T.weaponLine({ name: 'Beam pistol', table: 'High-tech Weapon Table' }), 'Range 10" · Shots 1 · Damage +1 · Pistol · Critical');
+    assert.equal(T.weaponLine({ name: 'Blade', table: 'Low-tech Weapon Table' }), 'Brawl · Damage +0 · Melee');
+    assert.equal(T.weaponLine({ name: 'Mystery gun', table: 'Low-tech Weapon Table' }), '');
+  });
+
   group('Table view marks');
 
   test('marks carry over for the same battle and reset for a new one', (assert) => {

@@ -1972,7 +1972,7 @@ main:focus {
 
 .member-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
+  grid-template-columns: 1fr;
   gap: 14px;
   margin: 0 0 18px;
   padding: 0;
@@ -2113,6 +2113,17 @@ main:focus {
 .item-editor {
   display: grid;
   gap: 6px;
+}
+
+.item-stats {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.item-text {
+  margin: 0;
+  font-size: 0.9rem;
 }
 
 .item-move {

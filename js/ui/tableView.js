@@ -88,6 +88,14 @@
     );
   }
 
+  function consumablesSection() {
+    if (!model.consumables || !model.consumables.length) return null;
+    return el('section', { id: 'consumables' },
+      el('h2', null, 'Consumables', el('small', { class: 'muted' }, 'shared by the whole crew')),
+      el('div', { class: 'team' }, model.consumables.map((c) => ruleLine({ name: c.name + (c.count > 1 ? ' ×' + c.count : ''), text: c.text })))
+    );
+  }
+
   function eventsSection() {
     const table = LP.rng.getTable('Battle Events Table');
     const one = (round) => {
@@ -158,6 +166,7 @@
     root.appendChild(el('main', null,
       briefSection(),
       teamSection('crew', 'Your crew', model.crew),
+      consumablesSection(),
       teamSection('enemies', 'Enemy force', model.enemies),
       eventsSection()
     ));

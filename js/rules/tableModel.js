@@ -10,6 +10,7 @@
    *     campaign, title, subtitle,
    *     brief: [{ label, lines: [string] }],
    *     crew:    Team, enemies: Team,
+   *     consumables: [{ name, count, text }],   // the crew's shared Consumables stash
    *     events: [{ round, rowId, natural }]   // already rolled on the Battle tab
    *   }
    *   Team = { heads: [string],         // stat column labels
@@ -65,10 +66,30 @@
     };
   }
 
+  /** What a non-weapon item does, from the rulebook ('' when unknown). */
+  function itemText(item) {
+    const entry = gear().items[keyOf(item.name)];
+    return entry ? entry.text : '';
+  }
+
   /** Rule lines for a non-weapon item. */
   function itemRule(item) {
-    const entry = gear().items[keyOf(item.name)];
-    return { name: item.name + (item.damaged ? ' (damaged: needs Repair)' : ''), text: entry ? entry.text : '' };
+    return { name: item.name + (item.damaged ? ' (damaged: needs Repair)' : ''), text: itemText(item) };
+  }
+
+  /** Items typed in by hand have no table; a name the weapon list knows still counts. */
+  function isWeapon(item) {
+    return LP.items.categoryOf(item.table) === 'weapon' || (!item.table && !!gear().weapons[keyOf(item.name)]);
+  }
+
+  /** A weapon's stats on one line, traits named but not explained; '' when the weapon is unknown. */
+  function weaponLine(item) {
+    const w = weaponOf(item.name, 1);
+    if (w.range === '—') return '';
+    const parts = [w.range === 'Brawl' ? 'Brawl' : 'Range ' + w.range];
+    if (w.shots !== '—') parts.push('Shots ' + w.shots);
+    if (w.damage !== '—') parts.push('Damage ' + w.damage);
+    return parts.concat(w.rules.map((r) => r.name)).join(' · ');
   }
 
   function groupByName(items) {
@@ -84,22 +105,22 @@
   /** A crew member as a unit: profile, species and equipment rules, weapons. */
   function crewUnit(campaign, member) {
     const species = R.species(member);
+    const cls = R.classOf(member);
     const p = member.profile;
     const items = groupByName(R.itemsOf(campaign, member.id));
     const weapons = [];
     const rules = [];
-    if (species) for (const text of species.rules || []) rules.push({ name: species.name, text: text });
+    rules.push(...R.abilities(member));
     for (const group of items) {
-      // Items typed in by hand have no table; a name the weapon list knows still counts.
-      const isWeapon = LP.items.categoryOf(group.item.table) === 'weapon' || (!group.item.table && !!gear().weapons[keyOf(group.name)]);
-      if (isWeapon && !group.damaged) weapons.push(weaponOf(group.name, group.count));
-      else if (isWeapon) rules.push({ name: group.name + ' (damaged: needs Repair)', text: '' });
+      const weapon = isWeapon(group.item);
+      if (weapon && !group.damaged) weapons.push(weaponOf(group.name, group.count));
+      else if (weapon) rules.push({ name: group.name + ' (damaged: needs Repair)', text: '' });
       else rules.push(itemRule(group.item));
     }
     return {
       id: 'c-' + member.id,
       name: R.nameOf(member),
-      sub: [species ? species.name : '', member.id === campaign.roster.leaderId ? 'Leader' : ''].filter(Boolean).join(' · '),
+      sub: [species ? species.name : '', cls ? cls.name : '', member.id === campaign.roster.leaderId ? 'Leader' : ''].filter(Boolean).join(' · '),
       stats: [String(p.reactions), p.speed + '"', signed(p.combat), String(p.toughness), signed(p.savvy), String(p.luck)],
       rules: rules,
       weapons: weapons
@@ -173,6 +194,10 @@
     return brief;
   }
 
+  function consumablesOf(campaign) {
+    return groupByName(R.hasCrew(campaign) ? R.consumables(campaign) : []).map((g) => ({ name: g.name, count: g.count, text: itemText(g.item) }));
+  }
+
   /** The table view's model for the current battle, or null before a battle is generated. */
   function build(campaign, battle, ctx) {
     const r = B.resolve(battle, ctx);
@@ -200,10 +225,11 @@
         units: members.map((m) => crewUnit(campaign, m)),
         note: members.length ? '' : 'No crew on the roster. Field ' + battle.options.crewFielded + ' figures.'
       },
+      consumables: consumablesOf(campaign),
       enemies: { heads: ['Panic', 'Speed', 'Combat', 'Tough', 'Save'], rules: enemyRules(r), units: units, note: '' },
       events: battle.events.map((ev) => ({ round: ev.round, rowId: ev.rowId, natural: ev.natural }))
     };
   }
 
-  LP.tableModel = { build, weaponOf, enemyWeapons, keyOf };
+  LP.tableModel = { build, weaponOf, weaponLine, isWeapon, itemText, enemyWeapons, keyOf };
 })(window.LP);

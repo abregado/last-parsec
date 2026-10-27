@@ -250,7 +250,7 @@
       const member = R.addMember(c, op.member);
       for (const item of op.items || []) {
         const copy = JSON.parse(JSON.stringify(item));
-        copy.carrierId = member.id;
+        copy.carrierId = LP.items.isConsumable(copy) ? null : member.id;
         R.roster(c).items.push(copy);
       }
     }
@@ -368,7 +368,7 @@
       const items = row ? LP.items.makeAll(fields) : [LP.items.make(Object.assign({ name: p.name }, fields))];
       return { ops: items.map((item) => ({ effect: 'item.add', item: item })) };
     },
-    describe: (c, op) => op.item.name + (op.item.damaged ? ' (damaged)' : '') + ' → ' + (op.item.carrierId ? name(c, 'member', op.item.carrierId) : 'Stash'),
+    describe: (c, op) => op.item.name + (op.item.damaged ? ' (damaged)' : '') + ' → ' + (op.item.carrierId ? name(c, 'member', op.item.carrierId) : LP.items.isConsumable(op.item) ? 'Consumables' : 'Stash'),
     apply(c, op) {
       const roster = R.roster(c);
       if (roster.items.some((i) => i.id === op.item.id)) return;
@@ -554,7 +554,7 @@
       const roster = R.roster(c);
       if (roster.items.some((i) => i.id === op.item.id)) return;
       const item = JSON.parse(JSON.stringify(op.item));
-      item.carrierId = op.to && R.getMember(c, op.to) ? op.to : null;
+      item.carrierId = op.to && R.getMember(c, op.to) && !LP.items.isConsumable(item) ? op.to : null;
       roster.items.push(item);
     }
   });

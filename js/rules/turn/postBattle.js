@@ -114,6 +114,17 @@
   /* 4.0 Battle result                                                      */
   /* ---------------------------------------------------------------------- */
 
+  /** Which of the crew's shared consumables were used up in the battle. */
+  function usedFields(ctx) {
+    const stock = hasCrew(ctx) ? R.consumables(ctx.campaign) : [];
+    if (!stock.length) return [];
+    return [{
+      key: 'consumedIds', type: 'multiselect', label: 'Consumables used', value: [],
+      options: stock.map((i) => ({ value: i.id, label: i.name, hint: i.turn ? 'from turn ' + i.turn : '' })),
+      help: 'Ticked items are deleted from the Consumables stash when you Apply.'
+    }];
+  }
+
   T.register({
     id: 'battle-result',
     step: 'post',
@@ -157,7 +168,7 @@
         { key: 'won', type: 'yesno', label: 'Did you Win (complete the objective)?', value: true, showIf: (v) => hasObjective(v.type) },
         { key: 'invasionThreat', type: 'yesno', label: 'Was the enemy an Invasion Threat?', value: !!(s && s.invasionThreat), showIf: (v) => v.type !== 'invasion' },
         { key: 'uniqueKilled', type: 'yesno', label: 'Did you kill a Unique Individual?', value: false },
-      ].concat(crewFields, [
+      ].concat(crewFields, usedFields(ctx), [
         { key: 'firstBlood', type: 'yesno', label: 'Did one of your crew inflict the first casualty?', value: true },
         { key: 'dangerPay', type: 'number', label: 'Danger Pay (credits)', min: 0, max: 10, value: 0, showIf: isType('patron') },
         { key: 'payTwice', type: 'yesno', label: 'Danger Pay lets you roll twice for pay (10+ result)?', value: false, showIf: isType('patron') },
@@ -203,10 +214,13 @@
       } else {
         items.push(['Casualties', String((input.casualties || 0) + (input.botCasualties || 0))]);
       }
+      const used = (input.consumedIds || []).map((id) => R.consumables(ctx.campaign).find((i) => i.id === id)).filter(Boolean);
+      if (used.length) items.push(['Consumables used', used.map((i) => i.name).join(', ')]);
       const hooks = LP.conditions.run(ctx.campaign, 'battleResult', input, {
         turn: { mission: input.type, casualtyIds: input.casualtyIds || [] }, rivalId: input.rivalId || null
       });
-      return { output: { headline: type + (input.heldField ? ': held the field' : ': driven off'), lines: [L.facts(items)].concat(hooks.lines), ops: hooks.ops } };
+      const ops = used.map((i) => ({ effect: 'item.remove', target: i.id })).concat(hooks.ops || []);
+      return { output: { headline: type + (input.heldField ? ': held the field' : ': driven off'), lines: [L.facts(items)].concat(hooks.lines), ops: ops } };
     },
     facts(input, output, ctx) {
       const s = battleSummary(ctx) || {};

@@ -20,22 +20,30 @@
 
 `js/ui/crewTab.js` edits `campaign.roster` (its shape is in the header of `roster.js`):
 - **Resources:** credits, story points, Rumors, fuel and ship parts, plus free `counters`.
-- **Member cards:**
+- **Member cards** (one per row):
   - portrait: drop or click an image; stored as a 240×480 JPEG data URL;
-  - name and leader;
+  - name and leader, with the species and Class under the name;
   - status, and Sick Bay turns;
   - stats and XP as plain text boxes (a stat's tooltip shows what the member joined with; `baseProfile` never changes);
+  - Abilities: the species rules and the Class bonus (`roster.abilities`);
   - carried items and notes.
 - **Conditions:** badges on member cards and in a Conditions panel (crew, ship, campaign and current-planet conditions), each with a Remove button.
 - **Recruits for events:** when an event offers a recruit, the Characters tab shows that one character with Accept, Reroll and Decline (`js/rules/recruit.js`).
 - **Stash:** with an Add item form.
+- **Consumables:** a separate stash (`roster.consumables`) for the whole crew, drawn under the Stash.
 - **Ship and crew info.**
 
 `hasCrew(campaign)` is true once a crew exists. From then on, turns and battles use named members (see `campaign-turn.md`).
 
 ## Items
 
-`js/rules/items.js` holds the item shape and `ITEM_TABLES` (leaf tables only; the Loot routing tables are not items). Item rows on the Crew tab are compact (name, type pip, Edit). Edit opens move, damaged, source text and delete. A damaged item's name is struck through.
+`js/rules/items.js` holds the item shape and `ITEM_TABLES` (leaf tables only; the Loot routing tables are not items). Item rows on the Crew tab are compact: name, type pip and Details. A weapon shows its stats on one line, with its traits named but not explained (`tableModel.weaponLine`). Stash items show the move dropdown on the row. Details opens the item's description (gear, gadgets and the rest, from `gear.js`), damaged, source text and delete. A damaged item's name is struck through.
+
+**Consumables** are shared by the crew in a battle, so they are never carried:
+- `items.make` sets `carrierId` to null for them, wherever they come from (rolls, events, recruits, hand-added), and `moveItem` refuses to move them.
+- They are not in `itemsOf(campaign, null)` (the Stash); use `consumables()`.
+- Their rows have a Delete button, even collapsed.
+- Post-Battle 4.0 asks which were used and removes them on Apply.
 
 Items gained in a turn are added by the engine (`LP.roster.syncStageItems`). Each carries:
 - `source` text, such as "Gained on Ruhr during a trade roll by Ava on turn 11.";

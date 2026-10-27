@@ -635,7 +635,7 @@
       if (!hasCrew(ctx)) return { output: { headline: 'Equipment assigned', lines: [] } };
       const names = (list) => list.length ? list.map((i) => i.name + (i.damaged ? ' (damaged)' : '')).join(', ') : 'Nothing';
       const items = R.members(ctx.campaign).map((m) => [R.nameOf(m), names(R.itemsOf(ctx.campaign, m.id))]);
-      items.push(['Stash', names(R.itemsOf(ctx.campaign, null))]);
+      items.push(['Stash', names(R.itemsOf(ctx.campaign, null))], ['Consumables', names(R.consumables(ctx.campaign))]);
       return { output: { headline: 'Equipment assigned', lines: [L.facts(items)] } };
     }
   });

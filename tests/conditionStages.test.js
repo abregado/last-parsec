@@ -201,6 +201,21 @@
     assert.equal(def.validate(Object.assign({}, input, { type: 'invasion' }), ctx), null, 'except in an Invasion battle');
   });
 
+  test('Battle result: asks which consumables were used and removes them on Apply', (assert) => {
+    const c = withCrew(campaign(3));
+    const def = stage('battle-result');
+    assert.ok(!def.fields(ctxFor(c, {})).filter(Boolean).some((f) => f.key === 'consumedIds'), 'no question without consumables');
+    const pills = R.addItem(c, { table: 'Consumables Subtable', rowId: 'booster-pills' });
+    const serum = R.addItem(c, { table: 'Consumables Subtable', rowId: 'combat-serum' });
+    const ctx = ctxFor(c, {});
+    const field = def.fields(ctx).filter(Boolean).find((f) => f.key === 'consumedIds');
+    assert.deepEqual(field.options.map((o) => o.value), [pills.id, serum.id]);
+    const input = { type: 'opportunity', category: 'criminal-elements', heldField: true, won: true, participantIds: ['bren'], casualtyIds: [], consumedIds: [serum.id] };
+    const result = def.resolve(input, ctx);
+    assert.deepEqual(result.output.ops.filter((o) => o.effect === 'item.remove').map((o) => o.target), [serum.id]);
+    assert.ok(/Combat Serum/.test(JSON.stringify(result.output.lines)));
+  });
+
   test('Battle result hooks: a small job pays on a Yes, and Promising lead pays for Opportunity missions', (assert) => {
     const c = withCrew(campaign(3));
     const job = add(c, 'small-job', { from: 'now' });

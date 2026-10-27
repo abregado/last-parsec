@@ -41,7 +41,7 @@ When `LP.roster.hasCrew()` is true, stages use the roster instead of typed count
 - **Upkeep:** Sick Bay is picked by name, and the form shows crew credits and the coming debt interest.
 - **Crew tasks:** each member gets a task (the `assign` field). Savvy rolls use that member's Savvy. Known Patrons and Rivals come from the current planet.
 - **Travel events and Character Events:** pick named crew.
-- **Battle result:** participants and casualties are picked by name. Injuries roll per member (Bots and Soulless use the Bot Injury Table), and XP is listed per member.
+- **Battle result:** participants and casualties are picked by name, and so are the Consumables used (they are deleted on Apply). Injuries roll per member (Bots and Soulless use the Bot Injury Table), and XP is listed per member.
 
 Stages that aren't ledger stages never apply XP, injuries, credits or story points; they appear in the result card's to-do list for the player to change on the Crew tab.
 

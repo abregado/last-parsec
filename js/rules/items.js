@@ -3,14 +3,16 @@
 
   /*
    * Items: one piece of equipment rolled on an item table, kept on the Crew
-   * tab either in the Stash or carried by a crew member.
+   * tab either in the Stash or carried by a crew member. Consumables are the
+   * exception: anyone can use them in a battle, so they live in their own
+   * stash and are never carried.
    *
    *   Item = {
    *     id, table, rowId, name,
    *     damaged: bool,            // needs Repair before it can be used
    *     source: string,           // "Gained on Ruhr during a trade roll by Ava on turn 11"
    *     turn: number | null,      // campaign turn it was gained on (0 = crew creation)
-   *     carrierId: string | null, // crew member carrying it; null = Stash
+   *     carrierId: string | null, // crew member carrying it; null = Stash (always null for a consumable)
    *     tag: string | null,       // set when a turn stage added it, so Undo can take it back
    *     key: string | null        // which result line it came from (with tag)
    *   }
@@ -63,6 +65,15 @@
     return c ? c.label : 'Item';
   }
 
+  /** Consumables are shared by the whole crew: from a Consumables row, or (typed by hand) named in the gear data. */
+  function isConsumable(item) {
+    if (!item) return false;
+    if (item.table) return ITEM_TABLES[item.table] === 'consumable';
+    const gear = LP.data && LP.data.gear;
+    const entry = gear && gear.items ? gear.items[String(item.name || '').toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, '')] : null;
+    return !!entry && entry.kind === 'Consumable';
+  }
+
   function rowName(tableName, rowId) {
     const table = LP.rng.getTable(tableName);
     const row = table.rows.find((r) => r.id === rowId);
@@ -81,7 +92,7 @@
   /** A new item. fields: { table, rowId, name?, damaged?, source?, turn?, carrierId?, tag?, key? } */
   function make(fields) {
     const f = fields || {};
-    return {
+    const item = {
       id: newId(),
       table: f.table || null,
       rowId: f.rowId || null,
@@ -93,6 +104,8 @@
       tag: f.tag || null,
       key: f.key || null
     };
+    if (isConsumable(item)) item.carrierId = null;
+    return item;
   }
 
   /** The items a row gives, made with the same fields (see expandRow). */
@@ -149,6 +162,7 @@
     isItemTable,
     categoryOf,
     categoryLabel,
+    isConsumable,
     rowName,
     make,
     makeAll,

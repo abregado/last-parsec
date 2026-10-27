@@ -8,7 +8,7 @@
    *
    *   campaign.roster = {
    *     members: [Member],
-   *     items: [Item],              // LP.items; carrierId null = Stash
+   *     items: [Item],              // LP.items; carrierId null = Stash (consumables: the Consumables stash)
    *     ship: Ship | null,
    *     leaderId: string | null,
    *     metThrough, characterizedAs: string | null,   // labels from crew creation
@@ -226,6 +226,27 @@
     campaign.conditions = (campaign.conditions || []).filter((c) => !(c.scope === 'character' && c.targetId === id));
   }
 
+  /** The member's Class: { name, effect }, or null. effect is the Class Table's bonus text ('' for none). */
+  function classOf(member) {
+    const origin = member && member.origins.find((o) => o.label === 'Class');
+    if (!origin) return null;
+    const s = species(member);
+    const rowId = origin.row && s && s.classMap && s.classMap[origin.row] ? s.classMap[origin.row] : origin.row;
+    const row = origin.table && rowId ? LP.character.findRow(origin.table, rowId) : null;
+    if (!row) return { name: origin.value, effect: '' };
+    const effect = String(row.effect || '').trim();
+    return { name: LP.character.rowLabel(origin.table, row), effect: effect === '-' ? '' : effect };
+  }
+
+  /** Species and Class abilities to show with a member: [{ name, text }]. */
+  function abilities(member) {
+    const s = species(member);
+    const out = (s && s.rules || []).map((text) => ({ name: s.name, text: text }));
+    const c = classOf(member);
+    if (c && c.effect) out.push({ name: c.name, text: c.effect });
+    return out;
+  }
+
   /* ---------------------------------------------------------------------- */
   /* Turn helpers                                                           */
   /* ---------------------------------------------------------------------- */
@@ -247,8 +268,14 @@
   /* Items                                                                  */
   /* ---------------------------------------------------------------------- */
 
+  /** What a member carries, or (null) the Stash. Consumables are not in the Stash: see consumables(). */
   function itemsOf(campaign, carrierId) {
-    return roster(campaign).items.filter((i) => (i.carrierId || null) === (carrierId || null));
+    return roster(campaign).items.filter((i) => (i.carrierId || null) === (carrierId || null) && !LP.items.isConsumable(i));
+  }
+
+  /** The crew's shared consumables. */
+  function consumables(campaign) {
+    return roster(campaign).items.filter(LP.items.isConsumable);
   }
 
   function addItem(campaign, fields) {
@@ -264,7 +291,7 @@
 
   function moveItem(campaign, id, carrierId) {
     const item = roster(campaign).items.find((i) => i.id === id);
-    if (!item) return false;
+    if (!item || LP.items.isConsumable(item)) return false;
     item.carrierId = carrierId && getMember(campaign, carrierId) ? carrierId : null;
     return true;
   }
@@ -428,7 +455,10 @@
     who,
     addMember,
     removeMember,
+    classOf,
+    abilities,
     itemsOf,
+    consumables,
     addItem,
     removeItem,
     moveItem,
